@@ -24,7 +24,7 @@
     },
     "include": [
       "./src/**/*", "index.js"
-    ],
+, "test"    ],
     "exclude": [
       "node_modules",
       "tests"

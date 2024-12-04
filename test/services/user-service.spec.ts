@@ -1,7 +1,8 @@
-import { UserDto } from "../../domain/dto/user-dto";
-import { User } from "../../domain/entities/user";
-import IUserRepository from "../../domain/repositories/user-repository";
-import { UserService } from "../../services/user-service";
+import { UserDto } from "../../src/domain/dto/user-dto";
+import { User } from "../../src/domain/entities/user";
+import IUserRepository from "../../src/domain/repositories/user-repository";
+import UserService from "../../src/services/user-service";
+
 
 describe('UserService', () => {
     let userService: UserService;

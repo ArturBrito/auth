@@ -49,4 +49,14 @@ export default class UserService implements IUserService {
             throw new Error('Error creating user');
         }
     }
+
+    async getUserByEmail(email: string): Promise<UserDto | null> {
+        const user = await this.userRepository.getUserByEmail(email);
+
+        if (!user) {
+            return null;
+        }
+
+        return UserMapper.toDto(user);
+    }
 }

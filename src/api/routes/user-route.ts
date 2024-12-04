@@ -12,5 +12,5 @@ export default (app: Router) => {
     app.use('/user', router);
 
     router.post('', (req, res, next) => ctrl.createUser(req, res, next));
-
+    router.get('/:email', (req, res, next) => ctrl.getUserByEmail(req, res, next));
 }
