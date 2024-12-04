@@ -6,8 +6,7 @@ export default class UserMapper {
         return {
             uid: user.uid,
             email: user.email,
-            role: user.role,
-            password: user.password
+            role: user.role
         };
     }
     static toEntity(userDto: UserDto): User {
