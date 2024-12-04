@@ -1,13 +1,13 @@
+import { injectable } from "inversify";
 import IPasswordManager from "../../services/contracts/password-manager";
 
 import bcrypt from 'bcrypt';
 
-export class BcryptAdapter implements IPasswordManager {
-    private readonly saltRounds: number;
+@injectable()
+export default class BcryptAdapter implements IPasswordManager {
+    private readonly saltRounds = 10;
 
-    constructor(saltRounds: number) {
-        this.saltRounds = saltRounds;
-    }
+    constructor() { }
 
     async hashPassword(password: string): Promise<string> {
         try {

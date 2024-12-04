@@ -1,7 +1,9 @@
 import { User } from "../../../domain/entities/user";
 import IUserRepository from "../../../domain/repositories/user-repository";
+import { injectable } from "inversify";
 
-export class UserInmemoryRepository implements IUserRepository{
+@injectable()
+export default class UserInmemoryRepository implements IUserRepository{
     private users: User[] = [];
     
     async createUser(user: User): Promise<User> {
