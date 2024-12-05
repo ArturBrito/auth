@@ -6,7 +6,7 @@ import IEncrypter from "../../src/services/contracts/encrypter-contract";
 import IPasswordManager from "../../src/services/contracts/password-manager";
 import IRefreshTokensStore from "../../src/services/contracts/refresh-tokens-store";
 
-describe('AuthService', () => {
+describe('AuthService Unit Tests', () => {
     let authService: IAuthService;
     let mockUserRepository: jest.Mocked<IUserRepository>;
     let mockEncrypter: jest.Mocked<IEncrypter>;

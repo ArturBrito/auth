@@ -5,7 +5,7 @@ import IPasswordManager from "../../src/services/contracts/password-manager";
 import UserService from "../../src/services/user-service";
 
 
-describe('UserService', () => {
+describe('UserService Unit Tests', () => {
     let userService: UserService;
     let mockUserRepository: jest.Mocked<IUserRepository>;
     let mockPasswordManager: jest.Mocked<IPasswordManager>;

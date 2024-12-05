@@ -161,13 +161,6 @@ describe('UserController Integration Tests', () => {
     userService = new UserService(userRepository, passwordManager);
     userController = new UserController(userService);
 
-    /*beforeEach(() => {
-        userRepository = new UserInmemoryRepository();
-        passwordManager = new BcryptAdapter();
-        userService = new UserService(userRepository, passwordManager);
-        userController = new UserController(userService);
-    });*/
-
 
     describe('createUser', () => {
         it('should create a new user', async () => {

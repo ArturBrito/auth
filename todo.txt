@@ -6,7 +6,5 @@
 Password minimum requirements
 Send email with verification
 Implement mongodb
-Test service with mongo
-Test controller
 Middleware de auth and authz
 Set the roles dynamic
