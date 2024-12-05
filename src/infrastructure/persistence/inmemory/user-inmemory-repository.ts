@@ -4,6 +4,7 @@ import { injectable } from "inversify";
 
 @injectable()
 export default class UserInmemoryRepository implements IUserRepository{
+    
     private users: User[] = [];
     
     async createUser(user: User): Promise<User> {

@@ -19,7 +19,7 @@ export default class AuthController implements IAuthController {
         try {
             const { email, password } = req.body;
             const tokens = await this.authService.signIn(email, password);
-            res.status(200).json({ tokens });
+            res.status(200).json(tokens);
         } catch (error) {
             throw error;
         }

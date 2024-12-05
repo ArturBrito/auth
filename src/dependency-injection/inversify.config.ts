@@ -12,13 +12,16 @@ import IAuthService from "../services/contracts/auth-service-contract";
 import AuthService from "../services/auth-service";
 import AuthController from "../controllers/auth-controller";
 import IAuthController from "../controllers/contracts/auth-controller-contract";
+import IEncrypter from "../services/contracts/encrypter-contract";
+import JwtAdapter from "../infrastructure/encrypt/jwt-adapter";
 
 const myContainer = new Container();
 myContainer.bind<IUserController>(TYPES.IUserController).to(UserController);
 myContainer.bind<IUserService>(TYPES.IUserService).to(UserService);
-myContainer.bind<IUserRepository>(TYPES.IUserRepository).to(UserInmemoryRepository);
+myContainer.bind<IUserRepository>(TYPES.IUserRepository).to(UserInmemoryRepository).inSingletonScope();
 myContainer.bind<IPasswordManager>(TYPES.IPasswordManager).to(BcryptAdapter);
 myContainer.bind<IAuthService>(TYPES.IAuthService).to(AuthService);
 myContainer.bind<IAuthController>(TYPES.IAuthController).to(AuthController);
+myContainer.bind<IEncrypter>(TYPES.IEncrypter).to(JwtAdapter);
 
 export { myContainer };

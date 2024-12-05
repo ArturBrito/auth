@@ -5,6 +5,7 @@ const TYPES = {
     IPasswordManager: Symbol.for('IPasswordManager'),
     IAuthController: Symbol.for('IAuthController'),
     IAuthService: Symbol.for('IAuthService'),
+    IEncrypter: Symbol.for('IEncrypter')
 };
 
 export { TYPES };

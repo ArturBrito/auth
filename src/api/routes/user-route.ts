@@ -5,7 +5,7 @@ import { TYPES } from '../../dependency-injection/types';
 import { body } from 'express-validator';
 import { validateRequest } from '../middlewares/validate-request';
 
-const router = Router()
+const router = Router();
 
 export default (app: Router) => {
     console.log('User route loaded');

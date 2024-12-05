@@ -3,6 +3,8 @@
 ✅ - Implementar erros todos iguais
 ✅ - Apanhar erros nao tratados
 ✅ - Endpoint not found error
+Password minimum requirements
+Send email with verification
 Implement mongodb
 Test service with mongo
 Test controller
