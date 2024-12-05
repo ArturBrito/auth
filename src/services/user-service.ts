@@ -22,7 +22,6 @@ export default class UserService implements IUserService {
     }
 
     async createUser(userDto: UserDto): Promise<UserDto> {
-        
         // check if the user already exists
         const userAlreadyExists = await this.userRepository.getUserByEmail(userDto.email).catch(() => {
             throw new DatabaseConnectionError();
@@ -32,24 +31,21 @@ export default class UserService implements IUserService {
             throw new UserAlreadyRegisteredError();
         }
 
-        try {
-            // hash the password
-            const hashedPassword = await this.passwordManager.hashPassword(userDto.password);
+        // hash the password
+        const hashedPassword = await this.passwordManager.hashPassword(userDto.password);
 
-            // create the user
-            const user = User.create({
-                email: userDto.email,
-                password: hashedPassword,
-                role: userDto.role
-            });
+        // create the user
+        const user = User.create({
+            email: userDto.email,
+            password: hashedPassword,
+            role: userDto.role
+        });
 
-            // save user
-            const newUser = await this.userRepository.createUser(user);
+        // save user
+        const newUser = await this.userRepository.createUser(user);
 
-            return UserMapper.toDto(newUser);
-        } catch (error) {
-            throw new Error('Error creating user');
-        }
+        return UserMapper.toDto(newUser);
+
     }
 
     async getUserByEmail(email: string): Promise<UserDto | null> {

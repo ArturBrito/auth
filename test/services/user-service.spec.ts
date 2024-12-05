@@ -1,12 +1,14 @@
 import { UserDto } from "../../src/domain/dto/user-dto";
 import { User } from "../../src/domain/entities/user";
 import IUserRepository from "../../src/domain/repositories/user-repository";
+import IPasswordManager from "../../src/services/contracts/password-manager";
 import UserService from "../../src/services/user-service";
 
 
 describe('UserService', () => {
     let userService: UserService;
     let mockUserRepository: jest.Mocked<IUserRepository>;
+    let mockPasswordManager: jest.Mocked<IPasswordManager>;
 
     const validUserData: UserDto = {
         email: 'artur.brito95@gmail.com',
@@ -23,10 +25,12 @@ describe('UserService', () => {
             deleteUser: jest.fn()
         }
 
-        userService = new UserService(mockUserRepository, {
+        mockPasswordManager = {
             hashPassword: jest.fn(),
             comparePasswords: jest.fn()
-        });
+        }
+
+        userService = new UserService(mockUserRepository, mockPasswordManager);
     });
 
     describe('createUser', () => {
@@ -38,6 +42,7 @@ describe('UserService', () => {
                 password: 'hashedPassword',
                 role: validUserData.role
             }));
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
 
             const user = await userService.createUser(validUserData);
 
@@ -82,8 +87,26 @@ describe('UserService', () => {
                 await userService.createUser(validUserData);
             } catch (error) {
                 expect(error).toBeInstanceOf(Error);
-                expect(error.message).toBe('Error creating user');
+                expect(error.message).toBe('Invalid user');
             }
         });
+
+        it('should throw an error if the email is invalid', async () => {
+            const invalidUserData = {
+                email: 'invalidEmail',
+                password: '123456',
+                role: 'user'
+            }
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(null);
+
+            try {
+                await userService.createUser(invalidUserData);
+            } catch (error) {
+                expect(error).toBeInstanceOf(Error);
+                expect(error.message).toBe('Invalid user');
+                expect(error.reason).toBe('Password is null or undefined');
+            }
+        })
     });
 });

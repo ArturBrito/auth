@@ -1,4 +1,6 @@
 import { v4 as uuid } from "uuid";
+import { Guard } from "../../helpers/Guard";
+import { InvalidUserError } from "../../errors/invalid-user-error";
 
 interface UserProps {
     uid?: string;
@@ -51,6 +53,23 @@ export class User {
     }
 
     public static create(props: UserProps): User {
+        const guardedNullProps = [
+            { argument: props.email, argumentName: 'Email' },
+            { argument: props.password, argumentName: 'Password' }
+        ]
+
+        const guardNullProps = Guard.againstNullOrUndefinedBulk(guardedNullProps);
+
+        if(!guardNullProps.succeeded) {
+            throw new InvalidUserError(guardNullProps.message);
+        }
+
+        const guardEmail = Guard.isEmail(props.email, 'Email');
+        
+        if(!guardEmail.succeeded) {
+            throw new InvalidUserError(guardEmail.message);
+        }
+        
         return new User(props);
     }
    
