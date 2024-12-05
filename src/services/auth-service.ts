@@ -1,4 +1,4 @@
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { AuthDto } from "../domain/dto/auth-dto";
 import IUserRepository from "../domain/repositories/user-repository";
 import IAuthService from "./contracts/auth-service-contract";
@@ -7,20 +7,25 @@ import { TYPES } from "../dependency-injection/types";
 import { InactiveUserError } from "../errors/inactive-user-error";
 import IPasswordManager from "./contracts/password-manager";
 import { BadRequestError } from "../errors/bad-request-error";
+import IRefreshTokensStore from "./contracts/refresh-tokens-store";
 
+@injectable()
 export default class AuthService implements IAuthService {
     private userRepository: IUserRepository;
     private encrypter: IEncrypter;
     private passwordManager: IPasswordManager;
+    private refreshTokenStore: IRefreshTokensStore;
 
     constructor(
         @inject(TYPES.IUserRepository) userRepository: IUserRepository,
         @inject(TYPES.IEncrypter) encrypter: IEncrypter,
-        @inject(TYPES.IPasswordManager) passwordManager: IPasswordManager
+        @inject(TYPES.IPasswordManager) passwordManager: IPasswordManager,
+        @inject(TYPES.IRefreshTokensStore) refreshTokenStore: IRefreshTokensStore
     ) {
         this.userRepository = userRepository;
         this.encrypter = encrypter;
         this.passwordManager = passwordManager;
+        this.refreshTokenStore = refreshTokenStore;
     }
 
     async signIn(email: string, password: string): Promise<AuthDto> {
@@ -46,6 +51,29 @@ export default class AuthService implements IAuthService {
             role: user.role 
         });
 
+        await this.refreshTokenStore.saveRefreshToken(tokens.refreshToken);
+
         return tokens;
+    }
+
+    async refreshToken(refreshToken: string): Promise<AuthDto> {
+        const token = await this.refreshTokenStore.getRefreshToken(refreshToken);
+
+        if(!token) {
+            throw new BadRequestError('Invalid refresh token');
+        }
+
+        const payload = await this.encrypter.decrypt(refreshToken);
+
+        const tokens = await this.encrypter.encrypt(payload);
+
+        await this.refreshTokenStore.deleteRefreshToken(refreshToken);
+        await this.refreshTokenStore.saveRefreshToken(tokens.refreshToken);
+
+        return tokens;
+    }
+
+    async signOut(refreshToken: string): Promise<void> {
+        await this.refreshTokenStore.deleteRefreshToken(refreshToken);
     }
 }

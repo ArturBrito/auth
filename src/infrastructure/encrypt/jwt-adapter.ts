@@ -3,11 +3,12 @@ import IEncrypter from "../../services/contracts/encrypter-contract";
 import fs from "fs";
 import path from "path";
 import jwt, { SignOptions, VerifyOptions } from 'jsonwebtoken';
+import { injectable } from "inversify";
 
 const privateKey = fs.readFileSync(path.join(__dirname, '../../../rs256.rsa'), 'utf8');
 const publicKey = fs.readFileSync(path.join(__dirname, '../../../rs256.rsa.pub'), 'utf8');
 
-
+@injectable()
 export default class JwtAdapter implements IEncrypter {
     async encrypt(payload: any): Promise<AuthDto> {
         const signInOptions: SignOptions = {

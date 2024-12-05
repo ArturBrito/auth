@@ -14,6 +14,8 @@ import AuthController from "../controllers/auth-controller";
 import IAuthController from "../controllers/contracts/auth-controller-contract";
 import IEncrypter from "../services/contracts/encrypter-contract";
 import JwtAdapter from "../infrastructure/encrypt/jwt-adapter";
+import IRefreshTokensStore from "../services/contracts/refresh-tokens-store";
+import InMemoryRefreshToken from "../infrastructure/refresh-tokens/inmemory-refresh-tokens";
 
 const myContainer = new Container();
 myContainer.bind<IUserController>(TYPES.IUserController).to(UserController);
@@ -23,5 +25,6 @@ myContainer.bind<IPasswordManager>(TYPES.IPasswordManager).to(BcryptAdapter);
 myContainer.bind<IAuthService>(TYPES.IAuthService).to(AuthService);
 myContainer.bind<IAuthController>(TYPES.IAuthController).to(AuthController);
 myContainer.bind<IEncrypter>(TYPES.IEncrypter).to(JwtAdapter);
+myContainer.bind<IRefreshTokensStore>(TYPES.IRefreshTokensStore).to(InMemoryRefreshToken).inSingletonScope();
 
 export { myContainer };
