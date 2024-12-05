@@ -6,6 +6,8 @@ import UserMapper from "../domain/mapper/user-mapper";
 import IUserService from "./contracts/user-service-contract";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../dependency-injection/types";
+import { DatabaseConnectionError } from "../errors/database-connection-error";
+import { UserAlreadyRegisteredError } from "../errors/user-already-registered";
 
 @injectable()
 export default class UserService implements IUserService {
@@ -20,14 +22,14 @@ export default class UserService implements IUserService {
     }
 
     async createUser(userDto: UserDto): Promise<UserDto> {
-
+        
         // check if the user already exists
         const userAlreadyExists = await this.userRepository.getUserByEmail(userDto.email).catch(() => {
-            throw new Error('Error createing user');
+            throw new DatabaseConnectionError();
         });
 
         if (userAlreadyExists) {
-            throw new Error('User already exists');
+            throw new UserAlreadyRegisteredError();
         }
 
         try {
@@ -54,7 +56,7 @@ export default class UserService implements IUserService {
         const user = await this.userRepository.getUserByEmail(email);
 
         if (!user) {
-            return null;
+            return;
         }
 
         return UserMapper.toDto(user);

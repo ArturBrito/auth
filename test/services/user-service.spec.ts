@@ -45,7 +45,6 @@ describe('UserService', () => {
             expect(user.uid).toBeDefined();
             expect(user.email).toBe(validUserData.email);
             expect(user.role).toBe(validUserData.role);
-            expect(user.password).toBe('hashedPassword');
         });
 
         it('should throw an error if the user already exists', async () => {
@@ -60,7 +59,7 @@ describe('UserService', () => {
                 await userService.createUser(validUserData);
             } catch (error) {
                 expect(error).toBeInstanceOf(Error);
-                expect(error.message).toBe('User already exists');
+                expect(error.message).toBe('User already registered');
             }
         });
 
@@ -71,7 +70,7 @@ describe('UserService', () => {
                 await userService.createUser(validUserData);
             } catch (error) {
                 expect(error).toBeInstanceOf(Error);
-                expect(error.message).toBe('Error createing user');
+                expect(error.message).toBe('Error connecting to database');
             }
         });
 

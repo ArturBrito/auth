@@ -19,7 +19,7 @@ export default class UserController implements IUserController {
             const user = await this.userService.getUserByEmail(email);
             res.status(200).json(user);
         } catch (error) {
-            next(error);
+            throw error;
         }
     }
 
@@ -29,7 +29,7 @@ export default class UserController implements IUserController {
             const newUser = await this.userService.createUser(userDto);
             res.status(201).json(newUser);
         } catch (error) {
-            next(error);
+            throw error;
         }
     }
 }
