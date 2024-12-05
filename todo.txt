@@ -1,9 +1,10 @@
-Validate email and password on domain
+✅ - Validate email and password on domain
 ✅ - Validate email and password on router input
 ✅ - Implementar erros todos iguais
-Apaganhar erros nao tratados
+✅ - Apanhar erros nao tratados
 ✅ - Endpoint not found error
 Implement mongodb
 Test service with mongo
 Test controller
 Middleware de auth and authz
+Set the roles dynamic
