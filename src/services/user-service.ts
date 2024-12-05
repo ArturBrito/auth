@@ -8,6 +8,7 @@ import { inject, injectable } from "inversify";
 import { TYPES } from "../dependency-injection/types";
 import { DatabaseConnectionError } from "../errors/database-connection-error";
 import { UserAlreadyRegisteredError } from "../errors/user-already-registered";
+import { NotFoundError } from "../errors/not-found-error";
 
 @injectable()
 export default class UserService implements IUserService {
@@ -52,7 +53,7 @@ export default class UserService implements IUserService {
         const user = await this.userRepository.getUserByEmail(email);
 
         if (!user) {
-            return;
+            throw new NotFoundError();
         }
 
         return UserMapper.toDto(user);
