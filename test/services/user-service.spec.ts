@@ -3,12 +3,13 @@ import { User } from "../../src/domain/entities/user";
 import IUserRepository from "../../src/domain/repositories/user-repository";
 import IPasswordManager from "../../src/services/contracts/password-manager";
 import UserService from "../../src/services/user-service";
-
+import { EventEmitter } from 'events';
 
 describe('UserService Unit Tests', () => {
     let userService: UserService;
     let mockUserRepository: jest.Mocked<IUserRepository>;
     let mockPasswordManager: jest.Mocked<IPasswordManager>;
+    let eventEmitter: EventEmitter;
 
     const validUserData: UserDto = {
         email: 'artur.brito95@gmail.com',
@@ -29,8 +30,10 @@ describe('UserService Unit Tests', () => {
             hashPassword: jest.fn(),
             comparePasswords: jest.fn()
         }
+        
+        eventEmitter = new EventEmitter();
 
-        userService = new UserService(mockUserRepository, mockPasswordManager);
+        userService = new UserService(mockUserRepository, mockPasswordManager, eventEmitter);
     });
 
     describe('createUser', () => {
@@ -107,6 +110,23 @@ describe('UserService Unit Tests', () => {
                 expect(error.message).toBe('Invalid user');
                 expect(error.reason).toBe('Password is null or undefined');
             }
-        })
+        });
+
+        it('should emit an event when a user is created', async () => {
+            mockUserRepository.getUserByEmail.mockResolvedValue(null);
+            mockUserRepository.createUser.mockResolvedValue(User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role
+            }));
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+
+            const eventEmitterSpy = jest.spyOn(eventEmitter, 'emit');
+
+            await userService.createUser(validUserData);
+
+            expect(eventEmitterSpy).toHaveBeenCalledWith('userCreated', expect.any(Object));
+        });
     });
 });

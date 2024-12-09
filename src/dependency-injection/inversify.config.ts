@@ -16,6 +16,7 @@ import IEncrypter from "../services/contracts/encrypter-contract";
 import JwtAdapter from "../infrastructure/encrypt/jwt-adapter";
 import IRefreshTokensStore from "../services/contracts/refresh-tokens-store";
 import InMemoryRefreshToken from "../infrastructure/refresh-tokens/inmemory-refresh-tokens";
+import { EventEmitter } from "events";
 
 const myContainer = new Container();
 myContainer.bind<IUserController>(TYPES.IUserController).to(UserController);
@@ -26,5 +27,6 @@ myContainer.bind<IAuthService>(TYPES.IAuthService).to(AuthService);
 myContainer.bind<IAuthController>(TYPES.IAuthController).to(AuthController);
 myContainer.bind<IEncrypter>(TYPES.IEncrypter).to(JwtAdapter);
 myContainer.bind<IRefreshTokensStore>(TYPES.IRefreshTokensStore).to(InMemoryRefreshToken).inSingletonScope();
+myContainer.bind(TYPES.EventEmmiter).toConstantValue(new EventEmitter());
 
 export { myContainer };

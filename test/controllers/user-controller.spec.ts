@@ -6,6 +6,7 @@ import UserInmemoryRepository from "../../src/infrastructure/persistence/inmemor
 import IPasswordManager from "../../src/services/contracts/password-manager";
 import IUserService from "../../src/services/contracts/user-service-contract";
 import UserService from "../../src/services/user-service";
+import { EventEmitter } from 'events';
 
 describe('UserController Unit Tests', () => {
     let userController: UserController;
@@ -155,10 +156,12 @@ describe('UserController Integration Tests', () => {
     let userService: IUserService;
     let userRepository: IUserRepository;
     let passwordManager: IPasswordManager;
+    let eventEmitter: EventEmitter;
 
     userRepository = new UserInmemoryRepository();
     passwordManager = new BcryptAdapter();
-    userService = new UserService(userRepository, passwordManager);
+    eventEmitter = new EventEmitter();
+    userService = new UserService(userRepository, passwordManager, eventEmitter);
     userController = new UserController(userService);
 
 
@@ -217,6 +220,7 @@ describe('UserController Integration Tests', () => {
 
 
         });
+        
     });
 
 

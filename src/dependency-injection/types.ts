@@ -6,7 +6,8 @@ const TYPES = {
     IAuthController: Symbol.for('IAuthController'),
     IAuthService: Symbol.for('IAuthService'),
     IEncrypter: Symbol.for('IEncrypter'),
-    IRefreshTokensStore: Symbol.for('IRefreshTokensStore')
+    IRefreshTokensStore: Symbol.for('IRefreshTokensStore'),
+    EventEmmiter: Symbol.for('EventEmmiter')
 };
 
 export { TYPES };

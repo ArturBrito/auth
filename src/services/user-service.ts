@@ -9,17 +9,21 @@ import { TYPES } from "../dependency-injection/types";
 import { DatabaseConnectionError } from "../errors/database-connection-error";
 import { UserAlreadyRegisteredError } from "../errors/user-already-registered";
 import { NotFoundError } from "../errors/not-found-error";
+import { EventEmitter } from "events";
 
 @injectable()
 export default class UserService implements IUserService {
     private userRepository: IUserRepository;
     private passwordManager: IPasswordManager;
+    private eventEmitter: EventEmitter;
     constructor(
         @inject(TYPES.IUserRepository) userRepository: IUserRepository,
-        @inject(TYPES.IPasswordManager) passwordManager: IPasswordManager
+        @inject(TYPES.IPasswordManager) passwordManager: IPasswordManager,
+        @inject(TYPES.EventEmmiter) eventEmitter: EventEmitter
     ) {
         this.userRepository = userRepository;
         this.passwordManager = passwordManager;
+        this.eventEmitter = eventEmitter;
     }
 
     async createUser(userDto: UserDto): Promise<UserDto> {
@@ -44,6 +48,9 @@ export default class UserService implements IUserService {
 
         // save user
         const newUser = await this.userRepository.createUser(user);
+
+        // emit event
+        this.eventEmitter.emit('userCreated', newUser);
 
         return UserMapper.toDto(newUser);
 
