@@ -12,6 +12,7 @@ export default class SetupDbMongo implements ISetupDb {
             console.log('Mongo database connected');
         } catch (error) {
             console.error('Error setting up mongo database');
+            throw new Error('Error setting up mongo database');
         }
 
     }

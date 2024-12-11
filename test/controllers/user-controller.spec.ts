@@ -395,7 +395,7 @@ describe('UserController Integration Tests', () => {
             const req = {
                 params: {
                     email: 'artur.brito95@gmail.com',
-                    activationCode: user.activationCode
+                    activationCode: user!.activationCode
                 }
             };
 

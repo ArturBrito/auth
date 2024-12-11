@@ -1,3 +1,4 @@
+import { IUserPersistence } from "../../data-model/user.datamodel";
 import { UserDto } from "../dto/user-dto";
 import { Role, User } from "../entities/user";
 
@@ -6,15 +7,19 @@ export default class UserMapper {
         return {
             uid: user.uid,
             email: user.email,
-            role: user.role
+            role: user.role,
+            activationCode: user.activationCode,
         };
     }
-    static toEntity(userDto: UserDto): User {
+    static toEntity(userPersistence: IUserPersistence): User {
         const user = User.create({
-            uid: userDto.uid,
-            email: userDto.email,
-            role: userDto.role as Role,
-            password: userDto.password
+            uid: userPersistence.uid,
+            email: userPersistence.email,
+            role: userPersistence.role as Role,
+            createdAt: userPersistence.createdAt,
+            isActive: userPersistence.isActive,
+            password: userPersistence.password,
+            activationCode: userPersistence.activationCode,
         });
         return user;
     }
@@ -23,6 +28,17 @@ export default class UserMapper {
             uid: user.uid,
             email: user.email,
             role: user.role
+        };
+    }
+    static toPersistence(user: User): IUserPersistence {
+        return {
+            uid: user.uid,
+            email: user.email,
+            password: user.password,
+            role: user.role,
+            createdAt: user.createdAt,
+            isActive: user.isActive,
+            activationCode: user.activationCode
         };
     }
 }

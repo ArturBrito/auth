@@ -84,7 +84,7 @@ export class User {
     public activateUser(activationCode: string): void {
         if(this._activationCode === activationCode) {
             this._isActive = true;
-            this._activationCode = '';
+            this._activationCode = 'activated';
             return;
         }
 
