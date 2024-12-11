@@ -42,7 +42,11 @@ export default class JwtAdapter implements IEncrypter {
 
     }
     async decrypt(token: string): Promise<any> {
-        throw new Error("Method not implemented.");
+        const verifyOptions: VerifyOptions = {
+            algorithms: ['RS256']
+        };
+
+        return jwt.verify(token, publicKey, verifyOptions);
     }
 
 }

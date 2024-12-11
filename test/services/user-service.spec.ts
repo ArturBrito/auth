@@ -126,7 +126,7 @@ describe('UserService Unit Tests', () => {
 
             await userService.createUser(validUserData);
 
-            expect(eventEmitterSpy).toHaveBeenCalledWith('userCreated', expect.any(Object));
+            expect(eventEmitterSpy).toHaveBeenCalledWith('CreateUserSendEmail', expect.any(Object));
         });
     });
 });

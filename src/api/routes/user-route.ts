@@ -8,7 +8,7 @@ import { validateRequest } from '../middlewares/validate-request';
 const router = Router();
 
 export default (app: Router) => {
-    console.log('User route loaded');
+    
     const ctrl = myContainer.get<IUserController>(TYPES.IUserController);
 
     app.use('/user', router);
@@ -26,4 +26,7 @@ export default (app: Router) => {
         validateRequest,
         (req: Request, res: Response, next: NextFunction) => ctrl.createUser(req, res, next));
     router.get('/:email', (req, res, next) => ctrl.getUserByEmail(req, res, next));
+
+
+    console.log('User route loaded');
 }

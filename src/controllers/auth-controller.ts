@@ -1,7 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import IUserService from "../services/contracts/user-service-contract";
-import IUserController from "./contracts/user-controller-contract";
-import { UserDto } from "../domain/dto/user-dto";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../dependency-injection/types";
 import IAuthController from "./contracts/auth-controller-contract";
@@ -14,6 +11,15 @@ export default class AuthController implements IAuthController {
         @inject(TYPES.IAuthService) authService: IAuthService
     ) {
         this.authService = authService;
+    }
+    async refreshToken(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { refreshToken } = req.body;
+            const tokens = await this.authService.refreshToken(refreshToken);
+            res.status(200).json(tokens);
+        } catch (error) {
+            throw error;
+        }
     }
     async signIn(req: Request, res: Response, next: NextFunction) {
         try {

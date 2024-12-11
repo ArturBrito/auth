@@ -65,6 +65,9 @@ export default class AuthService implements IAuthService {
 
         const payload = await this.encrypter.decrypt(refreshToken);
 
+        delete payload.iat;
+        delete payload.exp;
+
         const tokens = await this.encrypter.encrypt(payload);
 
         await this.refreshTokenStore.deleteRefreshToken(refreshToken);

@@ -10,8 +10,8 @@ describe('AuthController Unit Tests', () => {
     beforeEach(() => {
         mockAuthService = {
             signIn: jest.fn(),
-            signUp: jest.fn(),
-            signOut: jest.fn()
+            signOut: jest.fn(),
+            refreshToken: jest.fn()
         } as any;
 
         authController = new AuthController(mockAuthService);
@@ -147,8 +147,40 @@ describe('AuthController Unit Tests', () => {
             }
 
         });
-        
 
+
+    });
+
+    describe('RefreshToken', () => {
+        it('should refresh a token', async () => {
+            const req = {
+                body: {
+                    refreshToken: 'refreshToken'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockAuthService.refreshToken.mockResolvedValue({
+                token: 'token',
+                refreshToken: 'refreshToken'
+            });
+
+            await authController.refreshToken(req as any, res as any, next);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+
+            expect(res.json).toHaveBeenCalledWith({
+                token: 'token',
+                refreshToken: 'refreshToken'
+            });
+
+        });
     });
 
 });
