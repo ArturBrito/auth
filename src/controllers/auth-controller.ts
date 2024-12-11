@@ -18,7 +18,7 @@ export default class AuthController implements IAuthController {
             const tokens = await this.authService.refreshToken(refreshToken);
             res.status(200).json(tokens);
         } catch (error) {
-            throw error;
+            next(error);
         }
     }
     async signIn(req: Request, res: Response, next: NextFunction) {
@@ -27,7 +27,7 @@ export default class AuthController implements IAuthController {
             const tokens = await this.authService.signIn(email, password);
             res.status(200).json(tokens);
         } catch (error) {
-            throw error;
+            next(error);
         }
     }
 

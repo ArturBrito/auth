@@ -13,13 +13,24 @@ export default class UserController implements IUserController {
     ) { 
         this.userService = userService;
     }
+    async activateUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const activationCode = req.params.activationCode;
+            const userEmail = req.params.email;
+            const activatedUser = await this.userService.activateUser(userEmail, activationCode);
+            res.status(200).json(activatedUser);
+        } catch (error) {
+            next(error);
+        }
+    }
     async getUserByEmail(req: Request, res: Response, next: NextFunction) {
         try {
             const email = req.params.email;
             const user = await this.userService.getUserByEmail(email);
             res.status(200).json(user);
         } catch (error) {
-            throw error;
+            //throw error;
+            next(error);
         }
     }
 
@@ -29,7 +40,7 @@ export default class UserController implements IUserController {
             const newUser = await this.userService.createUser(userDto);
             res.status(201).json(newUser);
         } catch (error) {
-            throw error;
+            next(error);
         }
     }
 }
