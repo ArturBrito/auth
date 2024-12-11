@@ -54,7 +54,7 @@ describe('AuthController Unit Tests', () => {
 
         });
 
-        it('should throw an error if the user does not exist', async () => {
+        it('should throw an error if the user fail to signin', async () => {
             const req = {
                 body: {
                     email: 'artur.brito95@gmail.com',
@@ -71,83 +71,11 @@ describe('AuthController Unit Tests', () => {
 
             mockAuthService.signIn.mockRejectedValue(new BadRequestError('Invalid credentials'));
 
-            try {
-                await authController.signIn(req as any, res as any, next);
-            } catch (error) {
-                expect(error.message).toBe('Invalid credentials');
-                expect(error.statusCode).toBe(400);
-            }
+            await authController.signIn(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(BadRequestError));
+
 
         });
-
-        it('should throw an error if the user is inactive', async () => {
-            const user = User.create({
-                uid: '1',
-                email: 'artur.brito95@gmail.com',
-                password: 'hashedPassword',
-                role: 'user',
-                isActive: false
-            });
-
-            mockAuthService.signIn.mockRejectedValue(new BadRequestError('Invalid credentials'));
-
-            const req = {
-                body: {
-                    email: 'artur.brito95@gmail.com',
-                    password: 'hashedPassword'
-                }
-            };
-
-            const res = {
-                status: jest.fn().mockReturnThis(),
-                json: jest.fn()
-            };
-
-            const next = jest.fn();
-
-            try {
-                await authController.signIn(req as any, res as any, next);
-            } catch (error) {
-                expect(error.message).toBe('Invalid credentials');
-                expect(error.statusCode).toBe(400);
-            }
-
-        });
-
-        it('should throw an error if the password is invalid', async () => {
-            const user = User.create({
-                uid: '1',
-                email: 'artur.brito95@gmail.com',
-                password: 'hashedPassword',
-                role: 'user',
-                isActive: true
-            });
-
-            mockAuthService.signIn.mockRejectedValue(new BadRequestError('Invalid credentials'));
-
-            const req = {
-                body: {
-                    email: 'artur.brito95@gmail.com',
-                    password: 'hashedPassword'
-                }
-            };
-
-            const res = {
-                status: jest.fn().mockReturnThis(),
-                json: jest.fn()
-            };
-
-            const next = jest.fn();
-
-            try {
-                await authController.signIn(req as any, res as any, next);
-            } catch (error) {
-                expect(error.message).toBe('Invalid credentials');
-                expect(error.statusCode).toBe(400);
-            }
-
-        });
-
 
     });
 
@@ -179,6 +107,27 @@ describe('AuthController Unit Tests', () => {
                 token: 'token',
                 refreshToken: 'refreshToken'
             });
+
+        });
+
+        it('should throw an error if the refresh token is invalid', async () => {
+            const req = {
+                body: {
+                    refreshToken: 'refreshToken'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockAuthService.refreshToken.mockRejectedValue(new BadRequestError('Invalid refresh token'));
+
+            await authController.refreshToken(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(BadRequestError));
 
         });
     });

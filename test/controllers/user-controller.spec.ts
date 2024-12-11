@@ -1,6 +1,8 @@
 import UserController from "../../src/controllers/user-controller";
 import IUserRepository from "../../src/domain/repositories/user-repository";
+import { InvalidActivationCode } from "../../src/errors/invalid-activation-code-error";
 import { UserAlreadyRegisteredError } from "../../src/errors/user-already-registered";
+import { UserNotFoundError } from "../../src/errors/user-not-found-error";
 import BcryptAdapter from "../../src/infrastructure/password/bcrypt-adapter";
 import UserInmemoryRepository from "../../src/infrastructure/persistence/inmemory/user-inmemory-repository";
 import IPasswordManager from "../../src/services/contracts/password-manager";
@@ -15,7 +17,8 @@ describe('UserController Unit Tests', () => {
     beforeEach(() => {
         mockUserService = {
             createUser: jest.fn(),
-            getUserByEmail: jest.fn()
+            getUserByEmail: jest.fn(),
+            activateUser: jest.fn()
         };
 
         userController = new UserController(mockUserService);
@@ -67,16 +70,13 @@ describe('UserController Unit Tests', () => {
 
             const next = jest.fn();
 
-            mockUserService.getUserByEmail.mockResolvedValue(null);
+            mockUserService.getUserByEmail.mockRejectedValue(new UserNotFoundError());
 
-            try {
-                // Act
-                await userController.getUserByEmail(req as any, res as any, next);
-            } catch (error) {
-                // Assert
-                expect(res.status).toHaveBeenCalledWith(404);
-                expect(res.json).toHaveBeenCalledWith({ message: 'User not found' });
-            }
+            // Act
+            await userController.getUserByEmail(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
 
         });
     });
@@ -137,15 +137,89 @@ describe('UserController Unit Tests', () => {
 
             mockUserService.createUser.mockRejectedValue(new UserAlreadyRegisteredError());
 
-            try {
-                // Act
-                await userController.createUser(req as any, res as any, next);
-            } catch (error) {
-                // Assert
-                expect(error.statusCode).toEqual(403);
-                expect(error.reason).toEqual('User already registered');
-            }
+            // Act
+            await userController.createUser(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(UserAlreadyRegisteredError));
 
+        });
+    });
+
+    describe('activateUser', () => {
+        it('should activate a user', async () => {
+            // Arrange
+            const req = {
+                params: {
+                    email: 'artur.brito95@gmail.com',
+                    activationCode: '123456'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockUserService.activateUser.mockResolvedValue({
+                uid: '1',
+                email: 'artur.brito95@gmail.com',
+                role: 'user'
+            });
+
+            // Act
+            await userController.activateUser(req as any, res as any, next);
+
+            // Assert
+            expect(res.status).toHaveBeenCalledWith(200);
+
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            // Arrange
+            const req = {
+                params: {
+                    email: 'artur.brito95@gmail.com',
+                    activationCode: '123456'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockUserService.activateUser.mockRejectedValue(new UserNotFoundError());
+
+            // Act
+            await userController.activateUser(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
+
+        });
+
+        it('should throw an error if the activation code is invalid', async () => {
+            // Arrange
+            const req = {
+                params: {
+                    email: 'artur.brito95@gmail.com',
+                    activationCode: '123456'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockUserService.activateUser.mockRejectedValue(new InvalidActivationCode());
+
+            // Act
+            await userController.activateUser(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(InvalidActivationCode));
 
         });
     });
@@ -185,7 +259,7 @@ describe('UserController Integration Tests', () => {
 
 
             // Act
-            await userController.createUser(req as any, res as any, next);
+            const user = await userController.createUser(req as any, res as any, next);
 
             // Assert
             expect(res.status).toHaveBeenCalledWith(201);
@@ -209,18 +283,11 @@ describe('UserController Integration Tests', () => {
 
             const next = jest.fn();
 
-            try {
-                // Act
-                await userController.createUser(req as any, res as any, next);
-            } catch (error) {
-                // Assert
-                expect(error.statusCode).toEqual(403);
-                expect(error.reason).toEqual('User already registered');
-            }
-
-
+            // Act
+            await userController.createUser(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(UserAlreadyRegisteredError));
         });
-        
+
     });
 
 
@@ -242,14 +309,14 @@ describe('UserController Integration Tests', () => {
             await userController.getUserByEmail(req as any, res as any, next);
             // Assert
             expect(res.status).toHaveBeenCalledWith(200);
-            
+
         });
 
         it('should throw an error if the user does not exist', async () => {
             // Arrange
             const req = {
                 params: {
-                    email: 'artur.brito95@gmail.com',
+                    email: 'artur.brito@gmail.com',
                 }
             };
 
@@ -260,16 +327,58 @@ describe('UserController Integration Tests', () => {
 
             const next = jest.fn();
 
+            // Act
+            await userController.getUserByEmail(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
 
-            try {
-                // Act
-                await userController.getUserByEmail(req as any, res as any, next);
-            } catch (error) {
-                // Assert
-                expect(res.status).toHaveBeenCalledWith(404);
-                expect(res.json).toHaveBeenCalledWith({ message: 'User not found' });
-            }
+        });
+    });
 
+    describe('activateUser', () => {
+        it('should activate a user', async () => {
+            // Arrange
+            const user = await userRepository.getUserByEmail('artur.brito95@gmail.com');
+            const req = {
+                params: {
+                    email: 'artur.brito95@gmail.com',
+                    activationCode: user.activationCode
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.activateUser(req as any, res as any, next);
+
+            // Assert
+            expect(res.status).toHaveBeenCalledWith(200);
+
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            // Arrange
+            const req = {
+                params: {
+                    email: 'artur.brito@gmail.com',
+                    activationCode: '123456'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.activateUser(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
         });
     });
 
