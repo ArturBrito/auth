@@ -8,8 +8,8 @@ import { inject, injectable } from "inversify";
 import { TYPES } from "../dependency-injection/types";
 import { DatabaseConnectionError } from "../errors/database-connection-error";
 import { UserAlreadyRegisteredError } from "../errors/user-already-registered";
-import { NotFoundError } from "../errors/not-found-error";
 import { EventEmitter } from "events";
+import { UserNotFoundError } from "../errors/user-not-found-error";
 
 @injectable()
 export default class UserService implements IUserService {
@@ -24,6 +24,24 @@ export default class UserService implements IUserService {
         this.userRepository = userRepository;
         this.passwordManager = passwordManager;
         this.eventEmitter = eventEmitter;
+    }
+    async activateUser(email: string, activationCode: string): Promise<UserDto> {
+        // get user by email
+        const user = await this.userRepository.getUserByEmail(email).catch(() => {
+            throw new DatabaseConnectionError();
+        });
+
+        if (!user) {
+            throw new UserNotFoundError();
+        }
+
+        // activate user
+        user.activateUser(activationCode);
+
+        // save user
+        await this.userRepository.updateUser(user);
+
+        return UserMapper.toDto(user);
     }
 
     async createUser(userDto: UserDto): Promise<UserDto> {
@@ -60,7 +78,7 @@ export default class UserService implements IUserService {
         const user = await this.userRepository.getUserByEmail(email);
 
         if (!user) {
-            throw new NotFoundError();
+            throw new UserNotFoundError();
         }
 
         return UserMapper.toDto(user);

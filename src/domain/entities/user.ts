@@ -1,6 +1,7 @@
 import { v4 as uuid } from "uuid";
 import { Guard } from "../../helpers/Guard";
 import { InvalidUserError } from "../../errors/invalid-user-error";
+import { InvalidActivationCode } from "../../errors/invalid-activation-code-error";
 
 interface UserProps {
     uid?: string;
@@ -9,6 +10,7 @@ interface UserProps {
     role: string;
     createdAt?: Date;
     isActive?: boolean;
+    activationCode?: string;
 }
 
 export class User {
@@ -18,6 +20,7 @@ export class User {
     private _role: Role;
     private _createdAt: Date;
     private _isActive: boolean;
+    private _activationCode: string;
 
     private constructor(props: UserProps) {
         this._uid = props.uid || uuid();
@@ -25,7 +28,8 @@ export class User {
         this._password = props.password;
         this._role = props.role as Role || Role.USER;
         this._createdAt = props.createdAt || new Date();
-        this._isActive = props.isActive || true;
+        this._isActive = props.isActive || false;
+        this._activationCode = props.activationCode || uuid();
     }
 
     get uid(): string {
@@ -52,6 +56,10 @@ export class User {
         return this._isActive;
     }
 
+    get activationCode(): string {
+        return this._activationCode;
+    }
+
     public static create(props: UserProps): User {
         const guardedNullProps = [
             { argument: props.email, argumentName: 'Email' },
@@ -71,6 +79,16 @@ export class User {
         }
         
         return new User(props);
+    }
+
+    public activateUser(activationCode: string): void {
+        if(this._activationCode === activationCode) {
+            this._isActive = true;
+            this._activationCode = '';
+            return;
+        }
+
+        throw new InvalidActivationCode();
     }
    
 }

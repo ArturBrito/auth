@@ -380,6 +380,30 @@ describe('UserController Integration Tests', () => {
             await userController.activateUser(req as any, res as any, next);
             expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
         });
+
+        it('should throw an error if the activation code is invalid', async () => {
+            // Arrange
+            const req = {
+                params: {
+                    email: 'artur.brito95@gmail.com',
+                    activationCode: '123456'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.activateUser(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(InvalidActivationCode));
+
+        });
     });
 
 });

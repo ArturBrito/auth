@@ -28,4 +28,36 @@ describe('User', () => {
             }
         });
     });
+
+    describe('activateUser', () => {
+        it('should activate the user', async () => {
+            const user = User.create({
+                email: 'artur.brito95@gmail.com',
+                password: 'hashedPassword',
+                role: 'user',
+                activationCode: 'activationCode'
+            });
+
+            user.activateUser('activationCode');
+
+            expect(user.isActive).toBeTruthy();
+
+        });
+
+        it('should throw an error if the activation code is invalid', async () => {
+            const user = User.create({
+                email: 'artur.brito95@gmail.com',
+                password: 'hashedPassword',
+                role: 'user',
+                activationCode: 'activationCode'
+            });
+
+            try {
+                user.activateUser('invalidActivationCode');
+            } catch (error) {
+                expect(error.message).toBe('Invalid activation code');
+            }
+
+        });
+    });
 });

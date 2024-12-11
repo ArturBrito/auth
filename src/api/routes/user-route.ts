@@ -26,6 +26,7 @@ export default (app: Router) => {
         validateRequest,
         (req: Request, res: Response, next: NextFunction) => ctrl.createUser(req, res, next));
     router.get('/:email', (req, res, next) => ctrl.getUserByEmail(req, res, next));
+    router.put('/activate/:email/:activationCode', (req, res, next) => ctrl.activateUser(req, res, next));
 
 
     console.log('User route loaded');

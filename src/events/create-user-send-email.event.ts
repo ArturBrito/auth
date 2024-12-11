@@ -17,7 +17,7 @@ export class CreateUserSendEmailHandler implements IEventHandler {
         await this.emailClient.sendEmail(
             user.email,
             'Welcome to the platform',
-            'Welcome to the platform'
+            'Activation code: ' + user.activationCode
         );
     }
 }

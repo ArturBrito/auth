@@ -129,4 +129,96 @@ describe('UserService Unit Tests', () => {
             expect(eventEmitterSpy).toHaveBeenCalledWith('CreateUserSendEmail', expect.any(Object));
         });
     });
+
+    describe('activateUser', () => {
+        it('should activate a user', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role,
+                isActive: false,
+                activationCode: '123456'
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+
+            const activatedUser = await userService.activateUser(validUserData.email, '123456');
+
+            expect(activatedUser).toBeDefined();
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            mockUserRepository.getUserByEmail.mockResolvedValue(null);
+
+            try {
+                await userService.activateUser(validUserData.email, '123456');
+            } catch (error) {
+                expect(error).toBeInstanceOf(Error);
+                expect(error.message).toBe('User not found');
+            }
+        });
+
+        it('should throw an error if the database throw error', async () => {
+            mockUserRepository.getUserByEmail.mockRejectedValue(new Error('Error getting user'));
+
+            try {
+                await userService.activateUser(validUserData.email, '123456');
+            } catch (error) {
+                expect(error).toBeInstanceOf(Error);
+                expect(error.message).toBe('Error connecting to database');
+            }
+        });
+
+        it('should throw an error if the activation code is invalid', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role,
+                isActive: false,
+                activationCode: '123456'
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+
+            try {
+                await userService.activateUser(validUserData.email, '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(Error);
+                expect(error.message).toBe('Invalid activation code');
+            }
+        });
+        
+    });
+
+    describe('getUserByEmail', () => {
+        it('should get a user by email', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+
+            const foundUser = await userService.getUserByEmail(validUserData.email);
+
+            expect(foundUser).toBeDefined();
+            expect(foundUser.email).toBe(validUserData.email);
+            
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            mockUserRepository.getUserByEmail.mockResolvedValue(null);
+
+            try {
+                await userService.getUserByEmail(validUserData.email);
+            } catch (error) {
+                expect(error).toBeInstanceOf(Error);
+                expect(error.message).toBe('User not found');
+            }
+        });
+    });
 });

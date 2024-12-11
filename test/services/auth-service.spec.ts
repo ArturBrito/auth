@@ -90,7 +90,7 @@ describe('AuthService Unit Tests', () => {
             try {
                 await authService.signIn('artur.brito95@gmail.com', 'hashedPassword');
             } catch (error) {
-                expect(error.message).toBe('Invalid credentials');
+                expect(error.message).toBe('User is inactive');
             }
 
         });
