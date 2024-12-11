@@ -1,7 +1,7 @@
 import UserController from "../../src/controllers/user-controller";
 import IUserRepository from "../../src/domain/repositories/user-repository";
 import { InvalidActivationCode } from "../../src/errors/invalid-activation-code-error";
-import { UserAlreadyRegisteredError } from "../../src/errors/user-already-registered";
+import { UserAlreadyRegisteredError } from "../../src/errors/user-already-registered-error";
 import { UserNotFoundError } from "../../src/errors/user-not-found-error";
 import BcryptAdapter from "../../src/infrastructure/password/bcrypt-adapter";
 import UserInmemoryRepository from "../../src/infrastructure/persistence/inmemory/user-inmemory-repository";
@@ -18,7 +18,8 @@ describe('UserController Unit Tests', () => {
         mockUserService = {
             createUser: jest.fn(),
             getUserByEmail: jest.fn(),
-            activateUser: jest.fn()
+            activateUser: jest.fn(),
+            deleteUser: jest.fn()
         };
 
         userController = new UserController(mockUserService);
@@ -223,6 +224,59 @@ describe('UserController Unit Tests', () => {
 
         });
     });
+
+    describe('deleteUser', () => {
+        it('should delete a user', async () => {
+            // Arrange
+            const req = {
+                currentUser: {
+                    uid: '1',
+                    email: 'artur.brito95@gmail.com',
+                    role: 'user'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.deleteUser(req as any, res as any, next);
+
+            // Assert
+            expect(res.status).toHaveBeenCalledWith(204);
+
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            // Arrange
+            const req = {
+                currentUser: {
+                    uid: '1',
+                    email: 'artur.brito95@gmail.com',
+                    role: 'user'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockUserService.deleteUser.mockRejectedValue(new UserNotFoundError());
+
+            // Act
+            await userController.deleteUser(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
+
+        });
+
+    });
 });
 
 describe('UserController Integration Tests', () => {
@@ -404,6 +458,54 @@ describe('UserController Integration Tests', () => {
             expect(next).toHaveBeenCalledWith(expect.any(InvalidActivationCode));
 
         });
+    });
+
+    describe('deleteUser', () => {
+        it('should delete a user', async () => {
+            // Arrange
+            const user = await userRepository.getUserByEmail('artur.brito95@gmail.com');
+
+            const req = {
+                currentUser: user
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.deleteUser(req as any, res as any, next);
+
+            // Assert
+            expect(res.status).toHaveBeenCalledWith(204);
+
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            // Arrange
+            const req = {
+                currentUser: {
+                    uid: '1',
+                    email: 'artur.brito95@gmail.com',
+                    role: 'user'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.deleteUser(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
+        });
+
     });
 
 });

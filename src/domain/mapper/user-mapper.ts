@@ -18,4 +18,11 @@ export default class UserMapper {
         });
         return user;
     }
+    static tokenToDto(user: {uid: string, email: string, role: string}): UserDto {
+        return {
+            uid: user.uid,
+            email: user.email,
+            role: user.role
+        };
+    }
 }

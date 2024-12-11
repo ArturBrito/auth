@@ -7,6 +7,7 @@ import { TYPES } from "../../dependency-injection/types";
 import { NoTokenProvidedError } from "../../errors/no-token-provided-error";
 import { InvalidTokenError } from "../../errors/invalid-token-error";
 import { UnauthorizedError } from "../../errors/unauthorized-error";
+import UserMapper from "../../domain/mapper/user-mapper";
 
 declare global {
     namespace Express {
@@ -40,7 +41,7 @@ export default class VerifyToken implements IVerifyToken {
                 throw new InvalidTokenError();
             }
 
-            req.currentUser = decodedToken;
+            req.currentUser = UserMapper.tokenToDto(decodedToken);
             next();
         } catch (error) {
             throw new UnauthorizedError();

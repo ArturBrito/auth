@@ -1,5 +1,3 @@
-import { Role } from "../entities/user";
-
 export interface UserDto {
     uid?: string;
     email: string;

@@ -1,6 +1,12 @@
 import { UserDto } from "../../src/domain/dto/user-dto";
 import { User } from "../../src/domain/entities/user";
+import UserMapper from "../../src/domain/mapper/user-mapper";
 import IUserRepository from "../../src/domain/repositories/user-repository";
+import { DatabaseConnectionError } from "../../src/errors/database-connection-error";
+import { InvalidActivationCode } from "../../src/errors/invalid-activation-code-error";
+import { InvalidUserError } from "../../src/errors/invalid-user-error";
+import { UserAlreadyRegisteredError } from "../../src/errors/user-already-registered-error";
+import { UserNotFoundError } from "../../src/errors/user-not-found-error";
 import IPasswordManager from "../../src/services/contracts/password-manager";
 import UserService from "../../src/services/user-service";
 import { EventEmitter } from 'events';
@@ -66,19 +72,17 @@ describe('UserService Unit Tests', () => {
             try {
                 await userService.createUser(validUserData);
             } catch (error) {
-                expect(error).toBeInstanceOf(Error);
-                expect(error.message).toBe('User already registered');
+                expect(error).toBeInstanceOf(UserAlreadyRegisteredError);
             }
         });
 
         it('should throw an error if the database throw error', async () => {
-            mockUserRepository.getUserByEmail.mockRejectedValue(new Error('Error getting user'));
+            mockUserRepository.getUserByEmail.mockRejectedValue(new DatabaseConnectionError());
 
             try {
                 await userService.createUser(validUserData);
             } catch (error) {
-                expect(error).toBeInstanceOf(Error);
-                expect(error.message).toBe('Error connecting to database');
+                expect(error).toBeInstanceOf(DatabaseConnectionError);
             }
         });
 
@@ -89,8 +93,7 @@ describe('UserService Unit Tests', () => {
             try {
                 await userService.createUser(validUserData);
             } catch (error) {
-                expect(error).toBeInstanceOf(Error);
-                expect(error.message).toBe('Invalid user');
+                expect(error).toBeInstanceOf(InvalidUserError);
             }
         });
 
@@ -106,7 +109,7 @@ describe('UserService Unit Tests', () => {
             try {
                 await userService.createUser(invalidUserData);
             } catch (error) {
-                expect(error).toBeInstanceOf(Error);
+                expect(error).toBeInstanceOf(InvalidUserError);
                 expect(error.message).toBe('Invalid user');
                 expect(error.reason).toBe('Password is null or undefined');
             }
@@ -154,19 +157,17 @@ describe('UserService Unit Tests', () => {
             try {
                 await userService.activateUser(validUserData.email, '123456');
             } catch (error) {
-                expect(error).toBeInstanceOf(Error);
-                expect(error.message).toBe('User not found');
+                expect(error).toBeInstanceOf(UserNotFoundError);
             }
         });
 
         it('should throw an error if the database throw error', async () => {
-            mockUserRepository.getUserByEmail.mockRejectedValue(new Error('Error getting user'));
+            mockUserRepository.getUserByEmail.mockRejectedValue(new DatabaseConnectionError());
 
             try {
                 await userService.activateUser(validUserData.email, '123456');
             } catch (error) {
-                expect(error).toBeInstanceOf(Error);
-                expect(error.message).toBe('Error connecting to database');
+                expect(error).toBeInstanceOf(DatabaseConnectionError);
             }
         });
 
@@ -185,8 +186,7 @@ describe('UserService Unit Tests', () => {
             try {
                 await userService.activateUser(validUserData.email, '654321');
             } catch (error) {
-                expect(error).toBeInstanceOf(Error);
-                expect(error.message).toBe('Invalid activation code');
+                expect(error).toBeInstanceOf(InvalidActivationCode);
             }
         });
         
@@ -216,9 +216,47 @@ describe('UserService Unit Tests', () => {
             try {
                 await userService.getUserByEmail(validUserData.email);
             } catch (error) {
-                expect(error).toBeInstanceOf(Error);
-                expect(error.message).toBe('User not found');
+                expect(error).toBeInstanceOf(UserNotFoundError);
             }
+        });
+    });
+
+    describe('deleteUser', () => {
+        it('should delete a user', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+
+            await userService.deleteUser(UserMapper.toDto(user));
+
+            expect(mockUserRepository.deleteUser).toHaveBeenCalled();
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            mockUserRepository.getUserByEmail.mockResolvedValue(null);
+
+            try {
+                await userService.deleteUser(validUserData);
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+
+        it('should throw an error if the database throw error', async () => {
+            mockUserRepository.getUserByEmail.mockRejectedValue(new DatabaseConnectionError());
+
+            try {
+                await userService.deleteUser(validUserData);
+            } catch (error) {
+                expect(error).toBeInstanceOf(DatabaseConnectionError);
+            }
+
+          
         });
     });
 });

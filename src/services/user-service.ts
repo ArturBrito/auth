@@ -7,7 +7,7 @@ import IUserService from "./contracts/user-service-contract";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../dependency-injection/types";
 import { DatabaseConnectionError } from "../errors/database-connection-error";
-import { UserAlreadyRegisteredError } from "../errors/user-already-registered";
+import { UserAlreadyRegisteredError } from "../errors/user-already-registered-error";
 import { EventEmitter } from "events";
 import { UserNotFoundError } from "../errors/user-not-found-error";
 
@@ -24,6 +24,19 @@ export default class UserService implements IUserService {
         this.userRepository = userRepository;
         this.passwordManager = passwordManager;
         this.eventEmitter = eventEmitter;
+    }
+    async deleteUser(user: UserDto): Promise<void> {
+        // get user by email
+        const userToDelete = await this.userRepository.getUserByEmail(user.email).catch(() => {
+            throw new DatabaseConnectionError();
+        });
+
+        if (!userToDelete) {
+            throw new UserNotFoundError();
+        }
+
+        // delete user
+        await this.userRepository.deleteUser(userToDelete.uid);
     }
     async activateUser(email: string, activationCode: string): Promise<UserDto> {
         // get user by email

@@ -13,6 +13,15 @@ export default class UserController implements IUserController {
     ) { 
         this.userService = userService;
     }
+    async deleteUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const user = req.currentUser;
+            await this.userService.deleteUser(user);
+            res.status(204).send();
+        } catch (error) {
+            next(error);
+        }
+    }
     async activateUser(req: Request, res: Response, next: NextFunction) {
         try {
             const activationCode = req.params.activationCode;
