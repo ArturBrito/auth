@@ -1,0 +1,11 @@
+services:
+  auth:
+    build:
+      context: .
+      target: production
+    ports:
+      - 3000:3000
+    environment:
+      NODE_ENV: production
+      MONGO_URI: mongodb://root:example@mongo:27017
+      JWT_SECRET: testesecret

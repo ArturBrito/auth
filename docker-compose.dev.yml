@@ -1,0 +1,18 @@
+services:
+  auth:
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    container_name: auth
+    ports:
+      - 3000:3000
+    environment:
+      NODE_ENV: development
+      MONGO_URI: mongodb://root:example@mongo:27017
+      JWT_SECRET: testesecret
+    command: ["npm", "start"]
+
+  
