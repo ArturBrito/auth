@@ -4,12 +4,14 @@ import { myContainer } from '../../dependency-injection/inversify.config';
 import { TYPES } from '../../dependency-injection/types';
 import { body, param } from 'express-validator';
 import { validateRequest } from '../middlewares/validate-request';
+import IVerifyToken from '../middlewares/contracts/verify-token.contract';
 
 const router = Router();
 
 export default (app: Router) => {
 
     const ctrl = myContainer.get<IUserController>(TYPES.IUserController);
+    const verifyToken = myContainer.get<IVerifyToken>(TYPES.IVerifyToken);
 
     app.use('/user', router);
 
@@ -45,6 +47,15 @@ export default (app: Router) => {
         ],
         validateRequest,
         (req: Request, res: Response, next: NextFunction) => ctrl.activateUser(req, res, next));
+    router.delete('/:email',
+        [
+            param('email')
+                .isEmail()
+                .withMessage('Email must be valid'),
+        ],
+        validateRequest,
+        verifyToken.verifyToken,
+        (req: Request, res: Response, next: NextFunction) => ctrl.deleteUser(req, res, next));
 
 
     console.log('User route loaded');
