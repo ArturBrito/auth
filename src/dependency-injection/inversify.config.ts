@@ -19,6 +19,8 @@ import InMemoryRefreshToken from "../infrastructure/refresh-tokens/inmemory-refr
 import { EventEmitter } from "events";
 import { EventHandlers } from "../events/event-handlers";
 import { CreateUserSendEmailHandler } from "../events/create-user-send-email.event";
+import IEmailClient from "../services/contracts/email-client";
+import DummyEmailClient from "../infrastructure/email/dummy-email-client";
 
 const myContainer = new Container();
 myContainer.bind<IUserController>(TYPES.IUserController).to(UserController);
@@ -32,5 +34,6 @@ myContainer.bind<IRefreshTokensStore>(TYPES.IRefreshTokensStore).to(InMemoryRefr
 myContainer.bind(TYPES.EventEmmiter).toConstantValue(new EventEmitter());
 myContainer.bind<EventHandlers>(EventHandlers).toSelf();
 myContainer.bind<CreateUserSendEmailHandler>(TYPES.CreateUserSendEmailHandler).to(CreateUserSendEmailHandler);
+myContainer.bind<IEmailClient>(TYPES.IEmailClient).to(DummyEmailClient);
 
 export { myContainer };
