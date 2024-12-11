@@ -1,5 +1,4 @@
 import express from 'express';
-import { errorHandler } from './middlewares/error-handler';
 
 export default async function startServer() {
     const app = express();

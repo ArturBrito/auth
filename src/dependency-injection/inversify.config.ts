@@ -21,6 +21,7 @@ import IEmailClient from "../services/contracts/email-client";
 import DummyEmailClient from "../infrastructure/email/dummy-email-client";
 import IVerifyToken from "../api/middlewares/contracts/verify-token.contract";
 import { DI_CONFIG } from "../config";
+import ISetupDb from "../infrastructure/persistence/setup/setup-db.contract";
 
 const myContainer = new Container();
 myContainer.bind<IUserController>(TYPES.IUserController).to(UserController);
@@ -36,5 +37,6 @@ myContainer.bind<EventHandlers>(EventHandlers).toSelf();
 myContainer.bind<CreateUserSendEmailHandler>(TYPES.CreateUserSendEmailHandler).to(CreateUserSendEmailHandler);
 myContainer.bind<IEmailClient>(TYPES.IEmailClient).to(DummyEmailClient);
 myContainer.bind<IVerifyToken>(TYPES.IVerifyToken).to(DI_CONFIG.IVerifyToken);
+myContainer.bind<ISetupDb>(TYPES.ISetupDb).to(DI_CONFIG.ISetupDb);
 
 export { myContainer };
