@@ -1,39 +1,41 @@
 import { EventEmitter } from 'events'
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../dependency-injection/types';
+import { IEventHandler } from './contracts/event-handler.contract';
+
 
 @injectable()
 export class EventHandlers {
 
     private eventEmitter: EventEmitter;
+    private handlers: Map<string, IEventHandler>;
 
     constructor(
-        @inject(TYPES.EventEmmiter) eventEmitter: EventEmitter
+        @inject(TYPES.EventEmmiter) eventEmitter: EventEmitter,
+        @inject(TYPES.CreateUserSendEmailHandler) createUserSendEmailHandler: IEventHandler
     ) {
         this.eventEmitter = eventEmitter;
+
+        this.handlers = new Map<string, IEventHandler>([
+            ['CreateUserSendEmail', createUserSendEmailHandler]
+        ]);
     }
 
     registerEventHandlers() {
-        console.log('Events FiredUp')
 
-        this.eventEmitter.on('routeAccess', (route) => {
-            try {
-                this.anounceRouteAccess(route);
-                this.upgradeSecurity(route)
-            }
-            catch (error) {
-                console.log('An error occured while perform Route accessed actions')
-            }
+        this.handlers.forEach((handler, eventName) => {
+            this.eventEmitter.on(eventName, async (event) => {
+                try {
+                    console.log('Event Fired:', eventName)
+                    handler.handle(event)
+                }
+                catch (error) {
+                    console.log('An error occured while handling event', eventName)
+                }
+            });
         });
-    }
 
-    private anounceRouteAccess(route: string) {
-        console.log(`${route} has been accessed`)
-    }
-
-
-    private upgradeSecurity(route: string) {
-        console.log(`Locking all other routes and initiating higher security measures on ${route} route`)
+        console.log('Events Loaded')
     }
 
 }

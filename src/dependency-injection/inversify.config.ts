@@ -17,6 +17,8 @@ import JwtAdapter from "../infrastructure/encrypt/jwt-adapter";
 import IRefreshTokensStore from "../services/contracts/refresh-tokens-store";
 import InMemoryRefreshToken from "../infrastructure/refresh-tokens/inmemory-refresh-tokens";
 import { EventEmitter } from "events";
+import { EventHandlers } from "../events/event-handlers";
+import { CreateUserSendEmailHandler } from "../events/create-user-send-email.event";
 
 const myContainer = new Container();
 myContainer.bind<IUserController>(TYPES.IUserController).to(UserController);
@@ -28,5 +30,7 @@ myContainer.bind<IAuthController>(TYPES.IAuthController).to(AuthController);
 myContainer.bind<IEncrypter>(TYPES.IEncrypter).to(JwtAdapter);
 myContainer.bind<IRefreshTokensStore>(TYPES.IRefreshTokensStore).to(InMemoryRefreshToken).inSingletonScope();
 myContainer.bind(TYPES.EventEmmiter).toConstantValue(new EventEmitter());
+myContainer.bind<EventHandlers>(EventHandlers).toSelf();
+myContainer.bind<CreateUserSendEmailHandler>(TYPES.CreateUserSendEmailHandler).to(CreateUserSendEmailHandler);
 
 export { myContainer };

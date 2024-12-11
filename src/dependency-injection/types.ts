@@ -7,7 +7,8 @@ const TYPES = {
     IAuthService: Symbol.for('IAuthService'),
     IEncrypter: Symbol.for('IEncrypter'),
     IRefreshTokensStore: Symbol.for('IRefreshTokensStore'),
-    EventEmmiter: Symbol.for('EventEmmiter')
+    EventEmmiter: Symbol.for('EventEmmiter'),
+    CreateUserSendEmailHandler: Symbol.for('CreateUserSendEmailHandler')
 };
 
 export { TYPES };

@@ -50,7 +50,7 @@ export default class UserService implements IUserService {
         const newUser = await this.userRepository.createUser(user);
 
         // emit event
-        this.eventEmitter.emit('userCreated', newUser);
+        this.eventEmitter.emit('CreateUserSendEmail', newUser);
 
         return UserMapper.toDto(newUser);
 

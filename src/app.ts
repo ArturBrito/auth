@@ -9,8 +9,10 @@ import { EventEmitter } from 'events';
 dotenv.config();
 
 // configure event handlers
-const eventEmitter = myContainer.get<EventEmitter>(TYPES.EventEmmiter);
-const eventHandlers = new EventHandlers(eventEmitter);
+const eventHandlers = myContainer.get(EventHandlers);
 eventHandlers.registerEventHandlers();
+
+//const eventEmitter = myContainer.get<EventEmitter>(TYPES.EventEmmiter);
+//eventEmitter.emit('CreateUserSendEmail', { email: 'fasdfdas@fasdfsa.com' });
 
 startServer();
