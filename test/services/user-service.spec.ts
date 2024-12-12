@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { UserDto } from "../../src/domain/dto/user-dto";
 import { User } from "../../src/domain/entities/user";
 import UserMapper from "../../src/domain/mapper/user-mapper";
@@ -10,6 +11,8 @@ import { UserNotFoundError } from "../../src/errors/user-not-found-error";
 import IPasswordManager from "../../src/services/contracts/password-manager";
 import UserService from "../../src/services/user-service";
 import { EventEmitter } from 'events';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import UserMongoRepository from "../../src/infrastructure/persistence/mongo/user/user-mongo-repository";
 
 describe('UserService Unit Tests', () => {
     let userService: UserService;
@@ -36,7 +39,7 @@ describe('UserService Unit Tests', () => {
             hashPassword: jest.fn(),
             comparePasswords: jest.fn()
         }
-        
+
         eventEmitter = new EventEmitter();
 
         userService = new UserService(mockUserRepository, mockPasswordManager, eventEmitter);
@@ -49,7 +52,7 @@ describe('UserService Unit Tests', () => {
                 uid: '1',
                 email: validUserData.email,
                 password: 'hashedPassword',
-                role: validUserData.role
+                role: validUserData.role!
             }));
             mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
 
@@ -66,7 +69,7 @@ describe('UserService Unit Tests', () => {
                 uid: '1',
                 email: validUserData.email,
                 password: 'hashedPassword',
-                role: validUserData.role
+                role: validUserData.role!
             }));
 
             try {
@@ -121,7 +124,7 @@ describe('UserService Unit Tests', () => {
                 uid: '1',
                 email: validUserData.email,
                 password: 'hashedPassword',
-                role: validUserData.role
+                role: validUserData.role!
             }));
             mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
 
@@ -139,7 +142,7 @@ describe('UserService Unit Tests', () => {
                 uid: '1',
                 email: validUserData.email,
                 password: 'hashedPassword',
-                role: validUserData.role,
+                role: validUserData.role!,
                 isActive: false,
                 activationCode: '123456'
             });
@@ -176,7 +179,7 @@ describe('UserService Unit Tests', () => {
                 uid: '1',
                 email: validUserData.email,
                 password: 'hashedPassword',
-                role: validUserData.role,
+                role: validUserData.role!,
                 isActive: false,
                 activationCode: '123456'
             });
@@ -189,7 +192,7 @@ describe('UserService Unit Tests', () => {
                 expect(error).toBeInstanceOf(InvalidActivationCode);
             }
         });
-        
+
     });
 
     describe('getUserByEmail', () => {
@@ -198,7 +201,7 @@ describe('UserService Unit Tests', () => {
                 uid: '1',
                 email: validUserData.email,
                 password: 'hashedPassword',
-                role: validUserData.role
+                role: validUserData.role!
             });
 
             mockUserRepository.getUserByEmail.mockResolvedValue(user);
@@ -206,8 +209,8 @@ describe('UserService Unit Tests', () => {
             const foundUser = await userService.getUserByEmail(validUserData.email);
 
             expect(foundUser).toBeDefined();
-            expect(foundUser.email).toBe(validUserData.email);
-            
+            expect(foundUser!.email).toBe(validUserData.email);
+
         });
 
         it('should throw an error if the user does not exist', async () => {
@@ -227,7 +230,7 @@ describe('UserService Unit Tests', () => {
                 uid: '1',
                 email: validUserData.email,
                 password: 'hashedPassword',
-                role: validUserData.role
+                role: validUserData.role!
             });
 
             mockUserRepository.getUserByEmail.mockResolvedValue(user);
@@ -256,7 +259,168 @@ describe('UserService Unit Tests', () => {
                 expect(error).toBeInstanceOf(DatabaseConnectionError);
             }
 
-          
+
+        });
+    });
+});
+
+
+describe('UserService - MongoDB Integration Tests', () => {
+    let userService: UserService;
+    let eventEmitter: EventEmitter;
+    let mockPasswordManager: jest.Mocked<IPasswordManager>;
+    let mongoServer: MongoMemoryServer;
+    let userRepository: IUserRepository;
+
+    const validUserData: UserDto = {
+        email: 'artur.brito95@gmail.com',
+        password: '123456',
+        role: 'user'
+    }
+
+    beforeAll(async () => {
+        mongoServer = await MongoMemoryServer.create();
+        const uri = mongoServer.getUri();
+
+        await mongoose.connect(uri);
+    });
+
+    afterAll(async () => {
+        await mongoose.disconnect();
+        await mongoServer.stop();
+    });
+
+    beforeEach(async () => {
+        await Promise.all(
+            Object.values(mongoose.connection.collections).map(
+                async (collection) => await collection.deleteMany({})
+            )
+        );
+
+        eventEmitter = new EventEmitter();
+        mockPasswordManager = {
+            hashPassword: jest.fn(),
+            comparePasswords: jest.fn()
+        }
+
+        userRepository = new UserMongoRepository();
+
+        userService = new UserService(userRepository, mockPasswordManager, eventEmitter);
+    });
+
+    describe('createUser', () => {
+        it('should create a new user', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+
+            const user = await userService.createUser(validUserData);
+
+            expect(user).toBeDefined();
+            expect(user.uid).toBeDefined();
+            expect(user.email).toBe(validUserData.email);
+            expect(user.role).toBe(validUserData.role);
+        });
+
+        it('should throw an error if the user already exists', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+
+            await userService.createUser(validUserData);
+
+            try {
+                await userService.createUser(validUserData);
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserAlreadyRegisteredError);
+            }
+        });
+
+        it('should throw an error if the email is invalid', async () => {
+            const invalidUserData = {
+                email: 'invalidEmail',
+                password: '123456',
+                role: 'user'
+            }
+
+            try {
+                await userService.createUser(invalidUserData);
+            } catch (error) {
+                expect(error).toBeInstanceOf(InvalidUserError);
+                expect(error.message).toBe('Invalid user');
+                expect(error.reason).toBe('Password is null or undefined');
+            }
+        });
+    });
+
+    describe('activateUser', () => {
+        it('should activate a user', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            const user = await userService.createUser(validUserData);
+
+            const activatedUser = await userService.activateUser(validUserData.email, user.activationCode!);
+
+            expect(activatedUser).toBeDefined();
+            expect(activatedUser.activationCode).toBe('activated');
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            try {
+                await userService.activateUser(validUserData.email, '123456');
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+
+        it('should throw an error if the activation code is invalid', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            const user = await userService.createUser(validUserData);
+
+            try {
+                await userService.activateUser(validUserData.email, '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(InvalidActivationCode);
+            }
+        });
+    });
+
+    describe('getUserByEmail', () => {
+        it('should get a user by email', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            const user = await userService.createUser(validUserData);
+
+            const foundUser = await userService.getUserByEmail(validUserData.email);
+
+            expect(foundUser).toBeDefined();
+            expect(foundUser!.email).toBe(validUserData.email);
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            try {
+                await userService.getUserByEmail(validUserData.email);
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+    });
+
+    describe('deleteUser', () => {
+        it('should delete a user', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            const user = await userService.createUser(validUserData);
+
+
+            await userService.deleteUser(user);
+            try {
+                const foundUser = await userService.getUserByEmail(validUserData.email);
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            try {
+                await userService.deleteUser(validUserData);
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
         });
     });
 });

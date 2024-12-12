@@ -30,7 +30,6 @@ export default class UserService implements IUserService {
         const userToDelete = await this.userRepository.getUserByEmail(user.email).catch(() => {
             throw new DatabaseConnectionError();
         });
-
         if (!userToDelete) {
             throw new UserNotFoundError();
         }
