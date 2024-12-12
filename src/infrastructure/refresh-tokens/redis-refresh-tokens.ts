@@ -25,7 +25,7 @@ export default class RedisRefreshToken implements IRefreshTokensStore {
 
     async saveRefreshToken(refreshToken: string): Promise<void> {
         try {
-            this.redisClient.set(refreshToken, refreshToken);
+            this.redisClient.setEx(refreshToken, 3600 * 24, refreshToken);
         } catch (error) {
             throw error;
         }
