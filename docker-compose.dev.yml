@@ -13,8 +13,11 @@ services:
       NODE_ENV: development
       MONGO_URI: mongodb://root:example@mongo:27017
       JWT_SECRET: testesecret
+      REDIS_URI: redis://cache:6379
+      REDIS_PASSWORD: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
     depends_on:
       - mongo
+      - cache
       - mongo-express
     command: ["npm", "start"]
 
@@ -35,3 +38,10 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
       ME_CONFIG_BASICAUTH: false
+
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81

@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
-import ISetupDb from "./setup-db.contract";
 import mongoose from "mongoose";
+import ISetupDb from "../contracts/setup-db.contract";
 
 @injectable()
 export default class SetupDbMongo implements ISetupDb {

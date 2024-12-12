@@ -3,6 +3,9 @@ import IRefreshTokensStore from "../../services/contracts/refresh-tokens-store";
 
 @injectable()
 export default class InMemoryRefreshToken implements IRefreshTokensStore {
+    setup(): void {
+        throw new Error("Method not implemented.");
+    }
     private refreshTokens: string[] = [];
 
     async saveRefreshToken(refreshToken: string): Promise<void> {

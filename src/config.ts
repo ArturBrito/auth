@@ -2,14 +2,16 @@ import VerifyToken from "./api/middlewares/verify-token";
 import JwtAdapter from "./infrastructure/encrypt/jwt-adapter";
 import UserInmemoryRepository from "./infrastructure/persistence/inmemory/user-inmemory-repository";
 import UserMongoRepository from "./infrastructure/persistence/mongo/user/user-mongo-repository";
-import SetupDbInMemory from "./infrastructure/persistence/setup/setup-inmemory";
-import SetupDbMongo from "./infrastructure/persistence/setup/setup-mongo";
+import SetupDbMongo from "./infrastructure/setup/database/setup-mongo";
+import SetupRedis from "./infrastructure/setup/refresh-token-store/redis";
 import InMemoryRefreshToken from "./infrastructure/refresh-tokens/inmemory-refresh-tokens";
+import RedisRefreshToken from "./infrastructure/refresh-tokens/redis-refresh-tokens";
 
 export const DI_CONFIG = {
     "IVerifyToken": VerifyToken,
     "IEncrypter": JwtAdapter,
-    "IUserRepository": UserMongoRepository,
-    "IRefreshTokensStore": InMemoryRefreshToken,
-    "ISetupDb": SetupDbMongo
+    "IUserRepository": UserMongoRepository, // together with SetupDbMongo in ISetupDb
+    "ISetupDb": SetupDbMongo,
+    "IRefreshTokensStore": RedisRefreshToken, // together with SetupRedis in ISetupRefreshTokenStore
+    "ISetupRefreshTokenStore": SetupRedis
 };

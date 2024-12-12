@@ -12,6 +12,7 @@ const TYPES = {
     IEmailClient: Symbol.for('IEmailClient'),
     IVerifyToken: Symbol.for('IVerifyToken'),
     ISetupDb: Symbol.for('ISetupDb'),
+    ISetupRefreshTokenStore: Symbol.for('ISetupRefreshTokenStore'),
 };
 
 export { TYPES };

@@ -29,26 +29,26 @@ export default class AuthService implements IAuthService {
     }
 
     async signIn(email: string, password: string): Promise<AuthDto> {
-        
+
         const user = await this.userRepository.getUserByEmail(email);
-        
+
         if (!user) {
             throw new BadRequestError('Invalid credentials');
         }
 
-        if(user.isActive === false) {
+        if (user.isActive === false) {
             throw new InactiveUserError();
         }
 
         const isPasswordValid = await this.passwordManager.comparePasswords(password, user.password);
-        if(!isPasswordValid) {
+        if (!isPasswordValid) {
             throw new BadRequestError('Invalid credentials');
         }
 
-        const tokens = await this.encrypter.encrypt({ 
+        const tokens = await this.encrypter.encrypt({
             uid: user.uid,
-            email: user.email, 
-            role: user.role 
+            email: user.email,
+            role: user.role
         });
 
         await this.refreshTokenStore.saveRefreshToken(tokens.refreshToken);
@@ -59,7 +59,7 @@ export default class AuthService implements IAuthService {
     async refreshToken(refreshToken: string): Promise<AuthDto> {
         const token = await this.refreshTokenStore.getRefreshToken(refreshToken);
 
-        if(!token) {
+        if (!token) {
             throw new BadRequestError('Invalid refresh token');
         }
 
