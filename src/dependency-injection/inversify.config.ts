@@ -28,7 +28,7 @@ const myContainer = new Container();
 myContainer.bind<IUserController>(TYPES.IUserController).to(UserController);
 myContainer.bind<IUserService>(TYPES.IUserService).to(UserService);
 myContainer.bind<IUserRepository>(TYPES.IUserRepository).to(DI_CONFIG.IUserRepository).inSingletonScope();
-myContainer.bind<IPasswordManager>(TYPES.IPasswordManager).to(BcryptAdapter);
+myContainer.bind<IPasswordManager>(TYPES.IPasswordManager).to(DI_CONFIG.IPasswordManager);
 myContainer.bind<IAuthService>(TYPES.IAuthService).to(AuthService);
 myContainer.bind<IAuthController>(TYPES.IAuthController).to(AuthController);
 myContainer.bind<IEncrypter>(TYPES.IEncrypter).to(DI_CONFIG.IEncrypter);

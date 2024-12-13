@@ -6,12 +6,18 @@ import SetupDbMongo from "./infrastructure/setup/database/setup-mongo";
 import SetupRedis from "./infrastructure/setup/refresh-token-store/redis";
 import InMemoryRefreshToken from "./infrastructure/refresh-tokens/inmemory-refresh-tokens";
 import RedisRefreshToken from "./infrastructure/refresh-tokens/redis-refresh-tokens";
+import FireBaseUserRepository from "./infrastructure/persistence/firebase/user-firebase-repository";
+import SetupDbFirebase from "./infrastructure/setup/database/setup-firebase";
+import SetupDbInMemory from "./infrastructure/setup/database/setup-inmemory";
+import PasswordDummyAdapter from "./infrastructure/password/dummy-adapter";
+import FirebaseEncryptorAdapter from "./infrastructure/encrypt/firebase-adapter";
 
 export const DI_CONFIG = {
     "IVerifyToken": VerifyToken,
-    "IEncrypter": JwtAdapter,
-    "IUserRepository": UserMongoRepository, // together with SetupDbMongo in ISetupDb
-    "ISetupDb": SetupDbMongo,
-    "IRefreshTokensStore": RedisRefreshToken, // together with SetupRedis in ISetupRefreshTokenStore
-    "ISetupRefreshTokenStore": SetupRedis
+    "IEncrypter": FirebaseEncryptorAdapter,
+    "IUserRepository": FireBaseUserRepository,
+    "ISetupDb": SetupDbFirebase,
+    "IPasswordManager": PasswordDummyAdapter,
+    "IRefreshTokensStore": InMemoryRefreshToken,
+    "ISetupRefreshTokenStore": SetupDbInMemory
 };
