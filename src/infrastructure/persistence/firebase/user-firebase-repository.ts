@@ -1,7 +1,9 @@
+import { injectable } from "inversify";
 import { User } from "../../../domain/entities/user";
 import IUserRepository from "../../../domain/repositories/user-repository";
 import * as admin from "firebase-admin";
 
+@injectable()
 export default class FireBaseUserRepository implements IUserRepository {
     async createUser(user: User): Promise<User> {
         try {
@@ -15,7 +17,7 @@ export default class FireBaseUserRepository implements IUserRepository {
                 role: user.role
             });
             const activationLink = await admin.auth().generateEmailVerificationLink(user.email);
-
+            
             const newUser = User.create({
                 uid: user.uid,
                 email: user.email,

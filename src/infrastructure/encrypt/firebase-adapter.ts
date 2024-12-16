@@ -13,7 +13,8 @@ export default class FirebaseEncryptorAdapter implements IEncrypter {
         return {
             uid: decodedToken.uid,
             email: decodedToken.email,
-            role: decodedToken.role
+            role: decodedToken.role,
+            isActive: decodedToken.email_verified
         };
     }
 }

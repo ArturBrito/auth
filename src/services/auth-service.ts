@@ -48,7 +48,8 @@ export default class AuthService implements IAuthService {
         const tokens = await this.encrypter.encrypt({
             uid: user.uid,
             email: user.email,
-            role: user.role
+            role: user.role,
+            isActive: user.isActive
         });
 
         await this.refreshTokenStore.saveRefreshToken(tokens.refreshToken);

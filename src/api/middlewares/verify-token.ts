@@ -8,6 +8,7 @@ import { NoTokenProvidedError } from "../../errors/no-token-provided-error";
 import { InvalidTokenError } from "../../errors/invalid-token-error";
 import { UnauthorizedError } from "../../errors/unauthorized-error";
 import UserMapper from "../../domain/mapper/user-mapper";
+import { InactiveUserError } from "../../errors/inactive-user-error";
 
 declare global {
     namespace Express {
@@ -39,6 +40,10 @@ export default class VerifyToken implements IVerifyToken {
 
             if (!decodedToken) {
                 throw new InvalidTokenError();
+            }
+
+            if(decodedToken.isActive === false) {
+                throw new InactiveUserError();
             }
 
             req.currentUser = UserMapper.tokenToDto(decodedToken);
