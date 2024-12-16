@@ -42,14 +42,14 @@ export default class VerifyToken implements IVerifyToken {
                 throw new InvalidTokenError();
             }
 
-            if(decodedToken.isActive === false) {
+            if(!decodedToken.isActive) {
                 throw new InactiveUserError();
             }
 
             req.currentUser = UserMapper.tokenToDto(decodedToken);
             next();
         } catch (error) {
-            throw new UnauthorizedError();
+            next(error);
         }
     }
 
