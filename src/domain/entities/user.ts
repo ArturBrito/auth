@@ -114,6 +114,10 @@ export class User {
         this._password = password;
     }
 
+    public setGoogleId(googleId: string): void {
+        this._googleId = googleId;
+    }
+
 }
 
 

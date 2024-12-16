@@ -5,6 +5,11 @@
 ✅ - Endpoint not found error
 Password minimum requirements
 Send email with verification
-Implement mongodb
-Middleware de auth and authz
+✅ - Implement mongodb
+✅ - Middleware de auth and authz
 Set the roles dynamic
+
+
+DOCS:
+config google console
+config google cloud

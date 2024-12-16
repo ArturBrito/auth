@@ -20,7 +20,7 @@ passport.use(
     async (accessToken: string, refreshToken: string, profile: Profile, done: any) => {
       try {
         // Find or create the user in the database
-        let user = await userRepository.getByGoogleId(profile.id);
+        let user = await userRepository.getUserByEmail(profile.emails?.[0].value);
 
         if (!user) {
           user = User.create({
@@ -31,6 +31,9 @@ passport.use(
           });
           
           await userRepository.createUser(user);
+        }else{
+          user.setGoogleId(profile.id);
+          await userRepository.updateUser(user);
         }
 
         const tokens = await encrypter.encrypt({
