@@ -3,14 +3,30 @@ import { inject, injectable } from "inversify";
 import { TYPES } from "../dependency-injection/types";
 import IAuthController from "./contracts/auth-controller-contract";
 import IAuthService from "../services/contracts/auth-service-contract";
+import IAuthIAMService from "../services/contracts/iam-service-contract";
 
 @injectable()
 export default class AuthController implements IAuthController {
     private authService: IAuthService;
+    private authIAMService: IAuthIAMService;
     constructor(
-        @inject(TYPES.IAuthService) authService: IAuthService
+        @inject(TYPES.IAuthService) authService: IAuthService,
+        @inject(TYPES.IAuthIAMService) authIAMService: IAuthIAMService
     ) {
         this.authService = authService;
+        this.authIAMService = authIAMService;
+    }
+    async googleSignIn(req: Request, res: Response, next: NextFunction) {
+        try {
+            const handler = this.authIAMService.login('google', ['profile', 'email']);
+            handler(req, res, next);
+        } catch (error) {
+            next(error);
+        }
+    }
+    async googleCallback(req: Request, res: Response, next: NextFunction) {
+        const handler = this.authIAMService.callback('google');
+        handler(req, res, next);
     }
     async refreshToken(req: Request, res: Response, next: NextFunction) {
         try {

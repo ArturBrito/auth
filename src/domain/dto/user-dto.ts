@@ -6,4 +6,5 @@ export interface UserDto {
     createdAt?: Date;
     isActive?: boolean;
     activationCode?: string;
+    googleId?: string;
 }

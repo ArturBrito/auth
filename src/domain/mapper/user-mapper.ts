@@ -9,6 +9,7 @@ export default class UserMapper {
             email: user.email,
             role: user.role,
             activationCode: user.activationCode,
+            googleId: user.googleId
         };
     }
     static toEntity(userPersistence: IUserPersistence): User {
@@ -20,6 +21,7 @@ export default class UserMapper {
             isActive: userPersistence.isActive,
             password: userPersistence.password,
             activationCode: userPersistence.activationCode,
+            googleId: userPersistence.googleId
         });
         return user;
     }
@@ -38,7 +40,8 @@ export default class UserMapper {
             role: user.role,
             createdAt: user.createdAt,
             isActive: user.isActive,
-            activationCode: user.activationCode
+            activationCode: user.activationCode,
+            googleId: user.googleId
         };
     }
 }

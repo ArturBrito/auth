@@ -17,10 +17,10 @@ import BcryptAdapter from "./infrastructure/password/bcrypt-adapter";
 
 export const DI_CONFIG = {
     "IVerifyToken": VerifyToken,
-    "IEncrypter": FirebaseEncryptorAdapter,
-    "IUserRepository": FireBaseUserRepository,
-    "ISetupDb": SetupDbFirebase,
-    "IPasswordManager": PasswordDummyAdapter,
-    "IRefreshTokensStore": InMemoryRefreshToken, // can be used with RedisRefreshToken
-    "ISetupRefreshTokenStore": SetupDbInMemory // can be used with SetupRedis
+    "IEncrypter": JwtAdapter,
+    "IUserRepository": UserMongoRepository,
+    "ISetupDb": SetupDbMongo,
+    "IPasswordManager": BcryptAdapter,
+    "IRefreshTokensStore": RedisRefreshToken, // can be used with InMemoryRefreshToken
+    "ISetupRefreshTokenStore": SetupRedis // can be used with SetupDbInMemory
 };

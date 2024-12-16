@@ -2,10 +2,12 @@ import AuthController from "../../src/controllers/auth-controller";
 import { User } from "../../src/domain/entities/user";
 import { BadRequestError } from "../../src/errors/bad-request-error";
 import IAuthService from "../../src/services/contracts/auth-service-contract";
+import IAuthIAMService from "../../src/services/contracts/iam-service-contract";
 
 describe('AuthController Unit Tests', () => {
     let authController: AuthController;
     let mockAuthService: jest.Mocked<IAuthService>;
+    let mockAuthIAMService: jest.Mocked<IAuthIAMService>;
 
     beforeEach(() => {
         mockAuthService = {
@@ -14,7 +16,12 @@ describe('AuthController Unit Tests', () => {
             refreshToken: jest.fn()
         } as any;
 
-        authController = new AuthController(mockAuthService);
+        mockAuthIAMService = {
+            login: jest.fn(),
+            callback: jest.fn()
+        } as any;
+
+        authController = new AuthController(mockAuthService, mockAuthIAMService);
     });
 
     describe('signIn', () => {

@@ -3,10 +3,20 @@ import IUserRepository from "../../../../domain/repositories/user-repository";
 import { User } from "../../../../domain/entities/user";
 import { IUserPersistence } from "../../../../data-model/user.datamodel";
 import UserMapper from "../../../../domain/mapper/user-mapper";
-import UserModel from "./user.schema";
+import UserModel from "../../../../data-model/user.schema";
 
 @injectable()
 export default class UserMongoRepository implements IUserRepository {
+    async getByGoogleId(googleId: string): Promise<User | null> {
+        try {
+            const query = { googleId: googleId };
+            const user = await UserModel.findOne(query);
+            if (!user) return null;
+            return UserMapper.toEntity(user);
+        } catch (error) {
+            throw error;
+        }
+    }
     async createUser(user: User): Promise<User> {
         try {
             const userPersistence: IUserPersistence = UserMapper.toPersistence(user);
@@ -20,7 +30,7 @@ export default class UserMongoRepository implements IUserRepository {
         try {
             const query = { email: email };
             const user = await UserModel.findOne(query);
-            if(!user) return null;
+            if (!user) return null;
             return UserMapper.toEntity(user);
         } catch (error) {
             throw error;
@@ -30,7 +40,7 @@ export default class UserMongoRepository implements IUserRepository {
         try {
             const query = { uid: uid };
             const user = await UserModel.findOne(query);
-            if(!user) return null;
+            if (!user) return null;
             return UserMapper.toEntity(user);
         } catch (error) {
             throw error;

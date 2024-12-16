@@ -32,7 +32,8 @@ describe('UserService Unit Tests', () => {
             getUserByEmail: jest.fn(),
             getUserById: jest.fn(),
             updateUser: jest.fn(),
-            deleteUser: jest.fn()
+            deleteUser: jest.fn(),
+            getByGoogleId: jest.fn()
         }
 
         mockPasswordManager = {

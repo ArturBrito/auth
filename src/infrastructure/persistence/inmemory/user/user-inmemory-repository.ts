@@ -4,6 +4,9 @@ import { injectable } from "inversify";
 
 @injectable()
 export default class UserInmemoryRepository implements IUserRepository{
+    getByGoogleId(googleId: string): Promise<User | null> {
+        throw new Error("Method not implemented.");
+    }
     
     private users: User[] = [];
     

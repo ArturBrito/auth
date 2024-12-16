@@ -14,7 +14,10 @@ services:
       MONGO_URI: mongodb://root:example@mongo:27017
       JWT_SECRET: testesecret
       REDIS_URI: redis://cache:6379
-      REDIS_PASSWORD: eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+      REDIS_PASSWORD:
+      GOOGLE_CLIENT_ID:
+      GOOGLE_CLIENT_SECRET:
+      GOOGLE_CALLBACK_URL:
     depends_on:
       - mongo
       - cache

@@ -5,6 +5,9 @@ import * as admin from "firebase-admin";
 
 @injectable()
 export default class FireBaseUserRepository implements IUserRepository {
+    getByGoogleId(googleId: string): Promise<User | null> {
+        throw new Error("Method not implemented.");
+    }
     async createUser(user: User): Promise<User> {
         try {
             await admin.auth().createUser({

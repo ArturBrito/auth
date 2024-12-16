@@ -6,4 +6,5 @@ export default interface IUserRepository {
     getUserById(uid: string): Promise<User | null>;
     updateUser(user: User): Promise<void>;
     deleteUser(uid: string): Promise<void>;
+    getByGoogleId(googleId: string): Promise<User | null>;
 }

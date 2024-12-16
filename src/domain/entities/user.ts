@@ -6,11 +6,12 @@ import { InvalidActivationCode } from "../../errors/invalid-activation-code-erro
 interface UserProps {
     uid?: string;
     email: string;
-    password: string;
+    password?: string;
     role: string;
     createdAt?: Date;
     isActive?: boolean;
     activationCode?: string;
+    googleId?: string;
 }
 
 export class User {
@@ -21,15 +22,17 @@ export class User {
     private _createdAt: Date;
     private _isActive: boolean;
     private _activationCode: string;
+    private _googleId: string;
 
     private constructor(props: UserProps) {
         this._uid = props.uid || uuid();
         this._email = props.email;
-        this._password = props.password;
+        this._password = props.password || '';
         this._role = props.role as Role || Role.USER;
         this._createdAt = props.createdAt || new Date();
         this._isActive = props.isActive || false;
         this._activationCode = props.activationCode || uuid();
+        this._googleId = props.googleId || '';
     }
 
     get uid(): string {
@@ -60,29 +63,45 @@ export class User {
         return this._activationCode;
     }
 
+    get googleId(): string {
+        return this._googleId;
+    }
+
+    private static isRegisteringWithGoogle(props: UserProps): boolean {
+        return !!props.googleId === true;
+    }
+
     public static create(props: UserProps): User {
         const guardedNullProps = [
-            { argument: props.email, argumentName: 'Email' },
-            { argument: props.password, argumentName: 'Password' }
+            { argument: props.email, argumentName: 'Email' }
         ]
+
+        if (
+            !this.isRegisteringWithGoogle(props) 
+        ) {
+            // If we're not registering w/ a social provider, we also
+            // need `password`.
+
+            guardedNullProps.push({ argument: props.password, argumentName: 'Password' })
+        }
 
         const guardNullProps = Guard.againstNullOrUndefinedBulk(guardedNullProps);
 
-        if(!guardNullProps.succeeded) {
+        if (!guardNullProps.succeeded) {
             throw new InvalidUserError(guardNullProps.message);
         }
 
         const guardEmail = Guard.isEmail(props.email, 'Email');
-        
-        if(!guardEmail.succeeded) {
+
+        if (!guardEmail.succeeded) {
             throw new InvalidUserError(guardEmail.message);
         }
-        
+
         return new User(props);
     }
 
     public activateUser(activationCode: string): void {
-        if(this._activationCode === activationCode) {
+        if (this._activationCode === activationCode) {
             this._isActive = true;
             this._activationCode = 'activated';
             return;
@@ -90,7 +109,7 @@ export class User {
 
         throw new InvalidActivationCode();
     }
-   
+
 }
 
 

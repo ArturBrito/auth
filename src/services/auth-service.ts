@@ -8,6 +8,7 @@ import { InactiveUserError } from "../errors/inactive-user-error";
 import IPasswordManager from "./contracts/password-manager";
 import { BadRequestError } from "../errors/bad-request-error";
 import IRefreshTokensStore from "./contracts/refresh-tokens-store";
+import IAuthIAMService from "./contracts/iam-service-contract";
 
 @injectable()
 export default class AuthService implements IAuthService {

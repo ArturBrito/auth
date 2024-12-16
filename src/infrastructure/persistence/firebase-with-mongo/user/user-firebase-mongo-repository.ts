@@ -3,11 +3,14 @@ import IUserRepository from "../../../../domain/repositories/user-repository";
 import { User } from "../../../../domain/entities/user";
 import { IUserPersistence } from "../../../../data-model/user.datamodel";
 import UserMapper from "../../../../domain/mapper/user-mapper";
-import UserModel from "./user.schema";
+import UserModel from "../../../../data-model/user.schema";
 import * as admin from "firebase-admin";
 
 @injectable()
 export default class UserFirebaseWithMongoRepository implements IUserRepository {
+    getByGoogleId(googleId: string): Promise<User | null> {
+        throw new Error("Method not implemented.");
+    }
     async createUser(user: User): Promise<User> {
         let userCreated: IUserPersistence;
         try {

@@ -6,4 +6,5 @@ export interface IUserPersistence {
     createdAt: Date;
     isActive: boolean;
     activationCode?: string;
+    googleId?: string;
 }

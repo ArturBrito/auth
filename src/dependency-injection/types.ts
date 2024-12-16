@@ -13,6 +13,7 @@ const TYPES = {
     IVerifyToken: Symbol.for('IVerifyToken'),
     ISetupDb: Symbol.for('ISetupDb'),
     ISetupRefreshTokenStore: Symbol.for('ISetupRefreshTokenStore'),
+    IAuthIAMService: Symbol.for('IAuthIAMService'),
 };
 
 export { TYPES };
