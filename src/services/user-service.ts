@@ -62,12 +62,19 @@ export default class UserService implements IUserService {
             throw new DatabaseConnectionError();
         });
 
-        if (userAlreadyExists) {
+        if (userAlreadyExists && !userAlreadyExists.googleId) {
             throw new UserAlreadyRegisteredError();
         }
 
         // hash the password
         const hashedPassword = await this.passwordManager.hashPassword(userDto.password);
+
+        if (userAlreadyExists && userAlreadyExists.googleId) {
+            // associate password with the user
+            userAlreadyExists.setPassword(hashedPassword);
+            await this.userRepository.updateUser(userAlreadyExists);
+            return UserMapper.toDto(userAlreadyExists);
+        }
 
         // create the user
         const user = User.create({

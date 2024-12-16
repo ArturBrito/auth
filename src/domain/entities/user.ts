@@ -110,6 +110,10 @@ export class User {
         throw new InvalidActivationCode();
     }
 
+    public setPassword(password: string): void {
+        this._password = password;
+    }
+
 }
 
 

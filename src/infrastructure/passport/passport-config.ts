@@ -26,7 +26,8 @@ passport.use(
           user = User.create({
             googleId: profile.id,
             email: profile.emails?.[0].value,
-            role: Role.USER
+            role: Role.USER,
+            isActive: true
           });
           
           await userRepository.createUser(user);
