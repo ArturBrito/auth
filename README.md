@@ -27,6 +27,7 @@ KEYS *
 "IEncrypter": JwtAdapter,
 "IUserRepository": UserMongoRepository,
 "ISetupDb": SetupDbMongo,
+"IPasswordManager": BcryptAdapter,
 "IRefreshTokensStore": RedisRefreshToken, // can be used with InMemoryRefreshToken
 "ISetupRefreshTokenStore": SetupRedis // can be used with SetupDbInMemory
 
@@ -36,6 +37,16 @@ KEYS *
 "IEncrypter": FirebaseEncryptorAdapter,
 "IUserRepository": FireBaseUserRepository,
 "ISetupDb": SetupDbFirebase,
+"IPasswordManager": PasswordDummyAdapter,
+"IRefreshTokensStore": InMemoryRefreshToken, // can be used with RedisRefreshToken
+"ISetupRefreshTokenStore": SetupDbInMemory // can be used with SetupRedis
+
+
+# Firebase with mongo
+"IVerifyToken": VerifyToken,
+"IEncrypter": FirebaseEncryptorAdapter,
+"IUserRepository": UserFirebaseWithMongoRepository,
+"ISetupDb": SetupDbFirebaseMongo,
 "IPasswordManager": PasswordDummyAdapter,
 "IRefreshTokensStore": InMemoryRefreshToken, // can be used with RedisRefreshToken
 "ISetupRefreshTokenStore": SetupDbInMemory // can be used with SetupRedis

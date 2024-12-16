@@ -11,6 +11,9 @@ import SetupDbFirebase from "./infrastructure/setup/database/setup-firebase";
 import SetupDbInMemory from "./infrastructure/setup/database/setup-inmemory";
 import PasswordDummyAdapter from "./infrastructure/password/dummy-adapter";
 import FirebaseEncryptorAdapter from "./infrastructure/encrypt/firebase-adapter";
+import UserFirebaseWithMongoRepository from "./infrastructure/persistence/firebase-with-mongo/user-firebase-mongo-repository";
+import SetupDbFirebaseMongo from "./infrastructure/setup/database/setup-firebase-mongo";
+import BcryptAdapter from "./infrastructure/password/bcrypt-adapter";
 
 export const DI_CONFIG = {
     "IVerifyToken": VerifyToken,
@@ -18,6 +21,6 @@ export const DI_CONFIG = {
     "IUserRepository": FireBaseUserRepository,
     "ISetupDb": SetupDbFirebase,
     "IPasswordManager": PasswordDummyAdapter,
-    "IRefreshTokensStore": InMemoryRefreshToken,
-    "ISetupRefreshTokenStore": SetupDbInMemory
+    "IRefreshTokensStore": InMemoryRefreshToken, // can be used with RedisRefreshToken
+    "ISetupRefreshTokenStore": SetupDbInMemory // can be used with SetupRedis
 };
