@@ -5,7 +5,7 @@ import UserController from "../controllers/user-controller";
 import IUserService from "../services/contracts/user-service-contract";
 import UserService from "../services/user-service";
 import IUserRepository from "../domain/repositories/user-repository";
-import UserInmemoryRepository from "../infrastructure/persistence/inmemory/user-inmemory-repository";
+import UserInmemoryRepository from "../infrastructure/persistence/inmemory/user/user-inmemory-repository";
 import IPasswordManager from "../services/contracts/password-manager";
 import BcryptAdapter from "../infrastructure/password/bcrypt-adapter";
 import IAuthService from "../services/contracts/auth-service-contract";

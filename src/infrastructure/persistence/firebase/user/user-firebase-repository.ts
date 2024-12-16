@@ -1,23 +1,11 @@
 import { injectable } from "inversify";
-import IUserRepository from "../../../domain/repositories/user-repository";
-import { User } from "../../../domain/entities/user";
-import { IUserPersistence } from "../../../data-model/user.datamodel";
-import UserMapper from "../../../domain/mapper/user-mapper";
-import UserModel from "./user.schema";
+import { User } from "../../../../domain/entities/user";
+import IUserRepository from "../../../../domain/repositories/user-repository";
 import * as admin from "firebase-admin";
 
 @injectable()
-export default class UserFirebaseWithMongoRepository implements IUserRepository {
+export default class FireBaseUserRepository implements IUserRepository {
     async createUser(user: User): Promise<User> {
-        let userCreated: IUserPersistence;
-        try {
-            const userPersistence: IUserPersistence = UserMapper.toPersistence(user);
-            userCreated = await UserModel.create(userPersistence);
-
-        } catch (error) {
-            throw error;
-        }
-
         try {
             await admin.auth().createUser({
                 uid: user.uid,
@@ -29,7 +17,7 @@ export default class UserFirebaseWithMongoRepository implements IUserRepository 
                 role: user.role
             });
             const activationLink = await admin.auth().generateEmailVerificationLink(user.email);
-
+            
             const newUser = User.create({
                 uid: user.uid,
                 email: user.email,
@@ -38,13 +26,12 @@ export default class UserFirebaseWithMongoRepository implements IUserRepository 
                 isActive: false,
                 activationCode: activationLink
             });
-
+            
             return newUser;
-
         } catch (error) {
-            await UserModel.deleteOne({ uid: userCreated.uid }).catch(err => console.log(err));
             throw error;
         }
+
     }
     async getUserByEmail(email: string): Promise<User | null> {
         try {
@@ -78,18 +65,13 @@ export default class UserFirebaseWithMongoRepository implements IUserRepository 
             return null;
         }
     }
-    async updateUser(user: User): Promise<void> {
-        try {
-            const userPersistence: IUserPersistence = UserMapper.toPersistence(user);
-            await UserModel.updateOne({ uid: userPersistence.uid }, userPersistence);
-        } catch (error) {
-            throw error;
-        }
+    // no need to implement because the user is activated by google link
+    updateUser(user: User): Promise<void> {
+        throw new Error("Method not implemented.");
     }
     async deleteUser(uid: string): Promise<void> {
         try {
             await admin.auth().deleteUser(uid);
-            await UserModel.deleteOne({ uid: uid });
         } catch (error) {
             throw error;
         }

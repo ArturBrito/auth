@@ -4,7 +4,7 @@ import { InvalidActivationCode } from "../../src/errors/invalid-activation-code-
 import { UserAlreadyRegisteredError } from "../../src/errors/user-already-registered-error";
 import { UserNotFoundError } from "../../src/errors/user-not-found-error";
 import BcryptAdapter from "../../src/infrastructure/password/bcrypt-adapter";
-import UserInmemoryRepository from "../../src/infrastructure/persistence/inmemory/user-inmemory-repository";
+import UserInmemoryRepository from "../../src/infrastructure/persistence/inmemory/user/user-inmemory-repository";
 import IPasswordManager from "../../src/services/contracts/password-manager";
 import IUserService from "../../src/services/contracts/user-service-contract";
 import UserService from "../../src/services/user-service";
