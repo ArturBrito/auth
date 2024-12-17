@@ -12,11 +12,9 @@ export default class PassportIAM implements IAuthIAMService {
     callback(provider: string) {
         return (req: any, res: any, next: any) => {
             passport.authenticate(provider, { session: false }, (err: Error | null, user: { tokens: string } | false) => {
-                if (err) {
-                    throw new Error(err?.message || 'Authentication failed');
-                }
-                if (!user) {
-                    throw new UserNotFoundError();
+                if (err || !user) {
+                    res.status(500).send();
+                    return;
                 }
                 res.status(200).json(user.tokens);
             })(req, res, next);

@@ -25,8 +25,12 @@ export default class AuthController implements IAuthController {
         }
     }
     async googleCallback(req: Request, res: Response, next: NextFunction) {
-        const handler = this.authIAMService.callback('google');
-        handler(req, res, next);
+        try {
+            const handler = this.authIAMService.callback('google');
+            handler(req, res, next);
+        } catch (error) {
+            next(error)
+        }
     }
     async refreshToken(req: Request, res: Response, next: NextFunction) {
         try {
