@@ -59,6 +59,39 @@ There are some configurations to be made for each case explained in [Configurati
 
 <br><br>
 
+# System Features
+## Authentication Methods
+This authentication system supports two primary methods for user authentication:
+
+1. Username and Password Authentication
+   - Standard registration and login process.
+   - Passwords are securely hashed using bcrypt before being stored, ensuring sensitive user data is protected.
+   - Login credentials are validated against the hashed values during authentication.
+
+2. Google OAuth 2.0
+   - Users can log in or register using their Google accounts.
+   - The system integrates with Google's OAuth 2.0 API to handle the authentication process securely.
+   - After successful authentication, users are issued a JWT token to maintain session state.
+
+## Data Storage
+The system supports multiple data storage solutions to store user credentials and other data, making it highly configurable for diverse use cases:
+
+- In-Memory Storage (for development and testing).
+- MongoDB for persistent data storage.
+- Firebase for projects leveraging Google’s backend services.
+- Combined options under analysis, such as Firebase Authentication System with MongoDB.
+
+## Token Management
+The system employs the following mechanisms for token management:
+
+1. Access Token Expiry
+   - Access tokens are short-lived to minimize risks in case of token theft.
+   - Clients must use a refresh token to request a new access token once the old one expires.
+2. Refresh Token Storage
+   - Each refresh token is kept in an in-memory database with Redis until it is used or the token expires. This prevents the same refresh token from being used more than once.
+
+<br><br>
+
 # Configuration
 ## Environment Variables
 To run the application under **development**, an .env file can be created in the root of the project and the variables with the values ​​inserted there.  
@@ -145,3 +178,17 @@ In this project we have to activate authentication and Email/Password mode.
 After that, in General Project Settings -> Service accounts -> Generate private key  
 <br>
 The generated file must be renamed to config-firebase.json and placed in the root of the project
+
+<br><br>
+
+## Google Cloud
+### **This step is only necessary if we are going to use Google OAuth (sign in with google)**  
+
+Here we will have to configure an application on Google Cloud. To do this, we created the application and activated the Google+ API.
+After this we create OAuth Credentials. After this we will have access to the client ID and client Secret Key (these two variables must be created as stated in [Environment Variables](#environment-variables)).
+The last step we have to do is add the following URI in the "Authorized redirect URIs" part:
+- http://localhost:3000/api/google/callback
+
+This will be the value for the enviornment variable GOOGLE_CALLBACK_URL
+
+> Note: When the system is running on a machine that is not local (when it is in production for example) it will have to be added here too, but only by updating the http://localhost:3000 part. The remainder must be kept
