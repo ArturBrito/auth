@@ -10,6 +10,7 @@ const TYPES = {
     EventEmmiter: Symbol.for('EventEmmiter'),
     CreateUserSendEmailHandler: Symbol.for('CreateUserSendEmailHandler'),
     ChangePasswordSendEmailHandler: Symbol.for('ChangePasswordSendEmailHandler'),
+    ResetPasswordSendEmailHandler: Symbol.for('ResetPasswordSendEmailHandler'),
     IEmailClient: Symbol.for('IEmailClient'),
     IVerifyToken: Symbol.for('IVerifyToken'),
     ISetupDb: Symbol.for('ISetupDb'),

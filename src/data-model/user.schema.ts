@@ -9,7 +9,8 @@ const UserSchema = new mongoose.Schema({
     createdAt: { type: Date, required: true },
     isActive: { type: Boolean, required: true },
     activationCode: { type: String, required: false },
-    googleId: { type: String, required: false }
+    googleId: { type: String, required: false },
+    resetCode: { type: String, required: false }
 });
 
 export { UserSchema };

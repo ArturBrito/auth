@@ -13,6 +13,18 @@ export default class UserController implements IUserController {
     ) { 
         this.userService = userService;
     }
+    async resetPasswordRequest(req: Request, res: Response, next: NextFunction) {
+        try {
+            const email = req.body.email;
+            await this.userService.resetPasswordRequest(email);
+            res.status(200).send();
+        } catch (error) {
+            next(error);
+        }
+    }
+    resetPassword(req: Request, res: Response, next: NextFunction) {
+        throw new Error("Method not implemented.");
+    }
     async changePassword(req: Request, res: Response, next: NextFunction) {
         try {
             const userEmail = req.currentUser.email;

@@ -6,4 +6,6 @@ export default interface IUserController {
     activateUser(req: Request, res: Response, next: NextFunction);
     deleteUser(req: Request, res: Response, next: NextFunction);
     changePassword(req: Request, res: Response, next: NextFunction);
+    resetPasswordRequest(req: Request, res: Response, next: NextFunction);
+    resetPassword(req: Request, res: Response, next: NextFunction);
 }

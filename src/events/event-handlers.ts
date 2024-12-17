@@ -13,13 +13,15 @@ export class EventHandlers {
     constructor(
         @inject(TYPES.EventEmmiter) eventEmitter: EventEmitter,
         @inject(TYPES.CreateUserSendEmailHandler) createUserSendEmailHandler: IEventHandler,
-        @inject(TYPES.ChangePasswordSendEmailHandler) changePasswordSendEmailHandler: IEventHandler
+        @inject(TYPES.ChangePasswordSendEmailHandler) changePasswordSendEmailHandler: IEventHandler,
+        @inject(TYPES.ResetPasswordSendEmailHandler) resetPasswordSendEmailHandler: IEventHandler
     ) {
         this.eventEmitter = eventEmitter;
 
         this.handlers = new Map<string, IEventHandler>([
             ['CreateUserSendEmail', createUserSendEmailHandler],
-            ['PasswordChanged', changePasswordSendEmailHandler]
+            ['PasswordChanged', changePasswordSendEmailHandler],
+            ['ResetPasswordRequestSendEmail', resetPasswordSendEmailHandler]
         ]);
     }
 

@@ -7,4 +7,5 @@ export interface IUserPersistence {
     isActive: boolean;
     activationCode?: string;
     googleId?: string;
+    resetCode?: string;
 }

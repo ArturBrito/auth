@@ -65,6 +65,14 @@ export default (app: Router) => {
         validateRequest,
         verifyToken.verifyToken,
         (req: Request, res: Response, next: NextFunction) => ctrl.changePassword(req, res, next));
+    router.post('/reset-password-request',
+        [
+            body('email')
+                .isEmail()
+                .withMessage('Email must be valid')
+        ],
+        validateRequest,
+        (req: Request, res: Response, next: NextFunction) => ctrl.resetPasswordRequest(req, res, next));
 
 
     console.log('User route loaded');

@@ -12,6 +12,7 @@ interface UserProps {
     isActive?: boolean;
     activationCode?: string;
     googleId?: string;
+    resetCode?: string;
 }
 
 export class User {
@@ -23,6 +24,7 @@ export class User {
     private _isActive: boolean;
     private _activationCode: string;
     private _googleId: string;
+    private _resetCode: string;
 
     private constructor(props: UserProps) {
         this._uid = props.uid || uuid();
@@ -33,6 +35,7 @@ export class User {
         this._isActive = props.isActive || false;
         this._activationCode = props.activationCode || uuid();
         this._googleId = props.googleId || '';
+        this._resetCode = props.resetCode || '';
     }
 
     get uid(): string {
@@ -65,6 +68,10 @@ export class User {
 
     get googleId(): string {
         return this._googleId;
+    }
+
+    get resetCode(): string {
+        return this._resetCode;
     }
 
     private static isRegisteringWithGoogle(props: UserProps): boolean {
@@ -113,6 +120,10 @@ export class User {
 
     public setGoogleId(googleId: string): void {
         this._googleId = googleId;
+    }
+
+    public generateResetCode(): void {
+        this._resetCode = uuid();
     }
 
 }

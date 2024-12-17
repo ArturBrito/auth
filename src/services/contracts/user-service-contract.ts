@@ -6,4 +6,6 @@ export default interface IUserService {
     activateUser(email: string, activationCode: string): Promise<UserDto>;
     deleteUser(user: UserDto): Promise<void>;
     changePassword(email:string, password: string, newPassword: string): Promise<void>;
+    resetPasswordRequest(email: string): Promise<void>;
+    resetPassword(email: string, resetCode: string, newPassword: string): Promise<void>;
 }

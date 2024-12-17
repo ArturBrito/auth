@@ -25,6 +25,27 @@ export default class UserService implements IUserService {
         this.passwordManager = passwordManager;
         this.eventEmitter = eventEmitter;
     }
+    async resetPasswordRequest(email: string): Promise<void> {
+        // get user by email
+        const user = await this.userRepository.getUserByEmail(email).catch(() => {
+            throw new DatabaseConnectionError();
+        });
+
+        if (!user) {
+            throw new UserNotFoundError();
+        }
+
+        // generate reset code
+        user.generateResetCode();
+
+        // save user
+        await this.userRepository.updateUser(user);
+
+        this.eventEmitter.emit('ResetPasswordRequestSendEmail', UserMapper.toUserCodesDto(user));
+    }
+    resetPassword(email: string, resetCode: string, newPassword: string): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
     async changePassword(email: string, password: string, newPassword: string): Promise<void> {
         // get user by email
         const user = await this.userRepository.getUserByEmail(email).catch(() => {
@@ -51,7 +72,7 @@ export default class UserService implements IUserService {
         // save user
         await this.userRepository.updateUser(user);
 
-        this.eventEmitter.emit('PasswordChanged', user);
+        this.eventEmitter.emit('PasswordChanged', UserMapper.toDto(user));
     }
     async deleteUser(user: UserDto): Promise<void> {
         // get user by email
@@ -102,7 +123,7 @@ export default class UserService implements IUserService {
             userAlreadyExists.setPassword(hashedPassword);
             await this.userRepository.updateUser(userAlreadyExists);
             // emit event
-            this.eventEmitter.emit('CreateUserSendEmail', userAlreadyExists);
+            this.eventEmitter.emit('CreateUserSendEmail', UserMapper.toUserCodesDto(userAlreadyExists));
             return UserMapper.toDto(userAlreadyExists);
         }
 
@@ -117,7 +138,7 @@ export default class UserService implements IUserService {
         const newUser = await this.userRepository.createUser(user);
 
         // emit event
-        this.eventEmitter.emit('CreateUserSendEmail', newUser);
+        this.eventEmitter.emit('CreateUserSendEmail', UserMapper.toUserCodesDto(newUser));
 
         return UserMapper.toDto(newUser);
 
