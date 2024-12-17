@@ -1,52 +1,35 @@
-# generate RS256 keys:
-ssh-keygen -t rsa -b 4096 -m PEM -f rs256.rsa
-# Don't add passphrase
-openssl rsa -in rs256.rsa -pubout -outform PEM -out rs256.rsa.pub
+# Authentication System
 
-# Run docker-compose files
-docker-compose -f docker-compose.dev.yml up --build
-docker-compose -f docker-compose.prod.yml up --build
+**Disclaimer:** This project is developed for personal use and as part of a portfolio. I am not responsible for any issues that arise from using this system.
 
-# Redis
-redis-cli -h 127.0.0.1 -p 6379 -password eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
-KEYS *
+## Overview
+This project provides a ready-to-use authentication system with minimal configuration.  
 
-## Config
-# Local in memory
-"IVerifyToken": VerifyToken,
-"IEncrypter": JwtAdapter,
-"IUserRepository": UserInmemoryRepository,
-"ISetupDb": SetupDbInMemory,
-"IPasswordManager": BcryptAdapter,
-"IRefreshTokensStore": InMemoryRefreshToken,
-"ISetupRefreshTokenStore": SetupDbInMemory
+The system ensures:
 
+- **Stateless Authentication:** With JWT, user sessions are managed without maintaining server-side state.
+- **Role-Based Access Control:** Permissions can be implemented by encoding roles or privileges into the token claims.
 
-# Local with mongo
-"IVerifyToken": VerifyToken,
-"IEncrypter": JwtAdapter,
-"IUserRepository": UserMongoRepository,
-"ISetupDb": SetupDbMongo,
-"IPasswordManager": BcryptAdapter,
-"IRefreshTokensStore": RedisRefreshToken, // can be used with InMemoryRefreshToken
-"ISetupRefreshTokenStore": SetupRedis // can be used with SetupDbInMemory
+It supports registration and authentication via:
+- **Username and password**
+- **Google** (OAuth 2.0)
 
+## Documentation Index
 
-# Firebase
-"IVerifyToken": VerifyToken,
-"IEncrypter": FirebaseEncryptorAdapter,
-"IUserRepository": FireBaseUserRepository,
-"ISetupDb": SetupDbFirebase,
-"IPasswordManager": PasswordDummyAdapter,
-"IRefreshTokensStore": InMemoryRefreshToken, // can be used with RedisRefreshToken
-"ISetupRefreshTokenStore": SetupDbInMemory // can be used with SetupRedis
+1. [Getting Started](#getting-started)
+2. [System Features](#system-features)
+   - [Authentication Methods](#authentication-methods)
+   - [Data Storage](#data-storage)
+   - [Token Management](#token-management)
+3. [Configuration](#configuration)
+4. [API Endpoints](#api-endpoints)
+5. [Installation](#installation)
+6. [Running the Project](#running-the-project)
+7. [Technical Details](#technical-details)
+   - [Architecture](#architecture)
+   - [Dependencies](#dependencies)
+8. [Contributing](#contributing)
+9. [License](#license)
 
 
-# Firebase with mongo
-"IVerifyToken": VerifyToken,
-"IEncrypter": FirebaseEncryptorAdapter,
-"IUserRepository": UserFirebaseWithMongoRepository,
-"ISetupDb": SetupDbFirebaseMongo,
-"IPasswordManager": PasswordDummyAdapter,
-"IRefreshTokensStore": InMemoryRefreshToken, // can be used with RedisRefreshToken
-"ISetupRefreshTokenStore": SetupDbInMemory // can be used with SetupRedis
+
