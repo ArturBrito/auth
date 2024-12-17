@@ -13,6 +13,15 @@ export default class UserController implements IUserController {
     ) { 
         this.userService = userService;
     }
+    async resendActivationCode(req: Request, res: Response, next: NextFunction) {
+        try {
+            const email = req.body.email;
+            await this.userService.resendActivationCode(email);
+            res.status(200).send();
+        } catch (error) {
+            next(error);
+        }
+    }
     async resetPasswordRequest(req: Request, res: Response, next: NextFunction) {
         try {
             const email = req.body.email;

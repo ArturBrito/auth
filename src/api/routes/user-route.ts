@@ -47,6 +47,14 @@ export default (app: Router) => {
         ],
         validateRequest,
         (req: Request, res: Response, next: NextFunction) => ctrl.activateUser(req, res, next));
+    router.post('/resend-activation-code',
+        [
+            body('email')
+                .isEmail()
+                .withMessage('Email must be valid')
+        ],
+        validateRequest,
+        (req: Request, res: Response, next: NextFunction) => ctrl.resendActivationCode(req, res, next));
     router.delete('',
         verifyToken.verifyToken,
         (req: Request, res: Response, next: NextFunction) => ctrl.deleteUser(req, res, next));

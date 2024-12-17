@@ -25,6 +25,22 @@ export default class UserService implements IUserService {
         this.passwordManager = passwordManager;
         this.eventEmitter = eventEmitter;
     }
+    async resendActivationCode(email: string): Promise<void> {
+        // get user by email
+        const user = await this.userRepository.getUserByEmail(email).catch(() => {
+            throw new DatabaseConnectionError();
+        });
+
+        if (!user) {
+            throw new UserNotFoundError();
+        }
+
+        if(user.isActive) {
+            throw new UserAlreadyRegisteredError();
+        }
+
+        this.eventEmitter.emit('CreateUserSendEmail', UserMapper.toUserCodesDto(user));
+    }
     async resetPasswordRequest(email: string): Promise<void> {
         // get user by email
         const user = await this.userRepository.getUserByEmail(email).catch(() => {

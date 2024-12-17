@@ -8,4 +8,5 @@ export default interface IUserController {
     changePassword(req: Request, res: Response, next: NextFunction);
     resetPasswordRequest(req: Request, res: Response, next: NextFunction);
     resetPassword(req: Request, res: Response, next: NextFunction);
+    resendActivationCode(req: Request, res: Response, next: NextFunction);
 }

@@ -472,6 +472,80 @@ describe('UserService Unit Tests', () => {
             }
         });
     });
+
+    describe('resendActivationCode', () => {
+        it('should resend the activation code', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role!,
+                isActive: false
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+
+            await userService.resendActivationCode(validUserData.email);
+
+            expect(mockUserRepository.getUserByEmail).toHaveBeenCalled();
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            mockUserRepository.getUserByEmail.mockResolvedValue(null);
+
+            try {
+                await userService.resendActivationCode(validUserData.email);
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+
+        it('should throw an error if the database throw error', async () => {
+            mockUserRepository.getUserByEmail.mockRejectedValue(new DatabaseConnectionError());
+
+            try {
+                await userService.resendActivationCode(validUserData.email);
+            } catch (error) {
+                expect(error).toBeInstanceOf(DatabaseConnectionError);
+            }
+        });
+
+        it('should throw an error if the user is already active', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role!,
+                isActive: true
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+
+            try {
+                await userService.resendActivationCode(validUserData.email);
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserAlreadyRegisteredError);
+            }
+        });
+
+        it('should emit an event when a user resends the activation code', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role!,
+                isActive: false
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+
+            const eventEmitterSpy = jest.spyOn(eventEmitter, 'emit');
+
+            await userService.resendActivationCode(validUserData.email);
+
+            expect(eventEmitterSpy).toHaveBeenCalledWith('CreateUserSendEmail', expect.any(Object));
+        });
+    });
 });
 
 
@@ -764,6 +838,49 @@ describe('UserService - MongoDB Integration Tests', () => {
                 expect(error).toBeInstanceOf(UserNotFoundError);
                 expect(error.message).toBe('User not found');
             }
+        });
+    });
+
+    describe('resendActivationCode', () => {
+        it('should resend the activation code', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            const user = await userService.createUser(validUserData);
+
+            await userService.resendActivationCode(validUserData.email);
+
+            const foundUser = await userService.getUserByEmail(validUserData.email);
+
+            expect(foundUser).toBeDefined();
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            try {
+                await userService.resendActivationCode(validUserData.email);
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+
+        it('should throw an error if the user is already active', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            const user = await userService.createUser(validUserData);
+
+            try {
+                await userService.resendActivationCode(validUserData.email);
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserAlreadyRegisteredError);
+            }
+        });
+
+        it('should emit an event when a user resends the activation code', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            const user = await userService.createUser(validUserData);
+
+            const eventEmitterSpy = jest.spyOn(eventEmitter, 'emit');
+
+            await userService.resendActivationCode(validUserData.email);
+
+            expect(eventEmitterSpy).toHaveBeenCalledWith('CreateUserSendEmail', expect.any(Object));
         });
     });
 });

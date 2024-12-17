@@ -8,4 +8,5 @@ export default interface IUserService {
     changePassword(email:string, password: string, newPassword: string): Promise<void>;
     resetPasswordRequest(email: string): Promise<void>;
     resetPassword(email: string, resetCode: string, newPassword: string): Promise<void>;
+    resendActivationCode(email: string): Promise<void>;
 }
