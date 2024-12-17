@@ -27,6 +27,7 @@ import IAuthIAMService from "../services/contracts/iam-service-contract";
 import PassportIAM from "../infrastructure/passport/passport-iam";
 import { ChangePasswordSendEmailHandler } from "../events/change-password-send-email.event";
 import { ResetPasswordSendEmailHandler } from "../events/reset-password-send-email.event";
+import NodeMailerClient from "../infrastructure/email/node-mailer-client";
 
 const myContainer = new Container();
 myContainer.bind<IUserController>(TYPES.IUserController).to(UserController);
@@ -39,7 +40,7 @@ myContainer.bind<IEncrypter>(TYPES.IEncrypter).to(DI_CONFIG.IEncrypter);
 myContainer.bind<IRefreshTokensStore>(TYPES.IRefreshTokensStore).to(DI_CONFIG.IRefreshTokensStore).inSingletonScope();
 myContainer.bind(TYPES.EventEmmiter).toConstantValue(new EventEmitter());
 myContainer.bind<EventHandlers>(EventHandlers).toSelf();
-myContainer.bind<IEmailClient>(TYPES.IEmailClient).to(DummyEmailClient);
+myContainer.bind<IEmailClient>(TYPES.IEmailClient).to(NodeMailerClient);
 myContainer.bind<IVerifyToken>(TYPES.IVerifyToken).to(DI_CONFIG.IVerifyToken);
 myContainer.bind<ISetupDb>(TYPES.ISetupDb).to(DI_CONFIG.ISetupDb);
 myContainer.bind<ISetupRefreshTokenStore>(TYPES.ISetupRefreshTokenStore).to(DI_CONFIG.ISetupRefreshTokenStore);
