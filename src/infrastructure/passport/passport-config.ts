@@ -26,8 +26,7 @@ passport.use(
           user = User.create({
             googleId: profile.id,
             email: profile.emails?.[0].value,
-            role: Role.USER,
-            isActive: true
+            role: Role.USER
           });
           
           await userRepository.createUser(user);
@@ -40,7 +39,7 @@ passport.use(
           uid: user.uid,
           email: user.email,
           role: user.role,
-          isActive: true,
+          isActive: false
         })
 
         const userDto = UserMapper.toDto(user);

@@ -73,6 +73,8 @@ export default class UserService implements IUserService {
             // associate password with the user
             userAlreadyExists.setPassword(hashedPassword);
             await this.userRepository.updateUser(userAlreadyExists);
+            // emit event
+            this.eventEmitter.emit('CreateUserSendEmail', userAlreadyExists);
             return UserMapper.toDto(userAlreadyExists);
         }
 

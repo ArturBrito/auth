@@ -42,7 +42,7 @@ export default class VerifyToken implements IVerifyToken {
                 throw new InvalidTokenError();
             }
 
-            if(!decodedToken.isActive) {
+            if (!decodedToken.isActive) {
                 throw new InactiveUserError();
             }
 

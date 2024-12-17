@@ -77,11 +77,8 @@ export class User {
         ]
 
         if (
-            !this.isRegisteringWithGoogle(props) 
+            !this.isRegisteringWithGoogle(props)
         ) {
-            // If we're not registering w/ a social provider, we also
-            // need `password`.
-
             guardedNullProps.push({ argument: props.password, argumentName: 'Password' })
         }
 
