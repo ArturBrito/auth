@@ -293,3 +293,48 @@ POST `/api/user/reset-password`
 }
 ```
 * **Sucess Status Code:** 204
+
+<br>
+
+## Authentication
+### Signin
+POST `/api/signin`
+* **Description:** Receive an email and password and return tokens to access the resources
+* **Request Body:**
+```
+{
+    "email": "artur.brito95@gmail.com",
+    "password": "teste1"
+}
+```
+* **Sucess Status Code:** 200
+* **Response:**
+```
+{
+    "token": "token",
+    "refreshToken": "refreshToken"
+}
+```
+
+### Refresh Token
+POST `/api/refreshtoken`
+* **Description:** Receive a refresh token and receive a new token and a new refresh token
+* **Request Body:**
+```
+{
+    "refreshToken": "refresh token"
+}
+```
+* **Sucess Status Code:** 200
+* **Response:**
+```
+{
+    "token": "token",
+    "refreshToken": "refreshToken"
+}
+```
+
+### Google OAuth
+GET `/api/google`
+* **Description:** This is the endpoint to sign in with google
+* **Sucess Status Code:** 200
