@@ -1,4 +1,3 @@
-import VerifyToken from "./api/middlewares/verify-token";
 import JwtAdapter from "./infrastructure/encrypt/jwt-adapter";
 import UserInmemoryRepository from "./infrastructure/persistence/inmemory/user/user-inmemory-repository";
 import UserMongoRepository from "./infrastructure/persistence/mongo/user/user-mongo-repository";
@@ -11,11 +10,12 @@ import SetupDbFirebase from "./infrastructure/setup/database/setup-firebase";
 import SetupDbInMemory from "./infrastructure/setup/database/setup-inmemory";
 import PasswordDummyAdapter from "./infrastructure/password/dummy-adapter";
 import FirebaseEncryptorAdapter from "./infrastructure/encrypt/firebase-adapter";
-import UserFirebaseWithMongoRepository from "./infrastructure/persistence/firebase-with-mongo/user/user-firebase-mongo-repository";
-import SetupDbFirebaseMongo from "./infrastructure/setup/database/setup-firebase-mongo";
 import BcryptAdapter from "./infrastructure/password/bcrypt-adapter";
+import DummyRefreshToken from "./infrastructure/refresh-tokens/dummy-tokens";
+import DummyEmailClient from "./infrastructure/email/dummy-email-client";
+import NodeMailerClient from "./infrastructure/email/node-mailer-client";
 
-export const DI_CONFIG = {
+/*export const DI_CONFIG = {
     "IVerifyToken": VerifyToken,
     "IEncrypter": JwtAdapter,
     "IUserRepository": UserMongoRepository,
@@ -23,4 +23,55 @@ export const DI_CONFIG = {
     "IPasswordManager": BcryptAdapter,
     "IRefreshTokensStore": RedisRefreshToken, // can be used with InMemoryRefreshToken
     "ISetupRefreshTokenStore": SetupRedis // can be used with SetupDbInMemory
-};
+};*/
+
+const inMemory = {
+    "IEncrypter": JwtAdapter,
+    "IUserRepository": UserInmemoryRepository,
+    "ISetupDb": SetupDbInMemory,
+    "IPasswordManager": BcryptAdapter,
+    "IRefreshTokensStore": InMemoryRefreshToken,
+    "ISetupRefreshTokenStore": SetupDbInMemory,
+    "IEmailClient": DummyEmailClient
+}
+
+const mongoWithRedis = {
+    "IEncrypter": JwtAdapter,
+    "IUserRepository": UserMongoRepository,
+    "ISetupDb": SetupDbMongo,
+    "IPasswordManager": BcryptAdapter,
+    "IRefreshTokensStore": RedisRefreshToken, // can be used with InMemoryRefreshToken
+    "ISetupRefreshTokenStore": SetupRedis, // can be used with SetupDbInMemory
+    "IEmailClient": process.env.NODE_ENV != 'production' ? DummyEmailClient : NodeMailerClient
+}
+
+const mongoWithInMemory = {
+    "IEncrypter": JwtAdapter,
+    "IUserRepository": UserMongoRepository,
+    "ISetupDb": SetupDbMongo,
+    "IPasswordManager": BcryptAdapter,
+    "IRefreshTokensStore": InMemoryRefreshToken, // can be used with RedisRefreshToken
+    "ISetupRefreshTokenStore": SetupDbInMemory, // can be used with SetupRedis
+    "IEmailClient": process.env.NODE_ENV != 'production' ? DummyEmailClient : NodeMailerClient
+}
+
+const firebase = {
+    "IEncrypter": FirebaseEncryptorAdapter,
+    "IUserRepository": FireBaseUserRepository,
+    "ISetupDb": SetupDbFirebase,
+    "IPasswordManager": PasswordDummyAdapter,
+    "IRefreshTokensStore": DummyRefreshToken,
+    "ISetupRefreshTokenStore": SetupDbInMemory,
+    "IEmailClient": process.env.NODE_ENV != 'production' ? DummyEmailClient : NodeMailerClient
+}
+
+const selectedConfig = process.env.SELECTED_SETUP || 'inMemory';
+
+const config = {
+    inMemory,
+    mongoWithRedis,
+    mongoWithInMemory,
+    firebase
+}
+
+export default config[selectedConfig];

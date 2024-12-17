@@ -10,10 +10,11 @@ services:
     ports:
       - 3000:3000
     environment:
-      NODE_ENV: development
-      MONGO_URI: mongodb://root:example@mongo:27017
-      JWT_SECRET: testesecret
-      REDIS_URI: redis://cache:6379
+      NODE_ENV:
+      SELECTED_SETUP:
+      MONGO_URI:
+      JWT_SECRET:
+      REDIS_URI:
       REDIS_PASSWORD:
       GOOGLE_CLIENT_ID:
       GOOGLE_CLIENT_SECRET:
