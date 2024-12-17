@@ -126,6 +126,14 @@ export class User {
         this._resetCode = uuid();
     }
 
+    public validateResetCode(resetCode: string): boolean {
+        return this._resetCode === resetCode;
+    }
+    
+    public clearResetCode(): void {
+        this._resetCode = '';
+    }
+
 }
 
 

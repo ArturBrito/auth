@@ -319,7 +319,7 @@ describe('UserService Unit Tests', () => {
                 expect(error).toBeInstanceOf(UserNotFoundError);
             }
         });
-        
+
         it('should throw an error if the password is null or undefined', async () => {
             const user = User.create({
                 uid: '1',
@@ -333,6 +333,138 @@ describe('UserService Unit Tests', () => {
 
             try {
                 await userService.changePassword(validUserData.email, '', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(InvalidUserError);
+                expect(error.message).toBe('Invalid user');
+                expect(error.reason).toBe('Password is null or undefined');
+            }
+        });
+    });
+
+    describe('resetPasswordRequest', () => {
+        it('should reset the user password', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role!
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+
+            await userService.resetPasswordRequest(validUserData.email);
+
+            expect(mockUserRepository.updateUser).toHaveBeenCalled();
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            mockUserRepository.getUserByEmail.mockResolvedValue(null);
+
+            try {
+                await userService.resetPasswordRequest(validUserData.email);
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+
+        it('should throw an error if the database throw error', async () => {
+            mockUserRepository.getUserByEmail.mockRejectedValue(new DatabaseConnectionError());
+
+            try {
+                await userService.resetPasswordRequest(validUserData.email);
+            } catch (error) {
+                expect(error).toBeInstanceOf(DatabaseConnectionError);
+            }
+        });
+
+        it('should emit an event when a user resets the password', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role!
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+
+            const eventEmitterSpy = jest.spyOn(eventEmitter, 'emit');
+
+            await userService.resetPasswordRequest(validUserData.email);
+
+            expect(eventEmitterSpy).toHaveBeenCalledWith('ResetPasswordRequestSendEmail', expect.any(Object));
+        });
+
+    });
+
+    describe('resetPassword', () => {
+        it('should reset the user password', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role!,
+                resetCode: '123456'
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+
+            await userService.resetPassword(validUserData.email, '123456', '654321');
+
+            expect(mockUserRepository.updateUser).toHaveBeenCalled();
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            mockUserRepository.getUserByEmail.mockResolvedValue(null);
+
+            try {
+                await userService.resetPassword(validUserData.email, '123456', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+
+        it('should throw an error if the database throw error', async () => {
+            mockUserRepository.getUserByEmail.mockRejectedValue(new DatabaseConnectionError());
+
+            try {
+                await userService.resetPassword(validUserData.email, '123456', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(DatabaseConnectionError);
+            }
+        });
+
+        it('should throw an error if the reset code is invalid', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role!,
+                resetCode: '123456'
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+
+            try {
+                await userService.resetPassword(validUserData.email, '654321', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+
+        it('should throw an error if the password is null or undefined', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role!,
+                resetCode: '123456'
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+
+            try {
+                await userService.resetPassword(validUserData.email, '123456', '');
             } catch (error) {
                 expect(error).toBeInstanceOf(InvalidUserError);
                 expect(error.message).toBe('Invalid user');
@@ -431,11 +563,17 @@ describe('UserService - MongoDB Integration Tests', () => {
         it('should activate a user', async () => {
             mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
             const user = await userService.createUser(validUserData);
+            let userEntity = await userRepository.getUserByEmail(validUserData.email);
+            let activationCode = userEntity?.activationCode;
 
-            const activatedUser = await userService.activateUser(validUserData.email, user.activationCode!);
+            const activatedUser = await userService.activateUser(validUserData.email, activationCode!);
+
+            // fetch the user again after activation
+            userEntity = await userRepository.getUserByEmail(validUserData.email);
+            activationCode = userEntity?.activationCode;
 
             expect(activatedUser).toBeDefined();
-            expect(activatedUser.activationCode).toBe('activated');
+            expect(activationCode).toBe('activated');
         });
 
         it('should throw an error if the user does not exist', async () => {
@@ -498,6 +636,133 @@ describe('UserService - MongoDB Integration Tests', () => {
                 await userService.deleteUser(validUserData);
             } catch (error) {
                 expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+    });
+
+    describe('changePassword', () => {
+        it('should change the user password', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            mockPasswordManager.comparePasswords.mockResolvedValue(true);
+            const user = await userService.createUser(validUserData);
+
+            await userService.changePassword(validUserData.email, '123456', '654321');
+
+            const foundUser = await userService.getUserByEmail(validUserData.email);
+
+            expect(foundUser).toBeDefined();
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            try {
+                await userService.changePassword(validUserData.email, '123456', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+
+        it('should throw an error if the password is incorrect', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            mockPasswordManager.comparePasswords.mockResolvedValue(false);
+            const user = await userService.createUser(validUserData);
+
+            try {
+                await userService.changePassword(validUserData.email, '123456', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+
+        it('should throw an error if the password is null or undefined', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            mockPasswordManager.comparePasswords.mockResolvedValue(true);
+            const user = await userService.createUser(validUserData);
+
+            try {
+                await userService.changePassword(validUserData.email, '', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(InvalidUserError);
+                expect(error.message).toBe('Invalid user');
+                expect(error.reason).toBe('Password is null or undefined');
+            }
+        });
+    });
+
+    describe('resetPasswordRequest', () => {
+        it('should reset the user password', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            const user = await userService.createUser(validUserData);
+
+            await userService.resetPasswordRequest(validUserData.email);
+
+            const foundUser = await userService.getUserByEmail(validUserData.email);
+
+            expect(foundUser).toBeDefined();
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            try {
+                await userService.resetPasswordRequest(validUserData.email);
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+
+        it('should emit an event when a user resets the password', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            const user = await userService.createUser(validUserData);
+
+            const eventEmitterSpy = jest.spyOn(eventEmitter, 'emit');
+
+            await userService.resetPasswordRequest(validUserData.email);
+
+            expect(eventEmitterSpy).toHaveBeenCalledWith('ResetPasswordRequestSendEmail', expect.any(Object));
+        });
+    });
+
+    describe('resetPassword', () => {
+        it('should reset the user password', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            const user = await userService.createUser(validUserData);
+            await userService.resetPasswordRequest(validUserData.email);
+
+            const userEntity = await userRepository.getUserByEmail(validUserData.email);
+
+            await userService.resetPassword(validUserData.email, userEntity?.resetCode!, '654321');
+
+            const foundUser = await userService.getUserByEmail(validUserData.email);
+
+            expect(foundUser).toBeDefined();
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            try {
+                await userService.resetPassword(validUserData.email, '123456', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+
+        it('should throw an error if the reset code is invalid', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            const user = await userService.createUser(validUserData);
+
+            try {
+                await userService.resetPassword(validUserData.email, '654321', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+
+        it('should throw an error if the password is null or undefined', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            const user = await userService.createUser(validUserData);
+
+            try {
+                await userService.resetPassword(validUserData.email, '123456', '');
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+                expect(error.message).toBe('User not found');
             }
         });
     });

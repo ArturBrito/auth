@@ -73,6 +73,22 @@ export default (app: Router) => {
         ],
         validateRequest,
         (req: Request, res: Response, next: NextFunction) => ctrl.resetPasswordRequest(req, res, next));
+    router.post('/reset-password',
+        [
+            body('email')
+                .isEmail()
+                .withMessage('Email must be valid'),
+            body('resetCode')
+                .trim()
+                .notEmpty()
+                .withMessage('You must supply a reset code'),
+            body('newPassword')
+                .trim()
+                .notEmpty()
+                .withMessage('You must supply a new password')
+        ],
+        validateRequest,
+        (req: Request, res: Response, next: NextFunction) => ctrl.resetPassword(req, res, next));
 
 
     console.log('User route loaded');

@@ -43,8 +43,36 @@ export default class UserService implements IUserService {
 
         this.eventEmitter.emit('ResetPasswordRequestSendEmail', UserMapper.toUserCodesDto(user));
     }
-    resetPassword(email: string, resetCode: string, newPassword: string): Promise<void> {
-        throw new Error("Method not implemented.");
+    async resetPassword(email: string, resetCode: string, newPassword: string): Promise<void> {
+        // get user by email
+        const user = await this.userRepository.getUserByEmail(email).catch(() => {
+            throw new DatabaseConnectionError();
+        });
+
+        if (!user) {
+            throw new UserNotFoundError();
+        }
+
+        // check if the reset code is correct
+        const isResetCodeCorrect = user.validateResetCode(resetCode);
+
+        if (!isResetCodeCorrect) {
+            throw new UserNotFoundError();
+        }
+
+        // hash the new password
+        const hashedPassword = await this.passwordManager.hashPassword(newPassword);
+
+        // set the new password
+        user.setPassword(hashedPassword);
+
+        // clear reset code
+        user.clearResetCode();
+
+        // save user
+        await this.userRepository.updateUser(user);
+
+        this.eventEmitter.emit('PasswordChanged', UserMapper.toDto(user));
     }
     async changePassword(email: string, password: string, newPassword: string): Promise<void> {
         // get user by email

@@ -20,7 +20,9 @@ describe('UserController Unit Tests', () => {
             getUserByEmail: jest.fn(),
             activateUser: jest.fn(),
             deleteUser: jest.fn(),
-            changePassword: jest.fn()
+            changePassword: jest.fn(),
+            resetPasswordRequest: jest.fn(),
+            resetPassword: jest.fn()
         };
 
         userController = new UserController(mockUserService);
@@ -362,6 +364,135 @@ describe('UserController Unit Tests', () => {
         });
 
     });
+
+    describe('resetPasswordRequest', () => {
+        it('should request a password reset', async () => {
+            // Arrange
+            const req = {
+                body: {
+                    email: 'artur.brito95@gmail.com',
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.resetPasswordRequest(req as any, res as any, next);
+
+            // Assert
+            expect(res.status).toHaveBeenCalledWith(200);
+
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            // Arrange
+            const req = {
+                body: {
+                    email: 'artur.brito95@gmail.com',
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockUserService.resetPasswordRequest.mockRejectedValue(new UserNotFoundError());
+
+            // Act
+            await userController.resetPasswordRequest(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
+
+        });
+    });
+
+    describe('resetPassword', () => {
+        it('should reset the user password', async () => {
+            // Arrange
+            const req = {
+                body: {
+                    email: 'artur.brito95@gmail.com',
+                    resetCode: '123456',
+                    newPassword: '654321'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.resetPassword(req as any, res as any, next);
+
+            // Assert
+            expect(res.status).toHaveBeenCalledWith(204);
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            // Arrange
+            const req = {
+                body: {
+                    email: 'artur.brito95@gmail.com',
+                    resetCode: '123456',
+                    newPassword: '654321'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockUserService.resetPassword.mockRejectedValue(new UserNotFoundError());
+
+            // Act
+            await userController.resetPassword(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
+        });
+
+        it('should throw an error if the reset code is invalid', async () => {
+            // Arrange
+            const req = {
+                body: {
+                    email: 'artur.brito95@gmail.com',
+                    resetCode: '123456',
+                    newPassword: '654321'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockUserService.resetPassword.mockRejectedValue(new UserNotFoundError());
+
+            // Act
+            await userController.resetPassword(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
+
+        });
+    });
 });
 
 describe('UserController Integration Tests', () => {
@@ -577,7 +708,7 @@ describe('UserController Integration Tests', () => {
             // Arrange
             const req = {
                 currentUser: {
-                    email: 'artur.brito95@gmail.com',
+                    email: 'artur.brito@gmail.com',
                 },
                 body: {
                     password: '123456',
@@ -629,6 +760,133 @@ describe('UserController Integration Tests', () => {
 
     });
 
+    describe('resetPasswordRequest', () => {
+        it('should request a password reset', async () => {
+            // Arrange
+            const req = {
+                body: {
+                    email: 'artur.brito95@gmail.com',
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.resetPasswordRequest(req as any, res as any, next);
+
+            // Assert
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            // Arrange
+            const req = {
+                body: {
+                    email: 'artur.brito@gmail.com',
+                }
+
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.resetPasswordRequest(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
+
+        });
+        
+    });
+
+    describe('resetPassword', () => {
+        it('should reset the user password', async () => {
+            // Arrange
+            const user = await userRepository.getUserByEmail('artur.brito95@gmail.com');
+
+            const req = {
+                body: {
+                    email: 'artur.brito95@gmail.com',
+                    resetCode: user!.resetCode,
+                    newPassword: '654321'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.resetPassword(req as any, res as any, next);
+
+            // Assert
+            expect(res.status).toHaveBeenCalledWith(204);
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            // Arrange
+            const req = {
+                body: {
+                    email: 'artur.brito@gmail.com',
+                    resetCode: '123456',
+                    newPassword: '654321'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.resetPassword(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
+
+        });
+
+        it('should throw an error if the reset code is invalid', async () => {
+            // Arrange
+            const req = {
+                body: {
+                    email: 'artur.brito95@gmail.com',
+                    resetCode: '123456',
+                    newPassword: '654321'
+                }
+
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.resetPassword(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
+        });
+    });
+
 
     describe('deleteUser', () => {
         it('should delete a user', async () => {
@@ -677,5 +935,6 @@ describe('UserController Integration Tests', () => {
         });
 
     });
+
 
 });
