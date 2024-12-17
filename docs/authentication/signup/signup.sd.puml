@@ -1,0 +1,80 @@
+@startuml
+!theme cerulean
+participant "API" as API
+participant "Controller" as Ctrl
+participant "UserDto" as Dto
+participant "Service" as Service
+participant "Repository" as Repo
+participant "User" as User
+participant "IPasswordManager" as PassManager
+participant "Mapper" as Mapper
+participant "EventEmitter" as Emitter
+
+--> API: POST /api/user
+API -> Ctrl: createUser(request)
+activate Ctrl
+Ctrl -> Dto: convert request to UserDto
+activate Dto
+deactivate Dto
+Ctrl -> Service: newUser = createUser(UserDto)
+activate Service
+Service -> Repo: userAlreadyExists = getUserByEmail(userDto.email)
+activate Repo
+deactivate Repo
+alt user exist and don't have googleId
+    Service --> API: throw UserAlreadyRegisteredError
+    note right of Ctrl
+        Finish the workflow
+    end note
+    <-- API: 403 UserAlreadyRegisteredError
+end
+Service -> PassManager: hashedPassword = hashPassword(userDto.password)
+activate PassManager
+deactivate PassManager
+
+alt user exist and have googleId
+    note right of Ctrl
+        If the user already exists
+        and has a googleId, we update
+        the user with the new password
+    end note
+
+    Service -> User: userAlreadyExists.setPassword(hashedPassword)
+    activate User
+    deactivate User
+    Service -> Repo: updateUser(userAlreadyExists)
+    activate Repo
+    deactivate Repo
+    Service -> Emitter: emit('CreateUserSendEmail', newUser)
+    activate Emitter
+    deactivate Emitter
+    Service -> Mapper: dto = UserMapper.toDto(userAlreadyExists)
+    activate Mapper
+    deactivate Mapper
+    Service --> Ctrl: dto
+    note right of Ctrl
+        Finish the workflow
+    end note
+end
+
+Service -> User: user = User.create(userDto.email, hashedPassword, role: userDto.role)
+activate User
+deactivate User
+Service -> Repo: newUser = createUser(user)
+activate Repo
+deactivate Repo
+Service -> Emitter: emit('CreateUserSendEmail', newUser)
+activate Emitter
+deactivate Emitter
+Service -> Mapper: dto = UserMapper.toDto(newUser)
+activate Mapper
+deactivate Mapper
+Service --> Ctrl: dto
+deactivate Service
+Ctrl --> API: newUser
+deactivate Ctrl
+<-- API : 201 newUser
+
+
+
+@enduml
