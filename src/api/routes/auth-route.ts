@@ -4,15 +4,12 @@ import { TYPES } from "../../dependency-injection/types";
 import { myContainer } from "../../dependency-injection/inversify.config";
 import { validateRequest } from "../middlewares/validate-request";
 import { body } from "express-validator";
-import passport from "passport";
-import IAuthIAMService from "../../services/contracts/iam-service-contract";
 
 const router = Router();
 
 export default (app: Router) => {
 
     const ctrl = myContainer.get<IAuthController>(TYPES.IAuthController);
-    const authIAMService = myContainer.get<IAuthIAMService>(TYPES.IAuthIAMService);
 
     app.use('', router);
     router.post('/signin',
