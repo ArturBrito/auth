@@ -25,6 +25,34 @@ export default class UserService implements IUserService {
         this.passwordManager = passwordManager;
         this.eventEmitter = eventEmitter;
     }
+    async changePassword(email: string, password: string, newPassword: string): Promise<void> {
+        // get user by email
+        const user = await this.userRepository.getUserByEmail(email).catch(() => {
+            throw new DatabaseConnectionError();
+        });
+
+        if (!user) {
+            throw new UserNotFoundError();
+        }
+
+        // check if the password is correct
+        const isPasswordCorrect = await this.passwordManager.comparePasswords(password, user.password);
+
+        if (!isPasswordCorrect) {
+            throw new UserNotFoundError();
+        }
+
+        // hash the new password
+        const hashedPassword = await this.passwordManager.hashPassword(newPassword);
+
+        // set the new password
+        user.setPassword(hashedPassword);
+
+        // save user
+        await this.userRepository.updateUser(user);
+
+        this.eventEmitter.emit('PasswordChanged', user);
+    }
     async deleteUser(user: UserDto): Promise<void> {
         // get user by email
         const userToDelete = await this.userRepository.getUserByEmail(user.email).catch(() => {

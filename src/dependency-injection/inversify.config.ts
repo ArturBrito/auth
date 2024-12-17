@@ -25,6 +25,7 @@ import ISetupDb from "../infrastructure/setup/contracts/setup-db.contract";
 import ISetupRefreshTokenStore from "../infrastructure/setup/contracts/refresh-token-store.contract";
 import IAuthIAMService from "../services/contracts/iam-service-contract";
 import PassportIAM from "../infrastructure/passport/passport-iam";
+import { ChangePasswordSendEmailHandler } from "../events/change-password-send-email.event";
 
 const myContainer = new Container();
 myContainer.bind<IUserController>(TYPES.IUserController).to(UserController);
@@ -38,6 +39,7 @@ myContainer.bind<IRefreshTokensStore>(TYPES.IRefreshTokensStore).to(DI_CONFIG.IR
 myContainer.bind(TYPES.EventEmmiter).toConstantValue(new EventEmitter());
 myContainer.bind<EventHandlers>(EventHandlers).toSelf();
 myContainer.bind<CreateUserSendEmailHandler>(TYPES.CreateUserSendEmailHandler).to(CreateUserSendEmailHandler);
+myContainer.bind<ChangePasswordSendEmailHandler>(TYPES.ChangePasswordSendEmailHandler).to(ChangePasswordSendEmailHandler);
 myContainer.bind<IEmailClient>(TYPES.IEmailClient).to(DummyEmailClient);
 myContainer.bind<IVerifyToken>(TYPES.IVerifyToken).to(DI_CONFIG.IVerifyToken);
 myContainer.bind<ISetupDb>(TYPES.ISetupDb).to(DI_CONFIG.ISetupDb);

@@ -50,6 +50,21 @@ export default (app: Router) => {
     router.delete('',
         verifyToken.verifyToken,
         (req: Request, res: Response, next: NextFunction) => ctrl.deleteUser(req, res, next));
+    router.put('/change-password',
+        verifyToken.verifyToken,
+        [
+            body('password')
+                .trim()
+                .notEmpty()
+                .withMessage('You must supply a password'),
+            body('newPassword')
+                .trim()
+                .notEmpty()
+                .withMessage('You must supply a new password')
+        ],
+        validateRequest,
+        verifyToken.verifyToken,
+        (req: Request, res: Response, next: NextFunction) => ctrl.changePassword(req, res, next));
 
 
     console.log('User route loaded');

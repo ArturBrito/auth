@@ -19,7 +19,8 @@ describe('UserController Unit Tests', () => {
             createUser: jest.fn(),
             getUserByEmail: jest.fn(),
             activateUser: jest.fn(),
-            deleteUser: jest.fn()
+            deleteUser: jest.fn(),
+            changePassword: jest.fn()
         };
 
         userController = new UserController(mockUserService);
@@ -277,6 +278,90 @@ describe('UserController Unit Tests', () => {
         });
 
     });
+
+    describe('changePassword', () => {
+        it('should change the user password', async () => {
+            // Arrange
+            const req = {
+                currentUser: {
+                    email: 'artur.brito95@gmail.com',
+                },
+                body: {
+                    password: '123456',
+                    newPassword: '654321'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.changePassword(req as any, res as any, next);
+
+            // Assert
+            expect(res.status).toHaveBeenCalledWith(204);
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            // Arrange
+            const req = {
+                currentUser: {
+                    email: 'artur.brito95@gmail.com',
+                },
+                body: {
+                    password: '123456',
+                    newPassword: '654321'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockUserService.changePassword.mockRejectedValue(new UserNotFoundError());
+
+            // Act
+            await userController.changePassword(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
+        });
+
+        it('should throw an error if the password is incorrect', async () => {
+            // Arrange
+            const req = {
+                currentUser: {
+                    email: 'artur.brito95@gmail.com',
+                },
+                body: {
+                    password: '123456',
+                    newPassword: '654321'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockUserService.changePassword.mockRejectedValue(new UserNotFoundError());
+
+            // Act
+            await userController.changePassword(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
+
+        });
+
+    });
 });
 
 describe('UserController Integration Tests', () => {
@@ -459,6 +544,91 @@ describe('UserController Integration Tests', () => {
 
         });
     });
+
+    describe('changePassword', () => {
+        it('should change the user password', async () => {
+            // Arrange
+            const user = await userRepository.getUserByEmail('artur.brito95@gmail.com');
+
+            const req = {
+                currentUser: user,
+                body: {
+                    password: '123456',
+                    newPassword: '654321'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.changePassword(req as any, res as any, next);
+
+            // Assert
+            expect(res.status).toHaveBeenCalledWith(204);
+
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            // Arrange
+            const req = {
+                currentUser: {
+                    email: 'artur.brito95@gmail.com',
+                },
+                body: {
+                    password: '123456',
+                    newPassword: '654321'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.changePassword(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
+
+        });
+
+        it('should throw an error if the password is incorrect', async () => {
+            // Arrange
+            const req = {
+                currentUser: {
+                    email: 'artur.brito95@gmail.com',
+                },
+                body: {
+                    password: '123456',
+                    newPassword: '654321'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.changePassword(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
+
+        });
+
+    });
+
 
     describe('deleteUser', () => {
         it('should delete a user', async () => {

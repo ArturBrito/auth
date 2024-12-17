@@ -263,6 +263,83 @@ describe('UserService Unit Tests', () => {
 
         });
     });
+
+    describe('changePassword', () => {
+        it('should change the user password', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role!
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+            mockPasswordManager.comparePasswords.mockResolvedValue(true);
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+
+            await userService.changePassword(validUserData.email, '123456', '654321');
+
+            expect(mockUserRepository.updateUser).toHaveBeenCalled();
+        });
+
+        it('should throw an error if the user does not exist', async () => {
+            mockUserRepository.getUserByEmail.mockResolvedValue(null);
+
+            try {
+                await userService.changePassword(validUserData.email, '123456', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+
+        it('should throw an error if the database throw error', async () => {
+            mockUserRepository.getUserByEmail.mockRejectedValue(new DatabaseConnectionError());
+
+            try {
+                await userService.changePassword(validUserData.email, '123456', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(DatabaseConnectionError);
+            }
+        });
+
+        it('should throw an error if the password is incorrect', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role!
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+            mockPasswordManager.comparePasswords.mockResolvedValue(false);
+
+            try {
+                await userService.changePassword(validUserData.email, '123456', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(UserNotFoundError);
+            }
+        });
+        
+        it('should throw an error if the password is null or undefined', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role!
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+            mockPasswordManager.comparePasswords.mockResolvedValue(true);
+
+            try {
+                await userService.changePassword(validUserData.email, '', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(InvalidUserError);
+                expect(error.message).toBe('Invalid user');
+                expect(error.reason).toBe('Password is null or undefined');
+            }
+        });
+    });
 });
 
 

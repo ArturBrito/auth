@@ -9,6 +9,7 @@ const TYPES = {
     IRefreshTokensStore: Symbol.for('IRefreshTokensStore'),
     EventEmmiter: Symbol.for('EventEmmiter'),
     CreateUserSendEmailHandler: Symbol.for('CreateUserSendEmailHandler'),
+    ChangePasswordSendEmailHandler: Symbol.for('ChangePasswordSendEmailHandler'),
     IEmailClient: Symbol.for('IEmailClient'),
     IVerifyToken: Symbol.for('IVerifyToken'),
     ISetupDb: Symbol.for('ISetupDb'),

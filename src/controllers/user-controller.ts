@@ -13,6 +13,17 @@ export default class UserController implements IUserController {
     ) { 
         this.userService = userService;
     }
+    async changePassword(req: Request, res: Response, next: NextFunction) {
+        try {
+            const userEmail = req.currentUser.email;
+            const password = req.body.password;
+            const newPassword = req.body.newPassword;
+            await this.userService.changePassword(userEmail, password, newPassword);
+            res.status(204).send();
+        } catch (error) {
+            next(error);
+        }
+    }
     async deleteUser(req: Request, res: Response, next: NextFunction) {
         try {
             const user = req.currentUser;
