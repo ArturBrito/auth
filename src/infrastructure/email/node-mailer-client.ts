@@ -5,7 +5,7 @@ import IEmailClient from "../../services/contracts/email-client";
 @injectable()
 export default class NodeMailerClient implements IEmailClient {
     private transporter = nodemailer.createTransport({
-        service: 'Mailgun',
+        service: process.env.EMAIL_SERVICE,
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS

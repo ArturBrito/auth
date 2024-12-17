@@ -15,16 +15,6 @@ import DummyRefreshToken from "./infrastructure/refresh-tokens/dummy-tokens";
 import DummyEmailClient from "./infrastructure/email/dummy-email-client";
 import NodeMailerClient from "./infrastructure/email/node-mailer-client";
 
-/*export const DI_CONFIG = {
-    "IVerifyToken": VerifyToken,
-    "IEncrypter": JwtAdapter,
-    "IUserRepository": UserMongoRepository,
-    "ISetupDb": SetupDbMongo,
-    "IPasswordManager": BcryptAdapter,
-    "IRefreshTokensStore": RedisRefreshToken, // can be used with InMemoryRefreshToken
-    "ISetupRefreshTokenStore": SetupRedis // can be used with SetupDbInMemory
-};*/
-
 const inMemory = {
     "IEncrypter": JwtAdapter,
     "IUserRepository": UserInmemoryRepository,
@@ -45,12 +35,12 @@ const mongoWithRedis = {
     "IEmailClient": process.env.NODE_ENV != 'production' ? DummyEmailClient : NodeMailerClient
 }
 
-const mongoWithInMemory = {
+const mongoWithoutRedis = {
     "IEncrypter": JwtAdapter,
     "IUserRepository": UserMongoRepository,
     "ISetupDb": SetupDbMongo,
     "IPasswordManager": BcryptAdapter,
-    "IRefreshTokensStore": InMemoryRefreshToken, // can be used with RedisRefreshToken
+    "IRefreshTokensStore": DummyRefreshToken, // can be used with RedisRefreshToken
     "ISetupRefreshTokenStore": SetupDbInMemory, // can be used with SetupRedis
     "IEmailClient": process.env.NODE_ENV != 'production' ? DummyEmailClient : NodeMailerClient
 }
@@ -70,7 +60,7 @@ const selectedConfig = process.env.SELECTED_SETUP || 'inMemory';
 const config = {
     inMemory,
     mongoWithRedis,
-    mongoWithInMemory,
+    mongoWithoutRedis,
     firebase
 }
 

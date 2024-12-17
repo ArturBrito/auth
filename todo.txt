@@ -4,12 +4,14 @@
 ✅ - Apanhar erros nao tratados
 ✅ - Endpoint not found error
 Password minimum requirements
-Send email with verification
+✅ - Send email with verification
 ✅ - Implement mongodb
 ✅ - Middleware de auth and authz
 Set the roles dynamic
 Change config
 e2e tests
+Logger
+Custom html to send emails
 
 DOCS:
 config google console

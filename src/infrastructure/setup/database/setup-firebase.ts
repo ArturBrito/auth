@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 import ISetupDb from "../contracts/setup-db.contract";
 import * as admin from 'firebase-admin';
 
-const serviceAccount = require('../../../../cuca-firebase.json');
+const serviceAccount = require('../../../../config-firebase.json');
 
 @injectable()
 export default class SetupDbFirebase implements ISetupDb {

@@ -13,7 +13,6 @@ services:
       NODE_ENV:
       SELECTED_SETUP:
       MONGO_URI:
-      JWT_SECRET:
       REDIS_URI:
       REDIS_PASSWORD:
       GOOGLE_CLIENT_ID:

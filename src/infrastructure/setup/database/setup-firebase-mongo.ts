@@ -3,7 +3,7 @@ import { injectable } from 'inversify';
 import ISetupDb from '../contracts/setup-db.contract';
 import mongoose from 'mongoose';
 
-const serviceAccount = require('../../../../cuca-firebase.json');
+const serviceAccount = require('../../../../config-firebase.json');
 
 @injectable()
 export default class SetupDbFirebaseMongo implements ISetupDb {
