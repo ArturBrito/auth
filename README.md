@@ -192,3 +192,104 @@ The last step we have to do is add the following URI in the "Authorized redirect
 This will be the value for the enviornment variable GOOGLE_CALLBACK_URL
 
 > Note: When the system is running on a machine that is not local (when it is in production for example) it will have to be added here too, but only by updating the http://localhost:3000 part. The remainder must be kept
+
+<br><br>
+
+# API Endpoints
+## User
+### Register new user
+POST `/api/user`
+* **Description:** Registers a new user with a username and password
+* **Request Body:**
+```
+{
+    "email": "artur.brito95@gmail.com",
+    "password": "teste1"
+}
+```
+* **Sucess Status Code:** 201
+* **Response:**
+```
+{
+    "uid": "0be9691d-4e1d-4bb9-8376-a40a810bf5af",
+    "email": "artur.brito95@gmail.com",
+    "role": "user"
+}
+```
+
+### Activate user account
+PUT `/api/user/activate/:email/:activationCode`
+* **Description:** Activate user account
+* **Sucess Status Code:** 200
+* **Response:**
+```
+{
+    "uid": "0be9691d-4e1d-4bb9-8376-a40a810bf5af",
+    "email": "artur.brito95@gmail.com",
+    "role": "user"
+}
+```
+
+### Resend activation code
+POST `/api/user/resend-activation-code`
+* **Description:** Resend the validation code to the user
+* **Request Body:**
+```
+{
+    "email": "artur.brito95@gmail.com"
+}
+```
+* **Sucess Status Code:** 200
+
+### Delete user
+DELETE `/api/user/delete`
+* **Description:** Delete user
+* **Request Headers:**
+```
+{
+    "Authorization": "Bearer token"
+}
+```
+* **Sucess Status Code:** 204
+
+### Change password
+PUT `/api/user/change-password`
+* **Description:** Update user password
+* **Request Headers:**
+```
+{
+    "Authorization": "Bearer token"
+}
+```
+* **Request Body:**
+```
+{
+    "password": "teste1",
+    "newPassword: "teste2"
+}
+```
+* **Sucess Status Code:** 204
+
+### Request user reset password
+POST `/api/user/reset-password-request`
+* **Description:** This request will send an email with a reset link
+* **Request Body:**
+```
+{
+    "email": "artur.brito95@gmail.com"
+}
+```
+* **Sucess Status Code:** 200
+
+### Reset password
+POST `/api/user/reset-password`
+* **Description:** Reset the user password with the new password provided
+* **Request Body:**
+```
+{
+    "email": "artur.brito95@gmail.com",
+    "resetCode": "adjsfnafkjsadnfkj",
+    "newPassword": "teste3"
+}
+```
+* **Sucess Status Code:** 204
