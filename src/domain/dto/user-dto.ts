@@ -5,6 +5,4 @@ export interface UserDto {
     role?: string;
     createdAt?: Date;
     isActive?: boolean;
-    activationCode?: string;
-    googleId?: string;
 }

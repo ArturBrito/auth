@@ -1,4 +1,5 @@
 import { IUserPersistence } from "../../data-model/user.datamodel";
+import UserCodesDto from "../dto/user-codes-dto";
 import { UserDto } from "../dto/user-dto";
 import { Role, User } from "../entities/user";
 
@@ -7,9 +8,7 @@ export default class UserMapper {
         return {
             uid: user.uid,
             email: user.email,
-            role: user.role,
-            activationCode: user.activationCode,
-            googleId: user.googleId
+            role: user.role
         };
     }
     static toEntity(userPersistence: IUserPersistence): User {
@@ -21,7 +20,8 @@ export default class UserMapper {
             isActive: userPersistence.isActive,
             password: userPersistence.password,
             activationCode: userPersistence.activationCode,
-            googleId: userPersistence.googleId
+            googleId: userPersistence.googleId,
+            resetCode: userPersistence.resetCode
         });
         return user;
     }
@@ -41,7 +41,15 @@ export default class UserMapper {
             createdAt: user.createdAt,
             isActive: user.isActive,
             activationCode: user.activationCode,
-            googleId: user.googleId
+            googleId: user.googleId,
+            resetCode: user.resetCode
+        };
+    }
+    static toUserCodesDto(user: User) : UserCodesDto {
+        return {
+            email: user.email,
+            activationCode: user.activationCode,
+            resetCode: user.resetCode
         };
     }
 }

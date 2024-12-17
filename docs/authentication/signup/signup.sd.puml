@@ -45,7 +45,10 @@ alt user exist and have googleId
     Service -> Repo: updateUser(userAlreadyExists)
     activate Repo
     deactivate Repo
-    Service -> Emitter: emit('CreateUserSendEmail', newUser)
+    Service -> Mapper: userCodes = UserMapper.toUserCodesDto(userAlreadyExists)
+    activate Mapper
+    deactivate Mapper
+    Service -> Emitter: emit('CreateUserSendEmail', userCodes)
     activate Emitter
     deactivate Emitter
     Service -> Mapper: dto = UserMapper.toDto(userAlreadyExists)
@@ -63,7 +66,10 @@ deactivate User
 Service -> Repo: newUser = createUser(user)
 activate Repo
 deactivate Repo
-Service -> Emitter: emit('CreateUserSendEmail', newUser)
+Service -> Mapper: userCodes = UserMapper.toUserCodesDto(newUser)
+activate Mapper
+deactivate Mapper
+Service -> Emitter: emit('CreateUserSendEmail', userCodes)
 activate Emitter
 deactivate Emitter
 Service -> Mapper: dto = UserMapper.toDto(newUser)
