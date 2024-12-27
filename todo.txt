@@ -12,6 +12,7 @@ Change config
 e2e tests
 Logger
 Custom html to send emails
+Limit resend activate code emails
 
 DOCS:
 config google console

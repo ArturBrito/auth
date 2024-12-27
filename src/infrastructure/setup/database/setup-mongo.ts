@@ -11,7 +11,7 @@ export default class SetupDbMongo implements ISetupDb {
             await mongoose.connect(uri);
             console.log('Mongo database connected');
         } catch (error) {
-            console.error('Error setting up mongo database');
+            console.error('Error setting up mongo database: ', error);
             throw new Error('Error setting up mongo database');
         }
 

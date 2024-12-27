@@ -176,8 +176,10 @@ _It will also be these two keys that you must use in your project to decrypt the
 To download the keys we have to go to the Firebase console and create a project (if we don't already have one created).
 In this project we have to activate authentication and Email/Password mode.  
 After that, in General Project Settings -> Service accounts -> Generate private key  
+
 <br>
-The generated file must be renamed to config-firebase.json and placed in the root of the project
+
+The generated file must be renamed to **_config-firebase.json_** and placed in the root of the project
 
 <br><br>
 

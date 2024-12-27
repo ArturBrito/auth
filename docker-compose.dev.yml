@@ -20,6 +20,7 @@ services:
       GOOGLE_CALLBACK_URL:
       EMAIL_USER:
       EMAIL_PASS:
+      EMAIL_SERVICE:
     depends_on:
       - mongo
       - cache
