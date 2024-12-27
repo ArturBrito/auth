@@ -2,10 +2,10 @@
 FROM node:18 AS base
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN npm install --production=false
 
 # Build stage
 FROM base AS build
+RUN npm install
 COPY . .
 RUN npm run build
 
@@ -14,8 +14,7 @@ FROM node:18 AS production
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/build ./build
 COPY package*.json ./
-COPY rs256.rsa .
-COPY rs256.rsa.pub .
+COPY rs256.rsa* ./
 RUN npm install --omit=dev
 CMD [ "npm", "run", "start:prod" ]
 
