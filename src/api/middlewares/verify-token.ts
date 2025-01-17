@@ -49,7 +49,7 @@ export default class VerifyToken implements IVerifyToken {
             req.currentUser = UserMapper.tokenToDto(decodedToken);
             next();
         } catch (error) {
-            next(error);
+            next(new InvalidTokenError());
         }
     }
 
