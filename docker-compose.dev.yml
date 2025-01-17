@@ -34,6 +34,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    command: >
+      mongod --quiet --logpath /dev/null
 
   mongo-express:
     image: mongo-express
@@ -45,6 +47,7 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
       ME_CONFIG_BASICAUTH: false
+      ME_CONFIG_LOGGING__LEVEL: error
 
   cache:
     image: redis:6.2-alpine
