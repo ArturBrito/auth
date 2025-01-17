@@ -1,19 +1,16 @@
 ✅ - Validate email and password on domain
 ✅ - Validate email and password on router input
 ✅ - Implementar erros todos iguais
-✅ - Apanhar erros nao tratados
+✅ - Catch unhandled errors
 ✅ - Endpoint not found error
-Password minimum requirements
+✅ - Password minimum requirements
 ✅ - Send email with verification
 ✅ - Implement mongodb
 ✅ - Middleware de auth and authz
+Prevent register user duplicate (maybe the bug is just in memory)
 Set the roles dynamic
 Change config
 e2e tests
 Logger
 Custom html to send emails
 Limit resend activate code emails
-
-DOCS:
-config google console
-config google cloud

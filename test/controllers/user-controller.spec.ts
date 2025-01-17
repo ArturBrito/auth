@@ -1,6 +1,7 @@
 import UserController from "../../src/controllers/user-controller";
 import IUserRepository from "../../src/domain/repositories/user-repository";
 import { InvalidActivationCode } from "../../src/errors/invalid-activation-code-error";
+import { InvalidUserError } from "../../src/errors/invalid-user-error";
 import { UserAlreadyRegisteredError } from "../../src/errors/user-already-registered-error";
 import { UserNotFoundError } from "../../src/errors/user-not-found-error";
 import BcryptAdapter from "../../src/infrastructure/password/bcrypt-adapter";
@@ -147,6 +148,31 @@ describe('UserController Unit Tests', () => {
             expect(next).toHaveBeenCalledWith(expect.any(UserAlreadyRegisteredError));
 
         });
+
+        it('should throw an error if the password does not meet requirements', async () => {
+            // Arrange
+            const req = {
+                body: {
+                    email: 'artur.brito95@gmail.com',
+                    password: '123456',
+                    role: 'user'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockUserService.createUser.mockRejectedValue(new InvalidUserError('Password does not meet requirements'));
+
+            // Act
+            await userController.createUser(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(InvalidUserError));
+
+        });
     });
 
     describe('activateUser', () => {
@@ -290,8 +316,8 @@ describe('UserController Unit Tests', () => {
                     email: 'artur.brito95@gmail.com',
                 },
                 body: {
-                    password: '123456',
-                    newPassword: '654321'
+                    password: 'StrongPassword123!',
+                    newPassword: 'StrongPassword321!'
                 }
             };
 
@@ -364,6 +390,36 @@ describe('UserController Unit Tests', () => {
 
         });
 
+        it('should throw an error if the password does not meet requirements', async () => {
+            // Arrange
+            const req = {
+                currentUser: {
+                    email: 'artur.brito95@gmail.com',
+                },
+
+                body: {
+                    password: '123456',
+                    newPassword: '654321'
+                }
+
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockUserService.changePassword.mockRejectedValue(new InvalidUserError('Password does not meet requirements'));
+
+            // Act
+            await userController.changePassword(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(InvalidUserError));
+        });
+
     });
 
     describe('resetPasswordRequest', () => {
@@ -423,7 +479,7 @@ describe('UserController Unit Tests', () => {
                 body: {
                     email: 'artur.brito95@gmail.com',
                     resetCode: '123456',
-                    newPassword: '654321'
+                    newPassword: 'StrongPassword321!'
                 }
             };
 
@@ -492,6 +548,33 @@ describe('UserController Unit Tests', () => {
             // Assert
             expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
 
+        });
+
+        it('should throw an error if the password does not meet requirements', async () => {
+            // Arrange
+            const req = {
+                body: {
+                    email: 'artur.brito95@gmail.com',
+                    resetCode: '123456',
+                    newPassword: '654321'
+                }
+
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockUserService.resetPassword.mockRejectedValue(new InvalidUserError('Password does not meet requirements'));
+
+            // Act
+            await userController.resetPassword(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(InvalidUserError));
         });
     });
 
@@ -589,7 +672,7 @@ describe('UserController Integration Tests', () => {
             const req = {
                 body: {
                     email: 'artur.brito95@gmail.com',
-                    password: '123456',
+                    password: 'StrongPassword123!',
                     role: 'user'
                 }
             };
@@ -630,6 +713,28 @@ describe('UserController Integration Tests', () => {
             // Act
             await userController.createUser(req as any, res as any, next);
             expect(next).toHaveBeenCalledWith(expect.any(UserAlreadyRegisteredError));
+        });
+
+        it('should throw an error if the password does not meet requirements', async () => {
+            // Arrange
+            const req = {
+                body: {
+                    email: 'artur.brito@gmail.com',
+                    password: '123456',
+                    role: 'user'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.createUser(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(InvalidUserError));
         });
 
     });
@@ -699,7 +804,7 @@ describe('UserController Integration Tests', () => {
 
             // Assert
             expect(res.status).toHaveBeenCalledWith(200);
-            
+
         });
 
         it('should throw an error if the user does not exist', async () => {
@@ -807,8 +912,8 @@ describe('UserController Integration Tests', () => {
             const req = {
                 currentUser: user,
                 body: {
-                    password: '123456',
-                    newPassword: '654321'
+                    password: 'StrongPassword123!',
+                    newPassword: 'StrongPassword321!'
                 }
             };
 
@@ -881,6 +986,35 @@ describe('UserController Integration Tests', () => {
 
         });
 
+        it('should throw an error if the password does not meet requirements', async () => {
+            // Arrange
+            const req = {
+                currentUser: {
+                    email: 'artur.brito95@gmail.com',
+                },
+                body: {
+                    password: 'StrongPassword321!',
+                    newPassword: '654321'
+                }
+
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                send: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            // Act
+            await userController.changePassword(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(InvalidUserError));
+
+
+        });
+
     });
 
     describe('resetPasswordRequest', () => {
@@ -929,7 +1063,7 @@ describe('UserController Integration Tests', () => {
             expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
 
         });
-        
+
     });
 
     describe('resetPassword', () => {
@@ -941,7 +1075,7 @@ describe('UserController Integration Tests', () => {
                 body: {
                     email: 'artur.brito95@gmail.com',
                     resetCode: user!.resetCode,
-                    newPassword: '654321'
+                    newPassword: 'StrongPassword321!'
                 }
             };
 
@@ -1008,9 +1142,35 @@ describe('UserController Integration Tests', () => {
             // Assert
             expect(next).toHaveBeenCalledWith(expect.any(UserNotFoundError));
         });
+
+        it('should throw an error if the password does not meet requirements', async () => {
+           // Arrange
+           const user = await userRepository.getUserByEmail('artur.brito95@gmail.com');
+
+           const req = {
+               body: {
+                   email: 'artur.brito95@gmail.com',
+                   resetCode: user!.resetCode,
+                   newPassword: '123456'
+               }
+           };
+
+           const res = {
+               status: jest.fn().mockReturnThis(),
+               send: jest.fn()
+           };
+
+           const next = jest.fn();
+
+           // Act
+           await userController.resetPassword(req as any, res as any, next);
+
+            // Assert
+            expect(next).toHaveBeenCalledWith(expect.any(InvalidUserError));
+        });
     });
 
-    
+
     describe('deleteUser', () => {
         it('should delete a user', async () => {
             // Arrange

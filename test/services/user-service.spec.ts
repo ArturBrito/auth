@@ -22,7 +22,7 @@ describe('UserService Unit Tests', () => {
 
     const validUserData: UserDto = {
         email: 'artur.brito95@gmail.com',
-        password: '123456',
+        password: 'StrongPassword123!',
         role: 'user'
     }
 
@@ -104,7 +104,7 @@ describe('UserService Unit Tests', () => {
         it('should throw an error if the email is invalid', async () => {
             const invalidUserData = {
                 email: 'invalidEmail',
-                password: '123456',
+                password: 'StrongPassword123!',
                 role: 'user'
             }
 
@@ -134,6 +134,22 @@ describe('UserService Unit Tests', () => {
             await userService.createUser(validUserData);
 
             expect(eventEmitterSpy).toHaveBeenCalledWith('CreateUserSendEmail', expect.any(Object));
+        });
+
+        it('should throw an error if the password does not meet requirements', async () => {
+            const invalidUserData = {
+                email: 'artur.brito95@gmail.com',
+                password: '123456',
+                role: 'user'
+            }
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(null);
+
+            try {
+                await userService.createUser(invalidUserData);
+            } catch (error) {
+                expect(error).toBeInstanceOf(InvalidUserError);
+            }
         });
     });
 
@@ -277,7 +293,7 @@ describe('UserService Unit Tests', () => {
             mockPasswordManager.comparePasswords.mockResolvedValue(true);
             mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
 
-            await userService.changePassword(validUserData.email, '123456', '654321');
+            await userService.changePassword(validUserData.email, 'StrongPassword123!', 'StrongPassword321!');
 
             expect(mockUserRepository.updateUser).toHaveBeenCalled();
         });
@@ -336,7 +352,25 @@ describe('UserService Unit Tests', () => {
             } catch (error) {
                 expect(error).toBeInstanceOf(InvalidUserError);
                 expect(error.message).toBe('Invalid user');
-                expect(error.reason).toBe('Password is null or undefined');
+                expect(error.reason).toBe('Password does not meet requirements');
+            }
+        });
+
+        it('should throw an error if the password does not meet requirements', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role!
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+            mockPasswordManager.comparePasswords.mockResolvedValue(true);
+
+            try {
+                await userService.changePassword(validUserData.email, '123456', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(InvalidUserError);
             }
         });
     });
@@ -409,7 +443,7 @@ describe('UserService Unit Tests', () => {
             mockUserRepository.getUserByEmail.mockResolvedValue(user);
             mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
 
-            await userService.resetPassword(validUserData.email, '123456', '654321');
+            await userService.resetPassword(validUserData.email, '123456', 'StrongPassword123!');
 
             expect(mockUserRepository.updateUser).toHaveBeenCalled();
         });
@@ -468,7 +502,25 @@ describe('UserService Unit Tests', () => {
             } catch (error) {
                 expect(error).toBeInstanceOf(InvalidUserError);
                 expect(error.message).toBe('Invalid user');
-                expect(error.reason).toBe('Password is null or undefined');
+                expect(error.reason).toBe('Password does not meet requirements');
+            }
+        });
+
+        it('should throw an error if the password does not meet requirements', async () => {
+            const user = User.create({
+                uid: '1',
+                email: validUserData.email,
+                password: 'hashedPassword',
+                role: validUserData.role!,
+                resetCode: '123456'
+            });
+
+            mockUserRepository.getUserByEmail.mockResolvedValue(user);
+
+            try {
+                await userService.resetPassword(validUserData.email, '123456', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(InvalidUserError);
             }
         });
     });
@@ -558,7 +610,7 @@ describe('UserService - MongoDB Integration Tests', () => {
 
     const validUserData: UserDto = {
         email: 'artur.brito95@gmail.com',
-        password: '123456',
+        password: 'StrongPassword123!',
         role: 'user'
     }
 
@@ -619,7 +671,7 @@ describe('UserService - MongoDB Integration Tests', () => {
         it('should throw an error if the email is invalid', async () => {
             const invalidUserData = {
                 email: 'invalidEmail',
-                password: '123456',
+                password: 'StrongPassword123!',
                 role: 'user'
             }
 
@@ -629,6 +681,22 @@ describe('UserService - MongoDB Integration Tests', () => {
                 expect(error).toBeInstanceOf(InvalidUserError);
                 expect(error.message).toBe('Invalid user');
                 expect(error.reason).toBe('Password is null or undefined');
+            }
+        });
+
+        it('should throw an error if the password does not meet requirements', async () => {
+            const invalidUserData = {
+                email: 'artur.brito95@gmail.com',
+                password: '123456',
+                role: 'user'
+            }
+
+            try {
+                await userService.createUser(invalidUserData);
+            } catch (error) {
+                expect(error).toBeInstanceOf(InvalidUserError);
+                expect(error.message).toBe('Invalid user');
+                expect(error.reason).toBe('Password does not meet requirements');
             }
         });
     });
@@ -720,7 +788,7 @@ describe('UserService - MongoDB Integration Tests', () => {
             mockPasswordManager.comparePasswords.mockResolvedValue(true);
             const user = await userService.createUser(validUserData);
 
-            await userService.changePassword(validUserData.email, '123456', '654321');
+            await userService.changePassword(validUserData.email, 'StrongPassword123!', 'StrongPassword321!');
 
             const foundUser = await userService.getUserByEmail(validUserData.email);
 
@@ -757,7 +825,19 @@ describe('UserService - MongoDB Integration Tests', () => {
             } catch (error) {
                 expect(error).toBeInstanceOf(InvalidUserError);
                 expect(error.message).toBe('Invalid user');
-                expect(error.reason).toBe('Password is null or undefined');
+                expect(error.reason).toBe('Password does not meet requirements');
+            }
+        });
+
+        it('should throw an error if the password does not meet requirements', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            mockPasswordManager.comparePasswords.mockResolvedValue(true);
+            const user = await userService.createUser(validUserData);
+
+            try {
+                await userService.changePassword(validUserData.email, 'StrongPassword123!', '654321');
+            } catch (error) {
+                expect(error).toBeInstanceOf(InvalidUserError);
             }
         });
     });
@@ -802,7 +882,7 @@ describe('UserService - MongoDB Integration Tests', () => {
 
             const userEntity = await userRepository.getUserByEmail(validUserData.email);
 
-            await userService.resetPassword(validUserData.email, userEntity?.resetCode!, '654321');
+            await userService.resetPassword(validUserData.email, userEntity?.resetCode!, 'StrongPassword321!');
 
             const foundUser = await userService.getUserByEmail(validUserData.email);
 
@@ -837,6 +917,21 @@ describe('UserService - MongoDB Integration Tests', () => {
             } catch (error) {
                 expect(error).toBeInstanceOf(UserNotFoundError);
                 expect(error.message).toBe('User not found');
+            }
+        });
+
+        it('should throw an error if the password does not meet requirements', async () => {
+            mockPasswordManager.hashPassword.mockResolvedValue('hashedPassword');
+            const user = await userService.createUser(validUserData);
+            await userService.resetPasswordRequest(validUserData.email);
+
+            const userEntity = await userRepository.getUserByEmail(validUserData.email);
+
+        
+            try {
+                await userService.resetPassword(validUserData.email, userEntity?.resetCode!, '123456');
+            } catch (error) {
+                expect(error).toBeInstanceOf(InvalidUserError);
             }
         });
     });

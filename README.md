@@ -33,13 +33,12 @@ Possibility to choose where to store the data:
     - [Firebase Keys](#firebase-keys)
     - [Google Cloud](#google-cloud)
 4. [API Endpoints](#api-endpoints)
-5. [Installation](#installation)
-6. [Running the Project](#running-the-project)
-7. [Technical Details](#technical-details)
+5. [Installation and Running the Project](#installation-and-running-the-project)
+6. [Technical Details](#technical-details)
    - [Architecture](#architecture)
    - [Dependencies](#dependencies)
-8. [Contributing](#contributing)
-9. [License](#license)
+7. [Contributing](#contributing)
+8. [License](#license)
 
 <br><br>
 
@@ -110,6 +109,14 @@ There are some variables that only need to be defined depending on the mode in w
       - mongoWithRedis
       - mongoWithoutRedis
       - firebase
+3. PASSWORD_REQUIREMENTS (optional)
+   - A string that define the rules for password. Example: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$  
+   The absent of this variable will use the following requirements for the password:
+      - Minimum 8 characters
+      - At least one uppercase
+      - At least one lowercase
+      - At least one digit
+      - At least one special character
 
 <br>
 
@@ -201,7 +208,7 @@ This will be the value for the enviornment variable GOOGLE_CALLBACK_URL
 ## User
 ### Register new user
 POST `/api/user`
-* **Description:** Registers a new user with a username and password
+* **Description:** Registers a new user with a username and password. The user is created with the role of User
 * **Request Body:**
 ```
 {

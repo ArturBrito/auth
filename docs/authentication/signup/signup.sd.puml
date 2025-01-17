@@ -32,6 +32,18 @@ Service -> PassManager: hashedPassword = hashPassword(userDto.password)
 activate PassManager
 deactivate PassManager
 
+Service -> User: isPasswordValid = User.isPasswordValid(userDto.password, passwordRequirements)
+activate User
+deactivate User
+
+alt password is not valid
+    Service --> API: throw InvalidUserError
+    note right of Ctrl
+        Finish the workflow
+    end note
+    <-- API: 400 InvalidUserError
+end
+
 alt user exist and have googleId
     note right of Ctrl
         If the user already exists

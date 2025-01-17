@@ -25,6 +25,16 @@ const inMemory = {
     "IEmailClient": DummyEmailClient
 }
 
+const inMemoryWithRedis = {
+    "IEncrypter": JwtAdapter,
+    "IUserRepository": UserInmemoryRepository,
+    "ISetupDb": SetupDbInMemory,
+    "IPasswordManager": BcryptAdapter,
+    "IRefreshTokensStore": RedisRefreshToken,
+    "ISetupRefreshTokenStore": SetupRedis,
+    "IEmailClient": DummyEmailClient
+}
+
 const mongoWithRedis = {
     "IEncrypter": JwtAdapter,
     "IUserRepository": UserMongoRepository,
@@ -61,7 +71,10 @@ const config = {
     inMemory,
     mongoWithRedis,
     mongoWithoutRedis,
-    firebase
+    firebase,
+    inMemoryWithRedis
 }
 
 export default config[selectedConfig];
+
+export const passwordRequirements = process.env.PASSWORD_REQUIREMENTS || "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$";

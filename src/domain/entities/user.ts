@@ -74,18 +74,22 @@ export class User {
         return this._resetCode;
     }
 
+    public static isValidPassword(password: string, passwordRequirements: string): boolean {
+        const regex = new RegExp(passwordRequirements);
+        return regex.test(password);
+    }
+
     private static isRegisteringWithGoogle(props: UserProps): boolean {
         return !!props.googleId === true;
     }
 
+    // TODO: Change this approach. It allows to create a user without password validation
     public static create(props: UserProps): User {
         const guardedNullProps = [
             { argument: props.email, argumentName: 'Email' }
         ]
 
-        if (
-            !this.isRegisteringWithGoogle(props)
-        ) {
+        if (!this.isRegisteringWithGoogle(props)) {
             guardedNullProps.push({ argument: props.password, argumentName: 'Password' })
         }
 
@@ -129,7 +133,7 @@ export class User {
     public validateResetCode(resetCode: string): boolean {
         return this._resetCode === resetCode;
     }
-    
+
     public clearResetCode(): void {
         this._resetCode = '';
     }

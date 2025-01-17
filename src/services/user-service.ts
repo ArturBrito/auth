@@ -10,6 +10,8 @@ import { DatabaseConnectionError } from "../errors/database-connection-error";
 import { UserAlreadyRegisteredError } from "../errors/user-already-registered-error";
 import { EventEmitter } from "events";
 import { UserNotFoundError } from "../errors/user-not-found-error";
+import { passwordRequirements } from "../config";
+import { InvalidUserError } from "../errors/invalid-user-error";
 
 @injectable()
 export default class UserService implements IUserService {
@@ -79,6 +81,13 @@ export default class UserService implements IUserService {
         // hash the new password
         const hashedPassword = await this.passwordManager.hashPassword(newPassword);
 
+        // validate password
+        const isPasswordValid = User.isValidPassword(newPassword, passwordRequirements);
+
+        if (!isPasswordValid) {
+            throw new InvalidUserError('Password does not meet requirements');
+        }
+
         // set the new password
         user.setPassword(hashedPassword);
 
@@ -109,6 +118,13 @@ export default class UserService implements IUserService {
 
         // hash the new password
         const hashedPassword = await this.passwordManager.hashPassword(newPassword);
+
+        // validate password
+        const isPasswordValid = User.isValidPassword(newPassword, passwordRequirements);
+
+        if (!isPasswordValid) {
+            throw new InvalidUserError('Password does not meet requirements');
+        }
 
         // set the new password
         user.setPassword(hashedPassword);
@@ -161,6 +177,13 @@ export default class UserService implements IUserService {
 
         // hash the password
         const hashedPassword = await this.passwordManager.hashPassword(userDto.password);
+
+        // validate password
+        const isPasswordValid = User.isValidPassword(userDto.password, passwordRequirements);
+
+        if (!isPasswordValid) {
+            throw new InvalidUserError('Password does not meet requirements');
+        }
 
         if (userAlreadyExists && userAlreadyExists.googleId) {
             // associate password with the user

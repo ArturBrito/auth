@@ -21,6 +21,7 @@ services:
       EMAIL_USER:
       EMAIL_PASS:
       EMAIL_SERVICE:
+      PASSWORD_REQUIREMENTS:
     depends_on:
       - mongo
       - cache
