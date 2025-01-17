@@ -57,3 +57,5 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 rs256.rsa*
 cuca-firebase.json
+
+docker-compose.prod.yml
