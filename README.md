@@ -32,8 +32,8 @@ Possibility to choose where to store the data:
     - [Generate Keys](#generate-keys)
     - [Firebase Keys](#firebase-keys)
     - [Google Cloud](#google-cloud)
-4. [API Endpoints](#api-endpoints)
-5. [Installation and Running the Project](#installation-and-running-the-project)
+4. [Installation and Running the Project](#installation-and-running-the-project)
+5. [API Endpoints](#api-endpoints)
 6. [Technical Details](#technical-details)
    - [Architecture](#architecture)
    - [Dependencies](#dependencies)
@@ -204,6 +204,45 @@ This will be the value for the enviornment variable GOOGLE_CALLBACK_URL
 
 <br><br>
 
+# Installation and Running the Project
+
+This project can be installed and run in multiple ways, depending on your needs and setup. Below are the available options:
+
+### Easiest Way (For Testing and Development)
+1. Create a `.env` file in the root of the project with all the required environment variables for your setup (refer to [Configuration](#configuration)).
+2. Run the project using the `docker-compose.dev.yml` file:
+   ```bash
+   docker-compose -f docker-compose.dev.yml up --build
+   ```
+   This will build the Docker image and spin up all required services for testing and development.
+
+### Run Barebones (No Docker)
+You can run the project directly on your machine without using Docker:
+1. Ensure you have Node.js and npm installed.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the project:
+   ```bash
+   npm start
+   ```
+   OR
+   ```
+   npm run start:prod
+   ```
+4. Make sure any required services (e.g., MongoDB, Redis) are running and configured.
+
+### Build
+You can build the Docker image targeting either development or production and use it in your preferred setup, as long as the environment variables are properly configured.
+To build the Docker image you can use this commands:
+>docker build --target development -t auth-dev .  
+>docker build --target production -t auth-prod .
+
+You can also create a Docker Compose file and run the application directly from it.
+
+<br><br>
+
 # API Endpoints
 ## User
 ### Register new user
@@ -347,42 +386,3 @@ POST `/api/refreshtoken`
 GET `/api/google`
 * **Description:** This is the endpoint to sign in with google
 * **Sucess Status Code:** 200
-
-<br><br>
-
-# Installation and Running the Project
-
-This project can be installed and run in multiple ways, depending on your needs and setup. Below are the available options:
-
-### Easiest Way (For Testing and Development)
-1. Create a `.env` file in the root of the project with all the required environment variables for your setup (refer to [Configuration](#configuration)).
-2. Run the project using the `docker-compose.dev.yml` file:
-   ```bash
-   docker-compose -f docker-compose.dev.yml up --build
-   ```
-   This will build the Docker image and spin up all required services for testing and development.
-
-### Run Barebones (No Docker)
-You can run the project directly on your machine without using Docker:
-1. Ensure you have Node.js and npm installed.
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Run the project:
-   ```bash
-   npm start
-   ```
-   OR
-   ```
-   npm run start:prod
-   ```
-4. Make sure any required services (e.g., MongoDB, Redis) are running and configured.
-
-### Build
-You can build the Docker image targeting either development or production and use it in your preferred setup, as long as the environment variables are properly configured.
-To build the Docker image you can use this commands:
->docker build --target development -t auth-dev .  
->docker build --target production -t auth-prod .
-
-You can also create a Docker Compose file and run the application directly from it.
