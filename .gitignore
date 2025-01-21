@@ -59,3 +59,5 @@ rs256.rsa*
 cuca-firebase.json
 
 docker-compose.prod.yml
+cheats.md
+config-firebase.json
