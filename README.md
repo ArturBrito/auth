@@ -1,3 +1,4 @@
+![logo](./assets/logo.webp "Logo")
 # Authentication System
 
 **Disclaimer:** This project is developed for personal use and as part of a portfolio. I am not responsible for any issues that arise from using this system.
