@@ -1,15 +1,13 @@
 ✅ - Validate email and password on domain
 ✅ - Validate email and password on router input
-✅ - Implementar erros todos iguais
 ✅ - Catch unhandled errors
 ✅ - Endpoint not found error
 ✅ - Password minimum requirements
 ✅ - Send email with verification
 ✅ - Implement mongodb
 ✅ - Middleware de auth and authz
-Prevent register user duplicate (maybe the bug is just in memory)
 Set env for confirmation link url
-Change the errors to bad request error with the message (ex: invalid user. Can be BadRequestError('Invalid user'))
+✅ - Change the errors to bad request error with the message (ex: invalid user. Can be BadRequestError('Invalid user'))
 Set the roles dynamic
 Change config
 e2e tests
