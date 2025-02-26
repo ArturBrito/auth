@@ -4,7 +4,6 @@ import { User } from "../../src/domain/entities/user";
 import UserMapper from "../../src/domain/mapper/user-mapper";
 import IUserRepository from "../../src/domain/repositories/user-repository";
 import { DatabaseConnectionError } from "../../src/errors/database-connection-error";
-import { InvalidActivationCode } from "../../src/errors/invalid-activation-code-error";
 import { InvalidUserError } from "../../src/errors/invalid-user-error";
 import { UserAlreadyRegisteredError } from "../../src/errors/user-already-registered-error";
 import { UserNotFoundError } from "../../src/errors/user-not-found-error";
@@ -13,6 +12,7 @@ import UserService from "../../src/services/user-service";
 import { EventEmitter } from 'events';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import UserMongoRepository from "../../src/infrastructure/persistence/mongo/user/user-mongo-repository";
+import { BadRequestError } from "../../src/errors/bad-request-error";
 
 describe('UserService Unit Tests', () => {
     let userService: UserService;
@@ -206,7 +206,7 @@ describe('UserService Unit Tests', () => {
             try {
                 await userService.activateUser(validUserData.email, '654321');
             } catch (error) {
-                expect(error).toBeInstanceOf(InvalidActivationCode);
+                expect(error).toBeInstanceOf(BadRequestError);
             }
         });
 
@@ -733,7 +733,7 @@ describe('UserService - MongoDB Integration Tests', () => {
             try {
                 await userService.activateUser(validUserData.email, '654321');
             } catch (error) {
-                expect(error).toBeInstanceOf(InvalidActivationCode);
+                expect(error).toBeInstanceOf(BadRequestError);
             }
         });
     });

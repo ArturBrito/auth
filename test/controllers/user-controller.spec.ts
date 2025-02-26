@@ -1,6 +1,6 @@
 import UserController from "../../src/controllers/user-controller";
 import IUserRepository from "../../src/domain/repositories/user-repository";
-import { InvalidActivationCode } from "../../src/errors/invalid-activation-code-error";
+import { BadRequestError } from "../../src/errors/bad-request-error";
 import { InvalidUserError } from "../../src/errors/invalid-user-error";
 import { UserAlreadyRegisteredError } from "../../src/errors/user-already-registered-error";
 import { UserNotFoundError } from "../../src/errors/user-not-found-error";
@@ -246,11 +246,11 @@ describe('UserController Unit Tests', () => {
 
             const next = jest.fn();
 
-            mockUserService.activateUser.mockRejectedValue(new InvalidActivationCode());
+            mockUserService.activateUser.mockRejectedValue(new BadRequestError('Invalid activation code'));
 
             // Act
             await userController.activateUser(req as any, res as any, next);
-            expect(next).toHaveBeenCalledWith(expect.any(InvalidActivationCode));
+            expect(next).toHaveBeenCalledWith(expect.any(BadRequestError));
 
         });
     });
@@ -899,7 +899,7 @@ describe('UserController Integration Tests', () => {
             await userController.activateUser(req as any, res as any, next);
 
             // Assert
-            expect(next).toHaveBeenCalledWith(expect.any(InvalidActivationCode));
+            expect(next).toHaveBeenCalledWith(expect.any(BadRequestError));
 
         });
     });

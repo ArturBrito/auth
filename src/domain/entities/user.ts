@@ -1,7 +1,7 @@
 import { v4 as uuid } from "uuid";
 import { Guard } from "../../helpers/Guard";
 import { InvalidUserError } from "../../errors/invalid-user-error";
-import { InvalidActivationCode } from "../../errors/invalid-activation-code-error";
+import { BadRequestError } from "../../errors/bad-request-error";
 
 interface UserProps {
     uid?: string;
@@ -115,7 +115,7 @@ export class User {
             return;
         }
 
-        throw new InvalidActivationCode();
+        throw new BadRequestError('Invalid activation code');
     }
 
     public setPassword(password: string): void {
