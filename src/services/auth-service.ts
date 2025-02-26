@@ -4,11 +4,9 @@ import IUserRepository from "../domain/repositories/user-repository";
 import IAuthService from "./contracts/auth-service-contract";
 import IEncrypter from "./contracts/encrypter-contract";
 import { TYPES } from "../dependency-injection/types";
-import { InactiveUserError } from "../errors/inactive-user-error";
 import IPasswordManager from "./contracts/password-manager";
 import { BadRequestError } from "../errors/bad-request-error";
 import IRefreshTokensStore from "./contracts/refresh-tokens-store";
-import IAuthIAMService from "./contracts/iam-service-contract";
 
 @injectable()
 export default class AuthService implements IAuthService {
@@ -38,7 +36,7 @@ export default class AuthService implements IAuthService {
         }
 
         if (user.isActive === false) {
-            throw new InactiveUserError();
+            throw new BadRequestError('User is inactive');
         }
 
         const isPasswordValid = await this.passwordManager.comparePasswords(password, user.password);

@@ -1,7 +1,6 @@
 import { User } from "../../src/domain/entities/user";
 import IUserRepository from "../../src/domain/repositories/user-repository";
 import { BadRequestError } from "../../src/errors/bad-request-error";
-import { InactiveUserError } from "../../src/errors/inactive-user-error";
 import AuthService from "../../src/services/auth-service";
 import IAuthService from "../../src/services/contracts/auth-service-contract";
 import IEncrypter from "../../src/services/contracts/encrypter-contract";
@@ -93,7 +92,7 @@ describe('AuthService Unit Tests', () => {
             try {
                 await authService.signIn('artur.brito95@gmail.com', 'hashedPassword');
             } catch (error) {
-                expect(error).toBeInstanceOf(InactiveUserError);
+                expect(error).toBeInstanceOf(BadRequestError);
                 expect(error.message).toBe('User is inactive');
             }
 

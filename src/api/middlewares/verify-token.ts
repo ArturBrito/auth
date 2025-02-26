@@ -6,9 +6,8 @@ import IEncrypter from "../../services/contracts/encrypter-contract";
 import { TYPES } from "../../dependency-injection/types";
 import { NoTokenProvidedError } from "../../errors/no-token-provided-error";
 import { InvalidTokenError } from "../../errors/invalid-token-error";
-import { UnauthorizedError } from "../../errors/unauthorized-error";
 import UserMapper from "../../domain/mapper/user-mapper";
-import { InactiveUserError } from "../../errors/inactive-user-error";
+import { BadRequestError } from "../../errors/bad-request-error";
 
 declare global {
     namespace Express {
@@ -43,7 +42,7 @@ export default class VerifyToken implements IVerifyToken {
             }
 
             if (!decodedToken.isActive) {
-                throw new InactiveUserError();
+                throw new BadRequestError('User is inactive');
             }
 
             req.currentUser = UserMapper.tokenToDto(decodedToken);
