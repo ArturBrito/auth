@@ -4,7 +4,6 @@ import { Request, Response, NextFunction } from "express";
 import { UserDto } from "../../domain/dto/user-dto";
 import IEncrypter from "../../services/contracts/encrypter-contract";
 import { TYPES } from "../../dependency-injection/types";
-import { NoTokenProvidedError } from "../../errors/no-token-provided-error";
 import { InvalidTokenError } from "../../errors/invalid-token-error";
 import UserMapper from "../../domain/mapper/user-mapper";
 import { BadRequestError } from "../../errors/bad-request-error";
@@ -32,7 +31,7 @@ export default class VerifyToken implements IVerifyToken {
             const idToken = req.headers.authorization?.split('Bearer ')[1];
 
             if (!idToken) {
-                throw new NoTokenProvidedError();
+                throw new InvalidTokenError();
             }
 
             const decodedToken = await this.encrypter.decrypt(idToken);
