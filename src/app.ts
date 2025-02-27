@@ -21,10 +21,17 @@ const setupDb = myContainer.get<ISetupDb>(TYPES.ISetupDb);
 // setup refresh token store
 const setupRefreshTokenStore = myContainer.get<ISetupRefreshTokenStore>(TYPES.ISetupRefreshTokenStore);
 
+
+
+
 const setup = async () => {
     try {
         await setupDb.setup();
         await setupRefreshTokenStore.setup();
+        // check if ACTION_URL is set otherwise set default
+        if (!process.env.ACTION_URL) {
+            process.env.ACTION_URL = 'http://localhost:3000';
+        }
         startServer();
     } catch (error) {
         console.log(error);

@@ -21,6 +21,6 @@ export class ResetPasswordSendEmailHandler implements IEventHandler {
     }
 
     private generateResetUrl(user: UserCodesDto): string {
-        return `http://localhost:3000/api/user/reset-password/${user.email}/${user.resetCode}`;
+        return `${process.env.ACTION_URL}/api/user/reset-password/${user.email}/${user.resetCode}`;
     }
 }

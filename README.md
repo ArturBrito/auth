@@ -118,6 +118,9 @@ There are some variables that only need to be defined depending on the mode in w
       - At least one lowercase
       - At least one digit
       - At least one special character
+4. ACTION_URL (optional - will use the default value if not provided)
+   - The base URL used for user actions such as account verification and password reset (default: http://localhost:3000)
+
 
 <br>
 
