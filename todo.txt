@@ -6,7 +6,7 @@
 ✅ - Send email with verification
 ✅ - Implement mongodb
 ✅ - Middleware de auth and authz
-Set env for confirmation link url
+✅ - Set env for confirmation link url
 ✅ - Change the errors to bad request error with the message (ex: invalid user. Can be BadRequestError('Invalid user'))
 Set the roles dynamic
 Change config
