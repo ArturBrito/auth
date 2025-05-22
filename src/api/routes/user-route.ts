@@ -35,7 +35,7 @@ export default (app: Router) => {
         ],
         validateRequest,
         (req: Request, res: Response, next: NextFunction) => ctrl.getUserByEmail(req, res, next));
-    router.put('/activate/:email/:activationCode',
+    router.get('/activate/:email/:activationCode',
         [
             param('email')
                 .isEmail()

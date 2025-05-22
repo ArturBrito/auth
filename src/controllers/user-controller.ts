@@ -67,7 +67,7 @@ export default class UserController implements IUserController {
             const activationCode = req.params.activationCode;
             const userEmail = req.params.email;
             const activatedUser = await this.userService.activateUser(userEmail, activationCode);
-            res.status(200).json(activatedUser);
+            res.status(200).send('User activated successfully');
         } catch (error) {
             next(error);
         }
