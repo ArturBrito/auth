@@ -1,6 +1,7 @@
 import { injectable } from "inversify";
 import * as nodemailer from 'nodemailer';
 import IEmailClient from "../../services/contracts/email-client";
+import { Options } from "nodemailer/lib/mailer";
 
 @injectable()
 export default class NodeMailerClient implements IEmailClient {
@@ -12,13 +13,24 @@ export default class NodeMailerClient implements IEmailClient {
         }
     });
 
-    async sendEmail(email: string, subject: string, message: string): Promise<void> {
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject,
-            text: message
+    async sendEmail(email: string, subject: string, message?: string, html?: string): Promise<void> {
+        let mailOptions: Options;
+        if (html) {
+            mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject,
+                html: html
+            }
+        } else {
+            mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject,
+                text: message
+            }
         }
+
 
         try {
             await this.transporter.sendMail(mailOptions);
