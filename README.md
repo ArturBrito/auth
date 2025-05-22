@@ -248,6 +248,7 @@ To build the Docker image you can use this commands:
 
 You can also create a Docker Compose file and run the application directly from it.
 
+#### Note: The environment variable of NODE_ENV should match the build target
 <br><br>
 
 # API Endpoints
