@@ -7,6 +7,8 @@ import { TYPES } from "../dependency-injection/types";
 import IPasswordManager from "./contracts/password-manager";
 import { BadRequestError } from "../errors/bad-request-error";
 import IRefreshTokensStore from "./contracts/refresh-tokens-store";
+import { UserDto } from "../domain/dto/user-dto";
+import UserMapper from "../domain/mapper/user-mapper";
 
 @injectable()
 export default class AuthService implements IAuthService {
@@ -75,6 +77,24 @@ export default class AuthService implements IAuthService {
 
         return tokens;
     }
+
+    async validateToken(token: string): Promise<UserDto> {
+        const payload = await this.encrypter.decrypt(token);
+
+        if (!payload) {
+            throw new BadRequestError('Invalid token');
+        }
+
+        const user = await this.userRepository.getUserById(payload.uid);
+
+        if (!user) {
+            throw new BadRequestError('User not found');
+        }
+
+        return UserMapper.toDto(user);
+
+    }
+
 
     async signOut(refreshToken: string): Promise<void> {
         await this.refreshTokenStore.deleteRefreshToken(refreshToken);

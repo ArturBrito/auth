@@ -50,5 +50,13 @@ export default class AuthController implements IAuthController {
             next(error);
         }
     }
-
+    async validateToken(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { token } = req.body;
+            const isValid = await this.authService.validateToken(token);
+            res.status(200).json(isValid);
+        } catch (error) {
+            next(error);
+        }
+    }
 }

@@ -37,11 +37,20 @@ export default (app: Router) => {
     router.get(
         '/google',
         (req: Request, res: Response, next: NextFunction) => ctrl.googleSignIn(req, res, next));
-    
+
 
     router.get(
         '/google/callback',
         (req: Request, res: Response, next: NextFunction) => ctrl.googleCallback(req, res, next));
 
+    router.post('/validate-token',
+        [
+            body('token')
+                .trim()
+                .notEmpty()
+                .withMessage('You must supply a token')
+        ],
+        validateRequest,
+        (req: Request, res: Response, next: NextFunction) => ctrl.validateToken(req, res, next));
     console.log('Auth route loaded');
 }

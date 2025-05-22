@@ -5,4 +5,5 @@ export default interface IAuthController {
     refreshToken(req: Request, res: Response, next: NextFunction);
     googleSignIn(req: Request, res: Response, next: NextFunction);
     googleCallback(req: Request, res: Response, next: NextFunction);
+    validateToken(req: Request, res: Response, next: NextFunction);
 }

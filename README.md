@@ -233,6 +233,7 @@ You can run the project directly on your machine without using Docker:
    ```
    OR
    ```
+   npm run build
    npm run start:prod
    ```
 4. Make sure any required services (e.g., MongoDB, Redis) are running and configured.
