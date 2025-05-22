@@ -15,6 +15,7 @@ WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/build ./build
 COPY package*.json ./
 COPY rs256.rsa* ./
+COPY html ./html
 RUN npm install --omit=dev
 CMD [ "npm", "run", "start:prod" ]
 
