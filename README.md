@@ -104,13 +104,15 @@ There are some variables that only need to be defined depending on the mode in w
    - Defines the environment in which the application is located.
       - development
       - production
-2. SELECTED_SETUP
+2. AUTH_PORT
+   - Defines the port in wich the application will run
+3. SELECTED_SETUP
    - This is the variable that defines the mode in which the application is running. The modes are explained in [Getting Started](#getting-started)
       - inMemory
       - mongoWithRedis
       - mongoWithoutRedis
       - firebase
-3. PASSWORD_REQUIREMENTS (optional)
+4. PASSWORD_REQUIREMENTS (optional)
    - A string that define the rules for password. Example: ^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$  
    The absent of this variable will use the following requirements for the password:
       - Minimum 8 characters
@@ -118,7 +120,7 @@ There are some variables that only need to be defined depending on the mode in w
       - At least one lowercase
       - At least one digit
       - At least one special character
-4. ACTION_URL (optional - will use the default value if not provided)
+5. ACTION_URL (optional - will use the default value if not provided)
    - The base URL used for user actions such as account verification and password reset (default: http://localhost:3000)
 
 

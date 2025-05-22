@@ -28,7 +28,7 @@ const setup = async () => {
         await setupRefreshTokenStore.setup();
         // check if ACTION_URL is set otherwise set default
         if (!process.env.ACTION_URL) {
-            process.env.ACTION_URL = 'http://localhost:3000';
+            process.env.ACTION_URL = `http://localhost:${process.env.AUTH_PORT || 3000}`;
         }
         startServer();
     } catch (error) {
