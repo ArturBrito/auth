@@ -165,11 +165,11 @@ The [Google Cloud](#google-cloud) explains what the variables are and how to acc
 ### SMTP
 As this service sends emails, we need to configure the SMTP server
 
-1. EMAIL_SERVICE
-   - The service being used. Ex: google, Mailgun, etc.
-2. EMAIL_USER
-3. EMAIL_PASS
-4. EMAIL_SUBJECT
+1. EMAIL_HOST
+2. EMAIL_PORT
+3. EMAIL_USER
+4. EMAIL_PASS
+5. EMAIL_SUBJECT
    - The string that will be in the email subject
 
 The service is able to send the email as html. You can make your own html template, for that you need to:

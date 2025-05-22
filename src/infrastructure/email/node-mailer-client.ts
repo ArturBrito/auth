@@ -6,7 +6,11 @@ import { Options } from "nodemailer/lib/mailer";
 @injectable()
 export default class NodeMailerClient implements IEmailClient {
     private transporter = nodemailer.createTransport({
-        service: process.env.EMAIL_SERVICE,
+        host: process.env.EMAIL_HOST,
+        port: parseInt(process.env.EMAIL_PORT),
+        requireTLS: true,
+        secure: false,
+        tls: { ciphers: 'SSLv3', rejectUnauthorized: false },
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
