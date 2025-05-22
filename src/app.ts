@@ -1,7 +1,5 @@
 if (process.env.NODE_ENV !== 'production') {
-    import('dotenv').then(dotenv => {
-        dotenv.config();
-    });
+    require('dotenv').config();
 }
 import 'reflect-metadata';
 import startServer from './api/server';
