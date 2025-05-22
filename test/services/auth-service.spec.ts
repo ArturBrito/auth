@@ -17,7 +17,8 @@ describe('AuthService Unit Tests', () => {
     beforeEach(() => {
         mockUserRepository = {
             getUserByEmail: jest.fn(),
-            createUser: jest.fn()
+            createUser: jest.fn(),
+            getUserById: jest.fn()
         } as any;
         mockEncrypter = {
             encrypt: jest.fn(),
@@ -153,6 +154,36 @@ describe('AuthService Unit Tests', () => {
                 expect(error.message).toBe('Invalid refresh token');
             }
 
+        });
+    });
+
+    describe('validateToken', () => {
+        it('should validate the token', async () => {
+            mockEncrypter.decrypt.mockResolvedValue({
+                uid: '1',
+                email: 'artur.brito95@gmail.com',
+                role: 'CLIENTS',
+                username: 'abrito',
+                isActive: true
+            });
+
+
+            const user = User.create({
+                uid: '1',
+                email: 'artur.brito95@gmail.com',
+                password: 'hashedPassword',
+                role: 'CLIENTS',
+                isActive: true
+            });
+
+            mockUserRepository.getUserById.mockResolvedValue(user);
+
+            const userValidate = await authService.validateToken('token');
+
+            expect(userValidate).toBeDefined();
+            expect(userValidate.uid).toBe('1');
+            expect(userValidate.email).toBe('artur.brito95@gmail.com');
+            expect(userValidate.role).toBe('CLIENTS');
         });
     });
 

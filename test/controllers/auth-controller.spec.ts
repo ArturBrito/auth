@@ -13,7 +13,8 @@ describe('AuthController Unit Tests', () => {
         mockAuthService = {
             signIn: jest.fn(),
             signOut: jest.fn(),
-            refreshToken: jest.fn()
+            refreshToken: jest.fn(),
+            validateToken: jest.fn()
         } as any;
 
         mockAuthIAMService = {
@@ -136,6 +137,58 @@ describe('AuthController Unit Tests', () => {
             await authController.refreshToken(req as any, res as any, next);
             expect(next).toHaveBeenCalledWith(expect.any(BadRequestError));
 
+        });
+    });
+
+    describe('ValidateToken', () => {
+        it('should validate a token', async () => {
+            const req = {
+                body: {
+                    token: 'token'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            const user = {
+                uid: '1',
+                email: 'artur.brito95@gmail.com',
+                role: 'user',
+                isActive: true,
+                username: 'abrito',
+            }
+
+            mockAuthService.validateToken.mockResolvedValue(user);
+
+            await authController.validateToken(req as any, res as any, next);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(user);
+        });
+
+        it('should throw an error if the token is invalid', async () => {
+            const req = {
+                body: {
+                    token: 'token'
+                }
+            };
+
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            };
+
+            const next = jest.fn();
+
+            mockAuthService.validateToken.mockRejectedValue(new BadRequestError('Invalid token'));
+
+            await authController.validateToken(req as any, res as any, next);
+            expect(next).toHaveBeenCalledWith(expect.any(BadRequestError));
         });
     });
 
