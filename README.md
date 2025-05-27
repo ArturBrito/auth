@@ -138,10 +138,26 @@ No aditional environment variables are needed
    - Password for **MongoDB**
 3. MONGO_URI
    - **MongoDB** URI
-4. REDIS_URI
+
+#### Redis can be runned with a single instance or with a _sentinel_ for high availability
+#### Variabels to run in a single instance
+1. REDIS_URI
    - **Redis** URI
-5. REDIS_PASSWORD
+2. REDIS_PORT
+   - **Redis** Port
+3. REDIS_PASSWORD
    - Password for **Redis**
+
+#### Variabels to run with a _sentinel_
+1. REDIS_SENTINELS
+   - The addresses of the sentinels. Example:
+   ```
+   REDIS_SENTINELS=192.168.1.152:26379,192.168.1.156:26379,192.168.1.157:26379
+   ```
+2. REDIS_MASTER_NAME
+   - The name that you set for the replication
+3. REDIS_PASSWORD
+   - The password that you set for the replication
 
 ### Variables to mongoWithoutRedis
 1. MONGO_INITDB_ROOT_USERNAME
