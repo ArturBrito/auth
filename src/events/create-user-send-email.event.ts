@@ -22,7 +22,7 @@ export class CreateUserSendEmailHandler implements IEventHandler {
             try {
                 html = fs.readFileSync(path.join(__dirname, `../../html/${process.env.EMAIL_HTML}.html`), 'utf8');
                 const activationLink = this.generateActivationUrl(user);
-                html = html.replace('<a id="activation-link">', `<a id="activation-link" href="${activationLink}">`);
+                html = html.replace('<a id="action-link">', `<a id="action-link" href="${activationLink}">`);
             } catch (error) {
                 console.log('Error reading HTML file:', error);
             }
