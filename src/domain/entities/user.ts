@@ -2,6 +2,7 @@ import { v4 as uuid } from "uuid";
 import { Guard } from "../../helpers/Guard";
 import { InvalidUserError } from "../../errors/invalid-user-error";
 import { BadRequestError } from "../../errors/bad-request-error";
+import { Code } from "./code";
 
 interface UserProps {
     uid?: string;
@@ -12,7 +13,7 @@ interface UserProps {
     isActive?: boolean;
     activationCode?: string;
     googleId?: string;
-    resetCode?: string;
+    resetCode?: Code;
 }
 
 export class User {
@@ -24,7 +25,7 @@ export class User {
     private _isActive: boolean;
     private _activationCode: string;
     private _googleId: string;
-    private _resetCode: string;
+    private _resetCode: Code;
 
     private constructor(props: UserProps) {
         this._uid = props.uid || uuid();
@@ -35,7 +36,7 @@ export class User {
         this._isActive = props.isActive || false;
         this._activationCode = props.activationCode || uuid();
         this._googleId = props.googleId || '';
-        this._resetCode = props.resetCode || '';
+        this._resetCode = props.resetCode || null;
     }
 
     get uid(): string {
@@ -70,7 +71,7 @@ export class User {
         return this._googleId;
     }
 
-    get resetCode(): string {
+    get resetCode(): Code {
         return this._resetCode;
     }
 
@@ -127,15 +128,19 @@ export class User {
     }
 
     public generateResetCode(): void {
-        this._resetCode = uuid();
+        this._resetCode = new Code(uuid());
+    }
+
+    public setResetCode(resetCode: Code): void {
+        this._resetCode = resetCode;
     }
 
     public validateResetCode(resetCode: string): boolean {
-        return this._resetCode === resetCode;
+        return this._resetCode.code === resetCode;
     }
 
     public clearResetCode(): void {
-        this._resetCode = '';
+        this._resetCode = null;
     }
 
 }

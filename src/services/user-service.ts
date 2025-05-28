@@ -12,6 +12,7 @@ import { EventEmitter } from "events";
 import { UserNotFoundError } from "../errors/user-not-found-error";
 import { passwordRequirements } from "../config";
 import { InvalidUserError } from "../errors/invalid-user-error";
+import { BadRequestError } from "../errors/bad-request-error";
 
 @injectable()
 export default class UserService implements IUserService {
@@ -37,7 +38,7 @@ export default class UserService implements IUserService {
             throw new UserNotFoundError();
         }
 
-        if(user.isActive) {
+        if (user.isActive) {
             throw new UserAlreadyRegisteredError();
         }
 
@@ -51,6 +52,14 @@ export default class UserService implements IUserService {
 
         if (!user) {
             throw new UserNotFoundError();
+        }
+
+        if (user.isActive === false) {
+            throw new BadRequestError('User is inactive');
+        }
+
+        if (user.resetCode && !user.resetCode.isExpired()) {
+            throw new BadRequestError('You\'ve already requested a reset code. Please wait for the code to expire before requesting a new one.');
         }
 
         // generate reset code
@@ -69,6 +78,14 @@ export default class UserService implements IUserService {
 
         if (!user) {
             throw new UserNotFoundError();
+        }
+
+        if (user.isActive === false) {
+            throw new BadRequestError('User is inactive');
+        }
+
+        if (user.resetCode && user.resetCode.isExpired()) {
+            throw new BadRequestError('Reset code has expired. Please request a new reset code.');
         }
 
         // check if the reset code is correct

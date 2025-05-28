@@ -12,5 +12,5 @@ Set the roles dynamic
 Change config
 e2e tests
 Logger
-Custom html to send emails
+✅ - Custom html to send emails
 Limit resend activate code emails

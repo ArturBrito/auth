@@ -21,7 +21,7 @@ export default class UserMapper {
             password: userPersistence.password,
             activationCode: userPersistence.activationCode,
             googleId: userPersistence.googleId,
-            resetCode: userPersistence.resetCode
+            //resetCode: userPersistence.resetCode
         });
         return user;
     }
@@ -42,14 +42,14 @@ export default class UserMapper {
             isActive: user.isActive,
             activationCode: user.activationCode,
             googleId: user.googleId,
-            resetCode: user.resetCode
+            //resetCode: user.resetCode
         };
     }
     static toUserCodesDto(user: User) : UserCodesDto {
         return {
             email: user.email,
             activationCode: user.activationCode,
-            resetCode: user.resetCode
+            resetCode: user.resetCode ? user.resetCode.code : null
         };
     }
 }

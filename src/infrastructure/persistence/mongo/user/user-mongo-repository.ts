@@ -4,6 +4,8 @@ import { User } from "../../../../domain/entities/user";
 import { IUserPersistence } from "../../../../data-model/user.datamodel";
 import UserMapper from "../../../../domain/mapper/user-mapper";
 import UserModel from "../../../../data-model/user.schema";
+import UserResetPasswordCodeModel from "../../../../data-model/user-reset-password-code.schema";
+import { Code } from "../../../../domain/entities/code";
 
 @injectable()
 export default class UserMongoRepository implements IUserRepository {
@@ -31,7 +33,14 @@ export default class UserMongoRepository implements IUserRepository {
             const query = { email: email };
             const user = await UserModel.findOne(query);
             if (!user) return null;
-            return UserMapper.toEntity(user);
+            const userResetCode = await UserResetPasswordCodeModel.findOne({ email: email });
+
+            const userEntity = UserMapper.toEntity(user);
+            if (userResetCode) {
+                userEntity.setResetCode(new Code(userResetCode.resetCode, userResetCode.createdAt));
+            }
+            //return UserMapper.toEntity(user);
+            return userEntity;
         } catch (error) {
             throw error;
         }
@@ -50,6 +59,16 @@ export default class UserMongoRepository implements IUserRepository {
         try {
             const userPersistence: IUserPersistence = UserMapper.toPersistence(user);
             await UserModel.updateOne({ uid: userPersistence.uid }, userPersistence);
+            if (user.resetCode) {
+                const resetCodePersistence = {
+                    email: userPersistence.email,
+                    resetCode: user.resetCode.code,
+                    createdAt: user.resetCode.createdAt
+                };
+                await UserResetPasswordCodeModel.updateOne({ email: userPersistence.email }, resetCodePersistence, { upsert: true });
+            } else {
+                await UserResetPasswordCodeModel.deleteOne({ email: userPersistence.email });
+            }
         } catch (error) {
             throw error;
         }
