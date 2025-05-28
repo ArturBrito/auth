@@ -26,9 +26,12 @@ const setup = async () => {
     try {
         await setupDb.setup();
         await setupRefreshTokenStore.setup();
-        // check if ACTION_URL is set otherwise set default
-        if (!process.env.ACTION_URL) {
-            process.env.ACTION_URL = `http://localhost:${process.env.AUTH_PORT || 3000}`;
+        // check if CREATE_ACCOUNT_URL is set otherwise set default
+        if (!process.env.CREATE_ACCOUNT_URL) {
+            process.env.CREATE_ACCOUNT_URL = `http://localhost:${process.env.AUTH_PORT || 3000}`;
+        }
+        if (!process.env.RESET_PASSWORD_URL) {
+            process.env.RESET_PASSWORD_URL = `http://localhost:${process.env.AUTH_PORT || 3000}`;
         }
         startServer();
     } catch (error) {

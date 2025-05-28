@@ -120,8 +120,12 @@ There are some variables that only need to be defined depending on the mode in w
       - At least one lowercase
       - At least one digit
       - At least one special character
-5. ACTION_URL (optional - will use the default value if not provided)
-   - The base URL used for user actions such as account verification and password reset (default: http://localhost:3000)
+5. CREATE_ACCOUNT_URL (optional - will use the default value if not provided)
+   - The URL that goes in the create account email to the user validate account (default: http://localhost:3000).  
+   Example: `https://mydomain.com` (the rest of the url will be added automatically)
+6. RESET_PASSWORD_URL (optional - will use the default value if not provided)
+   - The URL that goes in the reset password email. This url should be the full path to your page with the fields to reset password. The reset code and email goes in the URL parameters.  
+   Example: `https://mydomain.com/reset-password`
 
 
 <br>

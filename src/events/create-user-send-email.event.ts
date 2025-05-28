@@ -37,6 +37,6 @@ export class CreateUserSendEmailHandler implements IEventHandler {
     }
 
     private generateActivationUrl(user: UserCodesDto): string {
-        return `${process.env.ACTION_URL}/api/user/activate/${user.email}/${user.activationCode}`;
+        return `${process.env.CREATE_ACCOUNT_URL}/api/user/activate/${user.email}/${user.activationCode}`;
     }
 }
