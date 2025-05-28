@@ -18,7 +18,7 @@ export class CreateUserSendEmailHandler implements IEventHandler {
     async handle(user: UserCodesDto) {
 
         let html = null;
-        if (process.env.EMAIL_HTML) {
+        if (process.env.EMAIL_CREATE_HTML) {
             try {
                 html = fs.readFileSync(path.join(__dirname, `../../html/${process.env.EMAIL_HTML}.html`), 'utf8');
                 const activationLink = this.generateActivationUrl(user);
@@ -30,7 +30,7 @@ export class CreateUserSendEmailHandler implements IEventHandler {
 
         await this.emailClient.sendEmail(
             user.email,
-            process.env.EMAIL_SUBJECT || 'Welcome to the platform',
+            process.env.EMAIL_CREATE_SUBJECT || 'Welcome to the platform',
             'Activation link: ' + this.generateActivationUrl(user),
             html
         );

@@ -187,17 +187,21 @@ As this service sends emails, we need to configure the SMTP server
 
 1. EMAIL_HOST
 2. EMAIL_PORT
+   - Need to be between ""
 3. EMAIL_USER
 4. EMAIL_PASS
-5. EMAIL_SUBJECT
-   - The string that will be in the email subject
+5. EMAIL_CREATE_SUBJECT
+   - The string that will be in the create email subject
+6. EMAIL_CHANGED_PASSWORD_SUBJECT
+   - The string that will be in the change email notification subject
 
 The service is able to send the email as html. You can make your own html template, for that you need to:
 - Create a html file with the link `<a id="activation-link">PLACEHOLDER</a>` anywhere
 - Put the html file inside html folder the root of the project
-- Configure the environment variable with the name of the html file (without the extension)
-   - EMAIL_HTML
-      - example: `EMAIL_HTML=example1`
+- Configure the environment variables (for create account, change password and) with the name of the html file (without the extension)
+   - EMAIL_CREATE_HTML
+      - example: `EMAIL_CREATE_HTML=example1`
+   - EMAIL_CHANGED_PASSWORD_HTML
 
 <br><br>
 
