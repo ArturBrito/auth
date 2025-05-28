@@ -19,9 +19,7 @@ export default class UserMapper {
             createdAt: userPersistence.createdAt,
             isActive: userPersistence.isActive,
             password: userPersistence.password,
-            activationCode: userPersistence.activationCode,
             googleId: userPersistence.googleId,
-            //resetCode: userPersistence.resetCode
         });
         return user;
     }
@@ -40,15 +38,13 @@ export default class UserMapper {
             role: user.role,
             createdAt: user.createdAt,
             isActive: user.isActive,
-            activationCode: user.activationCode,
             googleId: user.googleId,
-            //resetCode: user.resetCode
         };
     }
     static toUserCodesDto(user: User) : UserCodesDto {
         return {
             email: user.email,
-            activationCode: user.activationCode,
+            activationCode: user.activationCode ? user.activationCode.code : null,
             resetCode: user.resetCode ? user.resetCode.code : null
         };
     }

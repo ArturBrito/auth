@@ -5,7 +5,5 @@ export interface IUserPersistence {
     role: string;
     createdAt: Date;
     isActive: boolean;
-    activationCode?: string;
     googleId?: string;
-    //resetCode?: string;
 }

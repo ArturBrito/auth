@@ -11,7 +11,7 @@ interface UserProps {
     role: string;
     createdAt?: Date;
     isActive?: boolean;
-    activationCode?: string;
+    activationCode?: Code;
     googleId?: string;
     resetCode?: Code;
 }
@@ -23,7 +23,7 @@ export class User {
     private _role: Role;
     private _createdAt: Date;
     private _isActive: boolean;
-    private _activationCode: string;
+    private _activationCode: Code;
     private _googleId: string;
     private _resetCode: Code;
 
@@ -34,7 +34,7 @@ export class User {
         this._role = props.role as Role || Role.USER;
         this._createdAt = props.createdAt || new Date();
         this._isActive = props.isActive || false;
-        this._activationCode = props.activationCode || uuid();
+        this._activationCode = props.activationCode || new Code(uuid());
         this._googleId = props.googleId || '';
         this._resetCode = props.resetCode || null;
     }
@@ -63,7 +63,7 @@ export class User {
         return this._isActive;
     }
 
-    get activationCode(): string {
+    get activationCode(): Code {
         return this._activationCode;
     }
 
@@ -110,9 +110,8 @@ export class User {
     }
 
     public activateUser(activationCode: string): void {
-        if (this._activationCode === activationCode) {
+        if (this._activationCode.code === activationCode) {
             this._isActive = true;
-            this._activationCode = 'activated';
             return;
         }
 
@@ -135,12 +134,24 @@ export class User {
         this._resetCode = resetCode;
     }
 
+    public generateActivationCode(): void {
+        this.setActivationCode(new Code(uuid()));
+    }
+
+    public setActivationCode(activationCode: Code): void {
+        this._activationCode = activationCode;
+    }
+
     public validateResetCode(resetCode: string): boolean {
         return this._resetCode.code === resetCode;
     }
 
     public clearResetCode(): void {
         this._resetCode = null;
+    }
+
+    public clearActivationCode(): void {
+        this._activationCode = null;
     }
 
 }

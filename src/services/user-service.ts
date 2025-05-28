@@ -42,6 +42,15 @@ export default class UserService implements IUserService {
             throw new UserAlreadyRegisteredError();
         }
 
+        if (user.activationCode && !user.activationCode.isExpired()) {
+            throw new BadRequestError('You\'ve already requested an activation code. Please wait for the code to expire before requesting a new one.');
+        }
+
+        user.generateActivationCode();
+
+        // save user
+        await this.userRepository.updateUser(user);
+
         this.eventEmitter.emit('CreateUserSendEmail', UserMapper.toUserCodesDto(user));
     }
     async resetPasswordRequest(email: string): Promise<void> {
@@ -175,6 +184,9 @@ export default class UserService implements IUserService {
 
         // activate user
         user.activateUser(activationCode);
+
+        // clear activation code
+        user.clearActivationCode();
 
         // save user
         await this.userRepository.updateUser(user);
