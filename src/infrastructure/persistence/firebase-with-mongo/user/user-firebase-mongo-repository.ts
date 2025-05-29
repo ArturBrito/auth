@@ -5,6 +5,7 @@ import { IUserPersistence } from "../../../../data-model/user.datamodel";
 import UserMapper from "../../../../domain/mapper/user-mapper";
 import UserModel from "../../../../data-model/user.schema";
 import * as admin from "firebase-admin";
+import { Code } from "../../../../domain/entities/code";
 
 @injectable()
 export default class UserFirebaseWithMongoRepository implements IUserRepository {
@@ -39,7 +40,7 @@ export default class UserFirebaseWithMongoRepository implements IUserRepository 
                 password: "",
                 role: user.role,
                 isActive: false,
-                activationCode: activationLink
+                activationCode: new Code(activationLink)
             });
 
             return newUser;
