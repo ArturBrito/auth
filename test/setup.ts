@@ -7,43 +7,72 @@ import UserRepository from '../src/infrastructure/persistence/mongo/user/user-mo
 import PasswordManager from '../src/infrastructure/password/bcrypt-adapter';
 import { EventEmitter } from 'events';
 import express from 'express';
-import { json } from 'body-parser';
-import authRoute from '../src/api/routes/auth-route';
-import userRoute from '../src/api/routes/user-route';
 
 let mongoServer: MongoMemoryServer;
 const container = new Container();
 
 beforeAll(async () => {
-  // Setup in-memory MongoDB
-  mongoServer = await MongoMemoryServer.create();
-  const mongoUri = mongoServer.getUri();
-  
-  await connect(mongoUri);
+    // Setup in-memory MongoDB
+    mongoServer = await MongoMemoryServer.create();
+    const mongoUri = mongoServer.getUri();
 
-  // Configure container with real implementations
-  container.bind(TYPES.IUserRepository).to(UserRepository);
-  container.bind(TYPES.IPasswordManager).to(PasswordManager);
-  container.bind(TYPES.EventEmmiter).toConstantValue(new EventEmitter());
+    await connect(mongoUri);
+
+    // Configure container with real implementations
+    container.bind(TYPES.IUserRepository).to(UserRepository);
+    container.bind(TYPES.IPasswordManager).to(PasswordManager);
+    container.bind(TYPES.EventEmmiter).toConstantValue(new EventEmitter());
 });
 
 afterAll(async () => {
-  await connection.close();
-  await mongoServer.stop();
+    await connection.close();
+    await mongoServer.stop();
 });
 
 afterEach(async () => {
-  // Clear database between tests
-  const collections = connection.collections;
-  for (const key in collections) {
-    await collections[key].deleteMany({});
-  }
+    // Clear database between tests
+    const collections = connection.collections;
+    for (const key in collections) {
+        await collections[key].deleteMany({});
+    }
 });
 
 // Create test app
-const app = express();
-app.use(json());
-authRoute(app);
-userRoute(app);
+import { myContainer } from '../src/dependency-injection/inversify.config';
+import { EventHandlers } from '../src/events/event-handlers';
+import ISetupDb from '../src/infrastructure/setup/contracts/setup-db.contract';
+import ISetupRefreshTokenStore from '../src/infrastructure/setup/contracts/refresh-token-store.contract';
 
-export { app, container };
+// configure event handlers
+const eventHandlers = myContainer.get(EventHandlers);
+eventHandlers.registerEventHandlers();
+console.log(process.env.SELECTED_SETUP)
+// setup db
+const setupDb = myContainer.get<ISetupDb>(TYPES.ISetupDb);
+
+// setup refresh token store
+const setupRefreshTokenStore = myContainer.get<ISetupRefreshTokenStore>(TYPES.ISetupRefreshTokenStore);
+
+const app = express();
+
+const setup = async () => {
+    try {
+        await setupDb.setup();
+        await setupRefreshTokenStore.setup();
+        if (!process.env.CREATE_ACCOUNT_URL) {
+            process.env.CREATE_ACCOUNT_URL = `http://localhost:${process.env.AUTH_PORT || 3000}`;
+        }
+        if (!process.env.RESET_PASSWORD_URL) {
+            process.env.RESET_PASSWORD_URL = `http://localhost:${process.env.AUTH_PORT || 3000}`;
+        }
+
+        await require('../src/api/loaders').default({ expressApp: app });
+       
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+setup();
+
+export { container, app, myContainer };

@@ -10,7 +10,8 @@
     "test": "jest --runInBand --detectOpenHandles",
     "test:watch": "jest --watch --runInBand --detectOpenHandles",
     "test:unit": "jest --testPathPattern='unit'",
-    "test:integration": "jest --testPathPattern='integration'"
+    "test:integration": "jest --testPathPattern='integration'",
+    "test:coverage": "jest --coverage"
   },
   "keywords": [],
   "author": "",
