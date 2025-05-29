@@ -196,9 +196,12 @@ export default class UserService implements IUserService {
 
     async createUser(userDto: UserDto): Promise<UserDto> {
         // check if the user already exists
-        const userAlreadyExists = await this.userRepository.getUserByEmail(userDto.email).catch(() => {
+        let userAlreadyExists: User;
+        try {
+            userAlreadyExists = await this.userRepository.getUserByEmail(userDto.email)
+        } catch (error) {
             throw new DatabaseConnectionError();
-        });
+        }
 
         if (userAlreadyExists && !userAlreadyExists.googleId) {
             throw new UserAlreadyRegisteredError();

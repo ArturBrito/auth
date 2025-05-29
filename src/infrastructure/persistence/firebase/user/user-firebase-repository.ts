@@ -2,6 +2,7 @@ import { injectable } from "inversify";
 import { User } from "../../../../domain/entities/user";
 import IUserRepository from "../../../../domain/repositories/user-repository";
 import * as admin from "firebase-admin";
+import { Code } from "../../../../domain/entities/code";
 
 @injectable()
 export default class FireBaseUserRepository implements IUserRepository {
@@ -27,7 +28,7 @@ export default class FireBaseUserRepository implements IUserRepository {
                 password: "",
                 role: user.role,
                 isActive: false,
-                activationCode: activationLink
+                activationCode: new Code(activationLink)
             });
             
             return newUser;
