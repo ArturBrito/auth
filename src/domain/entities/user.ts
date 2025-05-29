@@ -99,6 +99,11 @@ export class User {
         if (!guardNullProps.succeeded) {
             throw new InvalidUserError(guardNullProps.message);
         }
+        
+        const guardEmptyPassword = Guard.againstEmptyString(props.password, 'Password');
+        if (!this.isRegisteringWithGoogle(props) && !guardEmptyPassword.succeeded) {
+            throw new InvalidUserError(guardEmptyPassword.message);
+        }
 
         const guardEmail = Guard.isEmail(props.email, 'Email');
 
