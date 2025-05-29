@@ -79,7 +79,12 @@ export default class AuthService implements IAuthService {
     }
 
     async validateToken(token: string): Promise<UserDto> {
-        const payload = await this.encrypter.decrypt(token);
+        let payload: any;
+        try {
+            payload = await this.encrypter.decrypt(token);
+        } catch (error) {
+            throw new BadRequestError('Invalid token');
+        }
 
         if (!payload) {
             throw new BadRequestError('Invalid token');
