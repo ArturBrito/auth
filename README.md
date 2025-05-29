@@ -211,7 +211,6 @@ The service is able to send the email as html. You can make your own html templa
 ## Generate Keys
 If we don't use Firebase to store user data (and consequently encrypt and decrypt the token) we will have to generate keys for this purpose.  
 Let's generate it by following the next steps on your machine:
-> // Don't add passphrase  
 > ssh-keygen -t rsa -b 4096 -m PEM -f rs256.rsa  
 > openssl rsa -in rs256.rsa -pubout -outform PEM -out rs256.rsa.pub
 
