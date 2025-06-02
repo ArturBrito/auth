@@ -42,11 +42,12 @@ import { myContainer } from '../src/dependency-injection/inversify.config';
 import { EventHandlers } from '../src/events/event-handlers';
 import ISetupDb from '../src/infrastructure/setup/contracts/setup-db.contract';
 import ISetupRefreshTokenStore from '../src/infrastructure/setup/contracts/refresh-token-store.contract';
+import logger from '../src/helpers/logger';
 
 // configure event handlers
 const eventHandlers = myContainer.get(EventHandlers);
 eventHandlers.registerEventHandlers();
-console.log(process.env.SELECTED_SETUP)
+logger.info(`Selected setup: ${process.env.SELECTED_SETUP}`)
 // setup db
 const setupDb = myContainer.get<ISetupDb>(TYPES.ISetupDb);
 
@@ -69,7 +70,7 @@ const setup = async () => {
         await require('../src/api/loaders').default({ expressApp: app });
        
     } catch (error) {
-        console.log(error);
+        logger.error(error);
     }
 }
 

@@ -8,10 +8,12 @@ import { EventHandlers } from './events/event-handlers';
 import { TYPES } from './dependency-injection/types';
 import ISetupDb from './infrastructure/setup/contracts/setup-db.contract';
 import ISetupRefreshTokenStore from './infrastructure/setup/contracts/refresh-token-store.contract';
+import logger from './helpers/logger';
 
 // configure event handlers
 const eventHandlers = myContainer.get(EventHandlers);
 eventHandlers.registerEventHandlers();
+logger.info(`Selected setup: ${process.env.SELECTED_SETUP}`)
 
 // setup db
 const setupDb = myContainer.get<ISetupDb>(TYPES.ISetupDb);
@@ -35,7 +37,7 @@ const setup = async () => {
         }
         startServer();
     } catch (error) {
-        console.log(error);
+        logger.error(error);
     }
 }
 

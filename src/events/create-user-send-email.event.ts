@@ -5,6 +5,7 @@ import { TYPES } from "../dependency-injection/types";
 import UserCodesDto from "../domain/dto/user-codes-dto";
 import fs from 'fs';
 import path from 'path';
+import logger from "../helpers/logger";
 
 @injectable()
 export class CreateUserSendEmailHandler implements IEventHandler {
@@ -24,7 +25,7 @@ export class CreateUserSendEmailHandler implements IEventHandler {
                 const activationLink = this.generateActivationUrl(user);
                 html = html.replace('<a id="action-link">', `<a id="action-link" href="${activationLink}">`);
             } catch (error) {
-                console.log('Error reading HTML file:', error);
+                logger.error('Error reading HTML file:', error);
             }
         }
 

@@ -5,6 +5,7 @@ import { TYPES } from "../dependency-injection/types";
 import { UserDto } from "../domain/dto/user-dto";
 import fs from 'fs';
 import path from 'path';
+import logger from "../helpers/logger";
 
 @injectable()
 export class ChangePasswordSendEmailHandler implements IEventHandler {
@@ -20,7 +21,7 @@ export class ChangePasswordSendEmailHandler implements IEventHandler {
             try {
                 html = fs.readFileSync(path.join(__dirname, `../../html/${process.env.EMAIL_CHANGED_PASSWORD_HTML}.html`), 'utf8');
             } catch (error) {
-                console.log('Error reading HTML file:', error);
+                logger.error('Error reading HTML file:', error);
             }
         }
 

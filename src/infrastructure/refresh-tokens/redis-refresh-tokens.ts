@@ -1,6 +1,7 @@
 import { injectable } from "inversify";
 import IRefreshTokensStore from "../../services/contracts/refresh-tokens-store";
 import Redis, { Redis as RedisClient } from 'ioredis';
+import logger from "../../helpers/logger";
 
 @injectable()
 export default class RedisRefreshToken implements IRefreshTokensStore {
@@ -33,11 +34,11 @@ export default class RedisRefreshToken implements IRefreshTokensStore {
         }
 
         this.redisClient.on('connect', () => {
-            console.log(`Redis refresh token running`)
+            logger.info(`Redis refresh token running`)
         })
 
         this.redisClient.on('error', (error) => {
-            console.log(error)
+            logger.error(error)
         })
 
         //this.redisClient.connect();

@@ -1,20 +1,21 @@
 import { injectable } from "inversify";
 import ISetupDb from "../contracts/setup-db.contract";
 import * as admin from "firebase-admin";
+import logger from "../../../helpers/logger";
 
 let serviceAccount: any;
 
 try {
     serviceAccount = require("../../../../config-firebase.json");
 } catch (error) {
-    console.warn("config-firebase.json not found. Firebase setup will be skipped.");
+    logger.debug("config-firebase.json not found. Firebase setup will be skipped.");
 }
 
 @injectable()
 export default class SetupDbFirebase implements ISetupDb {
     async setup(): Promise<void> {
         if (!serviceAccount) {
-            console.warn("Skipping Firebase setup due to missing config.");
+            logger.debug("Skipping Firebase setup due to missing config.");
             return;
         }
 
@@ -22,6 +23,6 @@ export default class SetupDbFirebase implements ISetupDb {
             credential: admin.credential.cert(serviceAccount),
         });
 
-        console.log("Firebase initialized");
+        logger.info("Firebase initialized");
     }
 }

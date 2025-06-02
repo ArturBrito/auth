@@ -5,6 +5,7 @@ import { TYPES } from "../dependency-injection/types";
 import UserCodesDto from "../domain/dto/user-codes-dto";
 import fs from 'fs';
 import path from 'path';
+import logger from "../helpers/logger";
 
 @injectable()
 export class ResetPasswordSendEmailHandler implements IEventHandler {
@@ -23,7 +24,7 @@ export class ResetPasswordSendEmailHandler implements IEventHandler {
                 const resetLink = this.generateResetUrl(payload);
                 html = html.replace('<a id="action-link">', `<a id="action-link" href="${resetLink}">`);
             } catch (error) {
-                console.log('Error reading HTML file:', error);
+                logger.error('Error reading HTML file:', error);
             }
         }
 

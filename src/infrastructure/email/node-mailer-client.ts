@@ -2,6 +2,7 @@ import { injectable } from "inversify";
 import * as nodemailer from 'nodemailer';
 import IEmailClient from "../../services/contracts/email-client";
 import { Options } from "nodemailer/lib/mailer";
+import logger from "../../helpers/logger";
 
 @injectable()
 export default class NodeMailerClient implements IEmailClient {
@@ -38,9 +39,9 @@ export default class NodeMailerClient implements IEmailClient {
 
         try {
             await this.transporter.sendMail(mailOptions);
-            console.log('Email sent to:', email)
+            logger.debug('Email sent to:', email)
         } catch (error) {
-            console.log(error)
+            logger.error(error)
         }
     }
 

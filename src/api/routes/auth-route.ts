@@ -4,6 +4,7 @@ import { TYPES } from "../../dependency-injection/types";
 import { myContainer } from "../../dependency-injection/inversify.config";
 import { validateRequest } from "../middlewares/validate-request";
 import { body } from "express-validator";
+import logger from "../../helpers/logger";
 
 const router = Router();
 
@@ -52,5 +53,5 @@ export default (app: Router) => {
         ],
         validateRequest,
         (req: Request, res: Response, next: NextFunction) => ctrl.validateToken(req, res, next));
-    console.log('Auth route loaded');
+    logger.info('Auth route loaded');
 }

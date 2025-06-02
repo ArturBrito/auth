@@ -5,6 +5,7 @@ import { TYPES } from '../../dependency-injection/types';
 import { body, param } from 'express-validator';
 import { validateRequest } from '../middlewares/validate-request';
 import IVerifyToken from '../middlewares/contracts/verify-token.contract';
+import logger from '../../helpers/logger';
 
 const router = Router();
 
@@ -99,5 +100,5 @@ export default (app: Router) => {
         (req: Request, res: Response, next: NextFunction) => ctrl.resetPassword(req, res, next));
 
 
-    console.log('User route loaded');
+    logger.info('User route loaded');
 }

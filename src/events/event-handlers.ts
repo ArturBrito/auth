@@ -2,7 +2,7 @@ import { EventEmitter } from 'events'
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../dependency-injection/types';
 import { IEventHandler } from './contracts/event-handler.contract';
-
+import logger from '../helpers/logger';
 
 @injectable()
 export class EventHandlers {
@@ -30,16 +30,16 @@ export class EventHandlers {
         this.handlers.forEach((handler, eventName) => {
             this.eventEmitter.on(eventName, async (event) => {
                 try {
-                    console.log('Event Fired:', eventName)
+                    logger.debug('Event Fired:', eventName)
                     handler.handle(event)
                 }
                 catch (error) {
-                    console.log('An error occured while handling event', eventName)
+                    logger.error('An error occured while handling event', eventName)
                 }
             });
         });
 
-        console.log('Events Loaded')
+        logger.info('Events Loaded')
     }
 
 }

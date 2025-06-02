@@ -6,6 +6,7 @@ import UserMapper from "../../../../domain/mapper/user-mapper";
 import UserModel from "../../../../data-model/user.schema";
 import * as admin from "firebase-admin";
 import { Code } from "../../../../domain/entities/code";
+import logger from "../../../../helpers/logger";
 
 @injectable()
 export default class UserFirebaseWithMongoRepository implements IUserRepository {
@@ -46,7 +47,7 @@ export default class UserFirebaseWithMongoRepository implements IUserRepository 
             return newUser;
 
         } catch (error) {
-            await UserModel.deleteOne({ uid: userCreated.uid }).catch(err => console.log(err));
+            await UserModel.deleteOne({ uid: userCreated.uid }).catch(err => logger.error(err));
             throw error;
         }
     }
