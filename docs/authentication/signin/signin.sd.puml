@@ -13,25 +13,20 @@ participant "RefreshTokenStore" as RefreshTokenStore
 --> API: POST /api/signin
 API -> Ctrl: signIn(request)
 activate Ctrl
-Ctrl -> Ctrl: {email, username, password} = request.body
-Ctrl -> Service: signIn(password, email, username)
+Ctrl -> Ctrl: {email, password} = request.body
+Ctrl -> Service: signIn(email, password)
 activate Service
-Service -> Repo: user = getUserByEmail(email, username)
+Service -> Repo: user = getUserByEmail(email)
 activate Repo
 deactivate Repo
 alt user not found
-    Service --> Repo: user = getUserByUsername(username)
-    activate Repo
-    deactivate Repo
-    alt user not found
         Service --> API: throw BadRequestError
         
         <-- API: 400 BadRequestError
     end
     note right of Ctrl
         Finish the workflow
-    end note
-end
+end note
 
 Service -> User: user.isActive()
 activate User
@@ -55,7 +50,7 @@ alt password is not valid
     <-- API: 400 BadRequestError
 end
 
-Service -> Encrypter: tokens = encrypter.encrypt({user.id, user.email, user.username, user.role, user.isActive})
+Service -> Encrypter: tokens = encrypter.encrypt({user.id, user.email, user.role, user.isActive})
 activate Encrypter
 deactivate Encrypter
 
