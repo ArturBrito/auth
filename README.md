@@ -429,3 +429,9 @@ POST `/api/refreshtoken`
 GET `/api/google`
 * **Description:** This is the endpoint to sign in with google
 * **Sucess Status Code:** 200
+
+# Technical Details
+## Architecture
+### Sequence Diagrams
+The sequence diagrams of the the requests are placed in [SD's](docs/authentication/SDs.md)
+## Dependencies
