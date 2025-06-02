@@ -1,0 +1,36 @@
+@startuml
+!theme cerulean
+participant "API" as API
+participant "Controller" as Ctrl
+participant "Service" as Service
+participant "Repository" as Repo
+
+
+--> API: DELETE /api
+API -> Ctrl: deleteUser(request)
+activate Ctrl
+Ctrl -> Ctrl: user = req.currentUser
+Ctrl -> Service: deleteUser(user: UserDto)
+activate Service
+Service -> Repo: user = getUserByEmail(user.email)
+activate Repo
+deactivate Repo
+alt user not found
+    Service --> API: throw UserNotFoundError
+        
+    <-- API: 404 UserNotFoundError
+    note right of Ctrl
+        Finish the workflow
+    end note
+end
+Service -> Repo: deleteUser(user.uid)
+activate Repo
+deactivate Repo
+Service --> Ctrl
+deactivate Service
+Ctrl --> API
+deactivate Ctrl
+<-- API : 204
+
+
+@enduml
