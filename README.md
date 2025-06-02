@@ -38,8 +38,7 @@ Possibility to choose where to store the data:
 6. [Technical Details](#technical-details)
    - [Architecture](#architecture)
    - [Dependencies](#dependencies)
-7. [Contributing](#contributing)
-8. [License](#license)
+7. [License](#license)
 
 <br><br>
 
@@ -439,3 +438,53 @@ In the diagram, not all implementations for each interface are represented,  onl
 ### Sequence Diagrams
 The sequence diagrams of the the requests are placed in [SD's](docs/authentication/SDs.md)
 ## Dependencies
+_All the dependencies are present in the package.json file_
+The production dependencies are:
+```json
+"dependencies": {
+   "bcryptjs": "^3.0.2",
+   "cors": "^2.8.5",
+   "express": "^4.21.1",
+   "express-async-errors": "^3.1.1",
+   "express-validator": "^7.2.0",
+   "firebase-admin": "^13.0.1",
+   "inversify": "^6.1.6",
+   "ioredis": "^5.6.1",
+   "jsonwebtoken": "^9.0.2",
+   "mongoose": "^8.9.5",
+   "morgan": "^1.10.0",
+   "nodemailer": "^6.9.16",
+   "passport": "^0.7.0",
+   "passport-google-oauth20": "^2.0.0",
+   "reflect-metadata": "^0.2.2",
+   "uuid": "^11.0.3",
+   "winston": "^3.17.0",
+   "winston-daily-rotate-file": "^5.0.0"
+}
+```
+
+The dev dependencies are only used for developing and testing. When the project is built with the --production flag, these packages will not be installed.
+```json
+"devDependencies": {
+   "@types/bcrypt": "^5.0.2",
+   "@types/cors": "^2.8.17",
+   "@types/express": "^4.17.21",
+   "@types/jest": "^29.5.14",
+   "@types/jsonwebtoken": "^9.0.7",
+   "@types/morgan": "^1.9.9",
+   "@types/nodemailer": "^6.4.17",
+   "@types/passport": "^1.0.17",
+   "@types/supertest": "^6.0.3",
+   "dotenv": "^16.4.7",
+   "jest": "^29.7.0",
+   "jest-html-reporter": "^4.1.0",
+   "jest-junit": "^16.0.0",
+   "mongodb-memory-server": "^10.1.4",
+   "nodemon": "^3.1.7",
+   "rimraf": "^6.0.1",
+   "supertest": "^7.1.1",
+   "ts-jest": "^29.2.5",
+   "ts-mockito": "^2.6.1",
+   "ts-node": "^10.9.2"
+}
+```
