@@ -287,6 +287,7 @@ You can also create a Docker Compose file and run the application directly from 
 <br><br>
 
 # API Endpoints
+_Note: Only the success cases are represented here_
 ## User
 ### Register new user
 POST `/api/user`
@@ -432,6 +433,9 @@ GET `/api/google`
 
 # Technical Details
 ## Architecture
+The project follows a clean architecture with inversion and dependency injection principles.
+In the diagram, not all implementations for each interface are represented,  only one to serve as an example.  
+![Architecture](/docs/architecture/architecture.svg)
 ### Sequence Diagrams
 The sequence diagrams of the the requests are placed in [SD's](docs/authentication/SDs.md)
 ## Dependencies

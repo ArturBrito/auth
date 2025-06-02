@@ -61,3 +61,6 @@ cuca-firebase.json
 docker-compose.prod.yml
 cheats.md
 config-firebase.json
+
+*vpp.bak*
+*vpp.lck
