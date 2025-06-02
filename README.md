@@ -488,3 +488,7 @@ The dev dependencies are only used for developing and testing. When the project 
    "ts-node": "^10.9.2"
 }
 ```
+
+
+# License
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
