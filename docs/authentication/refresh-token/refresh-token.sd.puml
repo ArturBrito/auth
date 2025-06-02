@@ -1,0 +1,46 @@
+@startuml
+!theme cerulean
+participant "API" as API
+participant "Controller" as Ctrl
+participant "Service" as Service
+participant "RefreshTokenStore" as RefreshTokenStore
+participant "Encrypter" as Encrypter
+
+
+
+--> API: POST /api/refreshtoken
+API -> Ctrl: refreshToken(request)
+activate Ctrl
+Ctrl -> Ctrl: {refreshToken} = request.body
+Ctrl -> Service: refreshToken(refreshToken)
+activate Service
+Service -> RefreshTokenStore: refreshTokenStore.getRefreshToken(refreshToken)
+activate RefreshTokenStore
+deactivate RefreshTokenStore
+alt refresh token not found
+    Service --> API: throw BadRequestError
+    note right of Ctrl
+        Finish the workflow
+    end note
+    <-- API: 400 BadRequestError
+end
+Service -> Encrypter: payload = encrypter.decrypt(refreshToken)
+activate Encrypter
+deactivate Encrypter
+
+Service -> Encrypter: tokens = encrypter.encrypt(payload)
+activate Encrypter
+deactivate Encrypter
+Service -> RefreshTokenStore: refreshTokenStore.deleteRefreshToken(refreshToken)
+activate RefreshTokenStore
+Service -> RefreshTokenStore: refreshTokenStore.saveRefreshToken(tokens.refreshToken)
+deactivate RefreshTokenStore
+
+Service -> Ctrl: {token, refreshToken}
+deactivate Service
+Ctrl -> API: {token, refreshToken}
+deactivate Ctrl
+<-- API : 200 {token, refreshToken}
+
+
+@enduml
