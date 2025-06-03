@@ -1,3 +1,4 @@
+[![Test & Coverage](https://github.com/ArturBrito/auth/actions/workflows/ci.yml/badge.svg)](https://github.com/ArturBrito/auth/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/ArturBrito/auth/branch/main/graph/badge.svg)](https://codecov.io/gh/ArturBrito/auth)
 
 ![logo](./assets/logo.webp "Logo")
