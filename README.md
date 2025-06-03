@@ -1,4 +1,4 @@
-[![Coverage Status](https://coveralls.io/repos/github/ArturBrito/auth/badge.svg?branch=main)](https://coveralls.io/github/ArturBrito/auth?branch=main)
+[![codecov](https://codecov.io/gh/ArturBrito/auth/branch/main/graph/badge.svg)](https://codecov.io/gh/ArturBrito/auth)
 
 ![logo](./assets/logo.webp "Logo")
 # Authentication System
