@@ -1,52 +1,29 @@
-name: Test GitHub Action
+# .github/workflows/test.yml
+name: Test & Coverage
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
 
 jobs:
-  test-action:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        action: [report, done, build-number-report, build-number-done]  # Note: We're also testing 'install' since it's implicit in each action
-        fail_on_error: [true, false]
-        coverage_reporter_version: ['v0.6.14', 'latest', '']
+  test:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up environment (Linux)
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        shell: bash
-        run: |
-          echo "Running on Linux"
-      - name: Set up environment (MacOS)
-        if: ${{ matrix.os == 'macos-latest' }}
-        shell: bash
-        run: |
-          echo "Running on macOS"
-      - name: Set up environment (Windows)
-        if: ${{ matrix.os == 'windows-latest' }}
-        shell: pwsh
-        run: |
-          echo "Running on Windows"
-
-      - name: Test Action
-        uses: ./
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          node-version: '18'
+      - run: npm install
+      - name: Generate RSA keys
+        run: |
+          openssl genpkey -algorithm RSA -out ./rs256.rsa -pkeyopt rsa_keygen_bits:2048
+          openssl rsa -in ./rs256.rsa -pubout -out ./rs256.rsa.pub
+      - run: npm run test -- --coverage
+      - name: Check coverage file
+        run: ls -la ./coverage
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
           debug: true
-          fail-on-error: ${{ matrix.fail_on_error }}
-          build-number: ${{ (matrix.action == 'build-number-report' || matrix.action == 'build-number-done') && github.sha || '' }} # Only set 'build-number' to `${{ github.sha }}` when testing `build-number-report` or `build-number-done`
-          parallel-finished: ${{ matrix.action == 'done' || matrix.action == 'build-number-done' }}  # Only set `parallel-finished` to `true` when testing `done` or `build-number-done`
-          coverage-reporter-version: ${{ matrix.coverage_reporter_version != '' && matrix.coverage_reporter_version || '' }}
-          coverage-reporter-platform: ${{ matrix.coverage_reporter_platform }}
-        env:
-          CI: true
-        continue-on-error: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
