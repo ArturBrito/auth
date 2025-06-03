@@ -103,6 +103,12 @@ describe('UserService', () => {
             });
             verify(mockEventEmitter.emit('CreateUserSendEmail', anything())).once();
         });
+
+        it('should throw DatabaseConnectionError when database connection fails', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenReject(new Error('Database connection error'));
+            await expect(userService.createUser(testUserDto))
+                .rejects.toThrow('Server problem');
+        });
     });
 
     describe('activateUser', () => {
@@ -132,6 +138,12 @@ describe('UserService', () => {
             await expect(userService.activateUser('nonexistent@example.com', 'code'))
                 .rejects.toThrow(UserNotFoundError);
         });
+
+        it('should throw DatabaseConnectionError when database connection fails', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenReject(new Error('Database connection error'));
+            await expect(userService.activateUser(testUserDto.email, 'code'))
+                .rejects.toThrow('Server problem');
+        });
     });
 
     describe('password management', () => {
@@ -158,69 +170,265 @@ describe('UserService', () => {
             verify(mockEventEmitter.emit('PasswordChanged', anything())).once();
         });
 
-        it('should change password with current password', async () => {
-          when(mockUserRepository.getUserByEmail('test@example.com')).thenResolve(testUser);
-          when(mockPasswordManager.comparePasswords('currentPassword', 'hashedpassword')).thenResolve(true);
-          when(mockPasswordManager.hashPassword('NewPassword1!')).thenResolve('newhashedpassword');
-          when(mockUserRepository.updateUser(anything())).thenResolve();
-    
-          await userService.changePassword('test@example.com', 'currentPassword', 'NewPassword1!');
-          
-          expect(testUser.password).toBe('newhashedpassword');
-          verify(mockEventEmitter.emit('PasswordChanged', anything())).once();
+        it('should throw UserNotFoundError when user does not exist', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenResolve(null);
+            await expect(userService.resetPassword(testUserDto.email, 'resetCode', 'NewPassword1!'))
+                .rejects.toThrow(UserNotFoundError);
         });
-    
-        it('should throw BadRequestError when reset code is expired', async () => {
-          const expiredUser = User.create({
-            email: 'expired@example.com',
-            password: 'hashedpassword',
-            role: Role.USER
-          });
-          expiredUser.generateResetCode();
-          // Force expiration
-          expiredUser.setResetCode(new Code(expiredUser.resetCode.code, new Date(Date.now() - 1000 * 60 * 60 * 2)));
-    
-          when(mockUserRepository.getUserByEmail('expired@example.com')).thenResolve(expiredUser);
-    
-          await expect(userService.resetPassword(
-            'expired@example.com', 
-            expiredUser.resetCode.code, 
-            'NewPassword1!'
-          )).rejects.toThrow(BadRequestError);
-        });
-      });
-    
-      describe('resendActivationCode', () => {
-        it('should generate new activation code for inactive user', async () => {
-          const inactiveUser = User.create({
-            email: 'inactive@example.com',
-            password: 'hashedpassword',
-            role: Role.USER
-          });
-    
-          // Force expiration
-          inactiveUser.setActivationCode(new Code(inactiveUser.activationCode.code, new Date(Date.now() - 1000 * 60 * 60 * 2)));
 
-          when(mockUserRepository.getUserByEmail('inactive@example.com')).thenResolve(inactiveUser);
-          when(mockUserRepository.updateUser(anything())).thenResolve();
-    
-          await userService.resendActivationCode('inactive@example.com');
-          
-          expect(inactiveUser.activationCode).toBeDefined();
-          verify(mockEventEmitter.emit('CreateUserSendEmail', anything())).once();
+
+        it('should throw BadRequestError when user is inactive', async () => {
+            const expiredUser = User.create({
+                email: 'expired@example.com',
+                password: 'hashedpassword',
+                role: Role.USER
+            });
+
+            when(mockUserRepository.getUserByEmail(expiredUser.email)).thenResolve(expiredUser);
+            await expect(userService.resetPassword(expiredUser.email, 'resetCode', 'NewPassword1!'))
+                .rejects.toThrow(BadRequestError);
         });
-    
+
+        it('should throw UserNotFoundError when reset code is invalid', async () => {
+            const existingUser = User.create({
+                email: 'expired@example.com',
+                password: 'hashedpassword',
+                role: Role.USER,
+                isActive: true
+            });
+
+            existingUser.generateResetCode();
+
+            when(mockUserRepository.getUserByEmail(existingUser.email)).thenResolve(existingUser);
+            await expect(userService.resetPassword(existingUser.email, 'invalidResetCode', 'NewPassword1!'))
+                .rejects.toThrow(UserNotFoundError);
+        });
+
+        it('should throw BadRequestError when reset code is expired', async () => {
+            const expiredUser = User.create({
+                email: 'expired@example.com',
+                password: 'hashedpassword',
+                role: Role.USER,
+                isActive: true
+            });
+            expiredUser.generateResetCode();
+            // Force expiration
+            expiredUser.setResetCode(new Code(expiredUser.resetCode.code, new Date(Date.now() - 2000 * 60 * 60 * 2)));
+
+            when(mockUserRepository.getUserByEmail('expired@example.com')).thenResolve(expiredUser);
+
+            await expect(userService.resetPassword(
+                'expired@example.com',
+                expiredUser.resetCode.code,
+                'NewPassword1!'
+            )).rejects.toThrow(BadRequestError);
+        });
+
+        it('should throw InvalidUserError when new password does not meet requirements', async () => {
+            const user = User.create({
+                email: 'expired@example.com',
+                password: 'hashedpassword',
+                role: Role.USER,
+                isActive: true
+            });
+            user.generateResetCode();
+            when(mockUserRepository.getUserByEmail(user.email)).thenResolve(user);
+            await expect(userService.resetPassword(user.email, user.resetCode.code, 'weak'))
+                .rejects.toThrow(InvalidUserError);
+        });
+
+        it('should throw DatabaseConnectionError when database connection fails', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenReject(new Error('Database connection error'));
+            await expect(userService.resetPassword(testUserDto.email, 'resetCode', 'NewPassword1!'))
+                .rejects.toThrow('Server problem');
+        });
+    });
+
+
+    describe('changePassword', () => {
+        it('should change password with current password', async () => {
+            when(mockUserRepository.getUserByEmail('test@example.com')).thenResolve(testUser);
+            when(mockPasswordManager.comparePasswords('currentPassword', 'hashedpassword')).thenResolve(true);
+            when(mockPasswordManager.hashPassword('NewPassword1!')).thenResolve('newhashedpassword');
+            when(mockUserRepository.updateUser(anything())).thenResolve();
+
+            await userService.changePassword('test@example.com', 'currentPassword', 'NewPassword1!');
+
+            expect(testUser.password).toBe('newhashedpassword');
+            verify(mockEventEmitter.emit('PasswordChanged', anything())).once();
+        });
+
+        it('should throw UserNotFoundError when user does not exist', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenResolve(null);
+            await expect(userService.changePassword(testUserDto.email, 'currentPassword', 'NewPassword1!'))
+                .rejects.toThrow(UserNotFoundError);
+        });
+
+        it('should throw UserNotFoundError when current password is incorrect', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenResolve(testUser);
+            when(mockPasswordManager.comparePasswords('wrongPassword', 'hashedpassword')).thenResolve(false);
+
+            await expect(userService.changePassword(testUserDto.email, 'wrongPassword', 'NewPassword1!'))
+                .rejects.toThrow(UserNotFoundError);
+        });
+
+        it('should throw InvalidUserError when new password does not meet requirements', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenResolve(testUser);
+            when(mockPasswordManager.comparePasswords('currentPassword', anything())).thenResolve(true);
+
+            await expect(userService.changePassword(testUserDto.email, 'currentPassword', 'weak'))
+                .rejects.toThrow(InvalidUserError);
+        });
+
+        it('should throw DatabaseConnectionError when database connection fails', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenReject(new Error('Database connection error'));
+            await expect(userService.changePassword(testUserDto.email, 'currentPassword', 'NewPassword1!'))
+                .rejects.toThrow('Server problem');
+        });
+    });
+
+    describe('resetPasswordRequest', () => {
+        it('should generate reset code for existing user', async () => {
+            const existingUser = User.create({
+                email: testUserDto.email,
+                password: 'hashedpassword',
+                role: Role.USER,
+                isActive: true
+            });
+
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenResolve(existingUser);
+            when(mockPasswordManager.hashPassword(anything())).thenResolve('hashedpassword');
+            when(mockUserRepository.updateUser(anything())).thenResolve();
+
+            await userService.resetPasswordRequest(testUserDto.email);
+
+            expect(existingUser.resetCode).toBeDefined();
+            verify(mockEventEmitter.emit('ResetPasswordRequestSendEmail', anything())).once();
+        });
+
+        it('should throw UserNotFoundError when user does not exist', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenResolve(null);
+            await expect(userService.resetPasswordRequest(testUserDto.email))
+                .rejects.toThrow(UserNotFoundError);
+        });
+
+        it('should throw BadRequestError when user is inactive', async () => {
+            const inactiveUser = User.create({
+                email: testUserDto.email,
+                password: 'hashedpassword',
+                role: Role.USER
+            });
+
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenResolve(inactiveUser);
+            await expect(userService.resetPasswordRequest(testUserDto.email))
+                .rejects.toThrow(BadRequestError);
+        });
+
+        it('should throw BadRequestError when reset code is not expired', async () => {
+            const existingUser = User.create({
+                email: testUserDto.email,
+                password: 'hashedpassword',
+                role: Role.USER,
+                isActive: true
+            });
+
+            existingUser.generateResetCode(); // Generate a reset code
+
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenResolve(existingUser);
+
+            await expect(userService.resetPasswordRequest(testUserDto.email))
+                .rejects.toThrow(BadRequestError);
+        });
+        
+        it('should throw DatabaseConnectionError when database connection fails', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenReject(new Error('Database connection error'));
+            await expect(userService.resetPasswordRequest(testUserDto.email))
+                .rejects.toThrow('Server problem');
+        });
+    });
+
+    describe('resendActivationCode', () => {
+        it('should generate new activation code for inactive user', async () => {
+            const inactiveUser = User.create({
+                email: 'inactive@example.com',
+                password: 'hashedpassword',
+                role: Role.USER
+            });
+
+            // Force expiration
+            inactiveUser.setActivationCode(new Code(inactiveUser.activationCode.code, new Date(Date.now() - 1000 * 60 * 60 * 2)));
+
+            when(mockUserRepository.getUserByEmail('inactive@example.com')).thenResolve(inactiveUser);
+            when(mockUserRepository.updateUser(anything())).thenResolve();
+
+            await userService.resendActivationCode('inactive@example.com');
+
+            expect(inactiveUser.activationCode).toBeDefined();
+            verify(mockEventEmitter.emit('CreateUserSendEmail', anything())).once();
+        });
+
         it('should throw BadRequestError when code is not expired', async () => {
-          const inactiveUser = User.create({
-            email: 'inactive@example.com',
-            password: 'hashedpassword',
-            role: Role.USER
-          });
-    
-          when(mockUserRepository.getUserByEmail('inactive@example.com')).thenResolve(inactiveUser);
-    
-          await expect(userService.resendActivationCode('inactive@example.com'))
-            .rejects.toThrow(BadRequestError);
+            const inactiveUser = User.create({
+                email: 'inactive@example.com',
+                password: 'hashedpassword',
+                role: Role.USER
+            });
+
+            when(mockUserRepository.getUserByEmail('inactive@example.com')).thenResolve(inactiveUser);
+
+            await expect(userService.resendActivationCode('inactive@example.com'))
+                .rejects.toThrow(BadRequestError);
+        });
+
+        it('should throw UserAlreadyRegisteredError when user is already active', async () => {
+            const activeUser = User.create({
+                email: testUserDto.email,
+                password: 'hashedpassword',
+                role: Role.USER,
+                isActive: true
+            });
+
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenResolve(activeUser);
+            await expect(userService.resendActivationCode(testUserDto.email))
+                .rejects.toThrow(UserAlreadyRegisteredError);
+        });
+
+        it('should throw UserNotFoundError when user does not exist', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenResolve(null);
+            await expect(userService.resendActivationCode(testUserDto.email))
+                .rejects.toThrow(UserNotFoundError);
+        });
+
+        it('should throw DatabaseConnectionError when database connection fails', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenReject(new Error('Database connection error'));
+            await expect(userService.resendActivationCode(testUserDto.email))
+                .rejects.toThrow('Server problem');
+        });
+    });
+
+    describe('deleteUser', () => {
+        it('should delete user by email', async () => {
+            const userToDelete = User.create({
+                email: testUserDto.email,
+                password: 'hashedpassword',
+                role: Role.USER,
+                isActive: true
+            });
+
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenResolve(userToDelete);
+            when(mockUserRepository.deleteUser(userToDelete.uid)).thenResolve();
+        });
+
+        it('should throw UserNotFoundError when user does not exist', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenResolve(null);
+            await expect(userService.deleteUser(testUserDto))
+                .rejects.toThrow(UserNotFoundError);
+        });
+
+        it('should throw DatabaseConnectionError when database connection fails', async () => {
+            when(mockUserRepository.getUserByEmail(testUserDto.email)).thenReject(new Error('Database connection error'));
+            await expect(userService.deleteUser(testUserDto))
+                .rejects.toThrow('Server problem');
         });
     });
 });
