@@ -21,6 +21,12 @@ jobs:
           openssl rsa -in ./rs256.rsa -pubout -out ./rs256.rsa.pub
       - run: npm run test -- --coverage
       - run: npm install coveralls
-      - run: cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+      - name: Check coverage file
+        run: ls -la ./coverage
+
+      - name: Upload to Coveralls
+        run: |
+          ls -la ./coverage
+          cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
