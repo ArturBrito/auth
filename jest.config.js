@@ -179,7 +179,7 @@ module.exports = {
 
   // Whether to use watchman for file crawling
   // watchman: true,
-  collectCoverage: true,
-  coverageDirectory: "coverage",
-  coverageReporters: ["lcov", "text"]
+  //collectCoverage: true,
+  //coverageDirectory: "coverage",
+  //coverageReporters: ["lcov", "text"]
 };
