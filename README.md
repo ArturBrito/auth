@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/ArturBrito/auth/badge.svg?branch=main)](https://coveralls.io/github/ArturBrito/auth?branch=main)
+
 ![logo](./assets/logo.webp "Logo")
 # Authentication System
 

@@ -1,20 +1,22 @@
-name: CI
-on: [push, pull_request]
+# .github/workflows/test.yml
+name: Test & Coverage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-    
-    - run: npm ci
-    - run: npm test
-    - run: npm run test:coverage -- --coverageReporters=text-lcov > coverage.lcov
-    
-    - uses: actions/upload-artifact@v3
-      with:
-        name: coverage
-        path: coverage.lcov
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm run test -- --coverage
+      - run: npm install coveralls
+      - run: cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
