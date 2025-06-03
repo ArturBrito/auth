@@ -72,16 +72,6 @@ export default class UserController implements IUserController {
             next(error);
         }
     }
-    async getUserByEmail(req: Request, res: Response, next: NextFunction) {
-        try {
-            const email = req.params.email;
-            const user = await this.userService.getUserByEmail(email);
-            res.status(200).json(user);
-        } catch (error) {
-            //throw error;
-            next(error);
-        }
-    }
 
     async createUser(req: Request, res: Response, next: NextFunction) {
         try {

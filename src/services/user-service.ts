@@ -242,14 +242,4 @@ export default class UserService implements IUserService {
         return UserMapper.toDto(newUser);
 
     }
-
-    async getUserByEmail(email: string): Promise<UserDto | null> {
-        const user = await this.userRepository.getUserByEmail(email);
-
-        if (!user) {
-            throw new UserNotFoundError();
-        }
-
-        return UserMapper.toDto(user);
-    }
 }
