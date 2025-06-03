@@ -15,6 +15,10 @@ jobs:
         with:
           node-version: '18'
       - run: npm install
+      - name: Generate RSA keys
+        run: |
+          openssl genpkey -algorithm RSA -out ./rs256.rsa -pkeyopt rsa_keygen_bits:2048
+          openssl rsa -in ./rs256.rsa -pubout -out ./rs256.rsa.pub
       - run: npm run test -- --coverage
       - run: npm install coveralls
       - run: cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
