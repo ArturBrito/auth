@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import IVerifyToken from "./contracts/verify-token.contract";
 import { Request, Response, NextFunction } from "express";
 import { UserDto } from "../../domain/dto/user-dto";
-import IEncrypter from "../../services/contracts/encrypter-contract";
+import ITokenManager from "../../services/contracts/token-manager-contract";
 import { TYPES } from "../../dependency-injection/types";
 import { InvalidTokenError } from "../../errors/invalid-token-error";
 import UserMapper from "../../domain/mapper/user-mapper";
@@ -18,11 +18,11 @@ declare global {
 
 @injectable()
 export default class VerifyToken implements IVerifyToken {
-    private encrypter: IEncrypter;
+    private tokenManager: ITokenManager;
     constructor(
-        @inject(TYPES.IEncrypter) encrypter: IEncrypter,
+        @inject(TYPES.ITokenManager) tokenManager: ITokenManager,
     ) {
-        this.encrypter = encrypter;
+        this.tokenManager = tokenManager;
         this.verifyToken = this.verifyToken.bind(this);
     }
 
@@ -34,7 +34,7 @@ export default class VerifyToken implements IVerifyToken {
                 throw new InvalidTokenError();
             }
 
-            const decodedToken = await this.encrypter.decrypt(idToken);
+            const decodedToken = await this.tokenManager.verify(idToken);
 
             if (!decodedToken) {
                 throw new InvalidTokenError();

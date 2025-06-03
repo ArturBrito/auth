@@ -4,7 +4,7 @@ participant "API" as API
 participant "Controller" as Ctrl
 participant "Service" as Service
 participant "RefreshTokenStore" as RefreshTokenStore
-participant "Encrypter" as Encrypter
+participant "TokenManager" as TokenManager
 
 
 
@@ -24,13 +24,13 @@ alt refresh token not found
     end note
     <-- API: 400 BadRequestError
 end
-Service -> Encrypter: payload = encrypter.decrypt(refreshToken)
-activate Encrypter
-deactivate Encrypter
+Service -> TokenManager: payload = tokenManager.verify(refreshToken)
+activate TokenManager
+deactivate TokenManager
 
-Service -> Encrypter: tokens = encrypter.encrypt(payload)
-activate Encrypter
-deactivate Encrypter
+Service -> TokenManager: tokens = TokenManager.sign(payload)
+activate TokenManager
+deactivate TokenManager
 Service -> RefreshTokenStore: refreshTokenStore.deleteRefreshToken(refreshToken)
 activate RefreshTokenStore
 Service -> RefreshTokenStore: refreshTokenStore.saveRefreshToken(tokens.refreshToken)

@@ -1,16 +1,16 @@
 import { AuthDto } from "../../domain/dto/auth-dto";
-import IEncrypter from "../../services/contracts/encrypter-contract";
 import fs from "fs";
 import path from "path";
 import jwt, { SignOptions, VerifyOptions } from 'jsonwebtoken';
 import { injectable } from "inversify";
+import ITokenManager from "../../services/contracts/token-manager-contract";
 
 const privateKey = fs.readFileSync(path.join(__dirname, '../../../rs256.rsa'), 'utf8');
 const publicKey = fs.readFileSync(path.join(__dirname, '../../../rs256.rsa.pub'), 'utf8');
 
 @injectable()
-export default class JwtAdapter implements IEncrypter {
-    async encrypt(payload: any): Promise<AuthDto> {
+export default class JwtAdapter implements ITokenManager {
+    async sign(payload: any): Promise<AuthDto> {
         const signInOptions: SignOptions = {
             algorithm: 'RS256',
             expiresIn: '3h',
@@ -41,7 +41,7 @@ export default class JwtAdapter implements IEncrypter {
         };
 
     }
-    async decrypt(token: string): Promise<any> {
+    async verify(token: string): Promise<any> {
         const verifyOptions: VerifyOptions = {
             algorithms: ['RS256']
         };

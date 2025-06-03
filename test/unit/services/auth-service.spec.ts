@@ -3,7 +3,7 @@ import { AuthDto } from '../../../src/domain/dto/auth-dto';
 import { BadRequestError } from '../../../src/errors/bad-request-error';
 import { mock, instance, when, verify, anything, reset } from 'ts-mockito';
 import IUserRepository from '../../../src/domain/repositories/user-repository';
-import IEncrypter from '../../../src/services/contracts/encrypter-contract';
+import ITokenManager from '../../../src/services/contracts/token-manager-contract';
 import IPasswordManager from '../../../src/services/contracts/password-manager';
 import IRefreshTokensStore from '../../../src/services/contracts/refresh-tokens-store';
 import { User, Role } from '../../../src/domain/entities/user';
@@ -11,7 +11,7 @@ import { User, Role } from '../../../src/domain/entities/user';
 describe('AuthService', () => {
     let authService: AuthService;
     let mockUserRepository: IUserRepository;
-    let mockEncrypter: IEncrypter;
+    let mockTokenManager: ITokenManager;
     let mockPasswordManager: IPasswordManager;
     let mockRefreshTokenStore: IRefreshTokensStore;
 
@@ -23,13 +23,13 @@ describe('AuthService', () => {
 
     beforeEach(() => {
         mockUserRepository = mock<IUserRepository>();
-        mockEncrypter = mock<IEncrypter>();
+        mockTokenManager = mock<ITokenManager>();
         mockPasswordManager = mock<IPasswordManager>();
         mockRefreshTokenStore = mock<IRefreshTokensStore>();
 
         authService = new AuthService(
             instance(mockUserRepository),
-            instance(mockEncrypter),
+            instance(mockTokenManager),
             instance(mockPasswordManager),
             instance(mockRefreshTokenStore)
         );
@@ -39,7 +39,7 @@ describe('AuthService', () => {
 
     afterEach(() => {
         reset(mockUserRepository);
-        reset(mockEncrypter);
+        reset(mockTokenManager);
         reset(mockPasswordManager);
         reset(mockRefreshTokenStore);
     });
@@ -53,7 +53,7 @@ describe('AuthService', () => {
 
             when(mockUserRepository.getUserByEmail('test@example.com')).thenResolve(testUser);
             when(mockPasswordManager.comparePasswords('password', 'hashedpassword')).thenResolve(true);
-            when(mockEncrypter.encrypt(anything())).thenResolve(testTokens);
+            when(mockTokenManager.sign(anything())).thenResolve(testTokens);
 
             const result = await authService.signIn('test@example.com', 'password');
 
@@ -101,8 +101,8 @@ describe('AuthService', () => {
             const payload = { uid: '123', email: 'test@example.com' };
 
             when(mockRefreshTokenStore.getRefreshToken('old-refresh-token')).thenResolve('stored-token');
-            when(mockEncrypter.decrypt('old-refresh-token')).thenResolve(payload);
-            when(mockEncrypter.encrypt(payload)).thenResolve(newTokens);
+            when(mockTokenManager.verify('old-refresh-token')).thenResolve(payload);
+            when(mockTokenManager.sign(payload)).thenResolve(newTokens);
 
             const result = await authService.refreshToken('old-refresh-token');
 
@@ -122,7 +122,7 @@ describe('AuthService', () => {
         it('should return user when token is valid', async () => {
             const payload = { uid: '123', email: 'test@example.com' };
 
-            when(mockEncrypter.decrypt('valid-token')).thenResolve(payload);
+            when(mockTokenManager.verify('valid-token')).thenResolve(payload);
             when(mockUserRepository.getUserById('123')).thenResolve(testUser);
 
             const result = await authService.validateToken('valid-token');
@@ -135,7 +135,7 @@ describe('AuthService', () => {
         });
 
         it('should throw BadRequestError when token is invalid', async () => {
-            when(mockEncrypter.decrypt('invalid-token')).thenResolve(null);
+            when(mockTokenManager.verify('invalid-token')).thenResolve(null);
 
             await expect(authService.validateToken('invalid-token')).rejects.toThrow(BadRequestError);
         });
@@ -143,7 +143,7 @@ describe('AuthService', () => {
         it('should throw BadRequestError when user is not found', async () => {
             const payload = { uid: '123', email: 'test@example.com' };
 
-            when(mockEncrypter.decrypt('valid-token')).thenResolve(payload);
+            when(mockTokenManager.verify('valid-token')).thenResolve(payload);
             when(mockUserRepository.getUserById('123')).thenResolve(null);
 
             await expect(authService.validateToken('valid-token')).rejects.toThrow(BadRequestError);

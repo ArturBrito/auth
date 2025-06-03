@@ -6,27 +6,32 @@ participant "Service" as Service
 participant "Repository" as Repo
 participant "User" as User
 participant "IPasswordManager" as PassManager
-participant "Encrypter" as Encrypter
+participant "TokenManager" as TokenManager
 participant "RefreshTokenStore" as RefreshTokenStore
 
 
 --> API: POST /api/signin
 API -> Ctrl: signIn(request)
 activate Ctrl
-Ctrl -> Ctrl: {email, password} = request.body
-Ctrl -> Service: signIn(email, password)
+Ctrl -> Ctrl: {email, username, password} = request.body
+Ctrl -> Service: signIn(password, email, username)
 activate Service
-Service -> Repo: user = getUserByEmail(email)
+Service -> Repo: user = getUserByEmail(email, username)
 activate Repo
 deactivate Repo
 alt user not found
+    Service --> Repo: user = getUserByUsername(username)
+    activate Repo
+    deactivate Repo
+    alt user not found
         Service --> API: throw BadRequestError
         
         <-- API: 400 BadRequestError
     end
     note right of Ctrl
         Finish the workflow
-end note
+    end note
+end
 
 Service -> User: user.isActive()
 activate User
@@ -50,9 +55,9 @@ alt password is not valid
     <-- API: 400 BadRequestError
 end
 
-Service -> Encrypter: tokens = encrypter.encrypt({user.id, user.email, user.role, user.isActive})
-activate Encrypter
-deactivate Encrypter
+Service -> TokenManager: tokens = tokenManager.sign({user.id, user.email, user.username, user.role, user.isActive})
+activate TokenManager
+deactivate TokenManager
 
 Service -> RefreshTokenStore: refreshTokenStore.saveRefreshToken(tokens.refreshToken)
 activate RefreshTokenStore

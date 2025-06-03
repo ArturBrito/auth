@@ -4,7 +4,7 @@ import UserService from '../../src/services/user-service';
 import { UserDto } from '../../src/domain/dto/user-dto';
 import { Role } from '../../src/domain/entities/user';
 import { mock, instance, when, anything, verify } from 'ts-mockito';
-import IEncrypter from '../../src/services/contracts/encrypter-contract';
+import ITokenManager from '../../src/services/contracts/token-manager-contract';
 import IRefreshTokensStore from '../../src/services/contracts/refresh-tokens-store';
 import { BadRequestError } from '../../src/errors/bad-request-error';
 import { TYPES } from '../../src/dependency-injection/types';
@@ -14,7 +14,7 @@ import IUserRepository from '../../src/domain/repositories/user-repository';
 describe('AuthService Integration', () => {
     let authService: AuthService;
     let userService: UserService;
-    const mockEncrypter = mock<IEncrypter>();
+    const mockTokenManager = mock<ITokenManager>();
     const mockRefreshTokenStore = mock<IRefreshTokensStore>();
     const userDto: UserDto = {
         email: 'signin@example.com',
@@ -32,7 +32,7 @@ describe('AuthService Integration', () => {
 
         authService = new AuthService(
             container.get(TYPES.IUserRepository),
-            instance(mockEncrypter),
+            instance(mockTokenManager),
             container.get(TYPES.IPasswordManager),
             instance(mockRefreshTokenStore)
         );
@@ -52,7 +52,7 @@ describe('AuthService Integration', () => {
 
             // Mock token generation
             const testTokens = { token: 'test-token', refreshToken: 'test-refresh' };
-            when(mockEncrypter.encrypt(anything())).thenResolve(testTokens);
+            when(mockTokenManager.sign(anything())).thenResolve(testTokens);
             when(mockRefreshTokenStore.saveRefreshToken(anything())).thenResolve();
 
             const result = await authService.signIn(userDto.email, 'ValidPassword1!');
@@ -89,7 +89,7 @@ describe('AuthService Integration', () => {
             
             // Mock token generation
             const testTokens = { token: 'test-token', refreshToken: 'test-refresh' };
-            when(mockEncrypter.encrypt(anything())).thenResolve(testTokens);
+            when(mockTokenManager.sign(anything())).thenResolve(testTokens);
             when(mockRefreshTokenStore.saveRefreshToken(anything())).thenResolve();
 
             const result = await authService.signIn(userDto.email, 'ValidPassword1!');
@@ -118,9 +118,9 @@ describe('AuthService Integration', () => {
             // Mock dependencies
             when(mockRefreshTokenStore.getRefreshToken(oldRefreshToken))
                 .thenResolve(oldRefreshToken); // Token exists in store
-            when(mockEncrypter.decrypt(oldRefreshToken))
-                .thenResolve(payload); // Decrypted payload
-            when(mockEncrypter.encrypt(payload))
+            when(mockTokenManager.verify(oldRefreshToken))
+                .thenResolve(payload); // verifyed payload
+            when(mockTokenManager.sign(payload))
                 .thenResolve(newTokens); // New tokens generated
             when(mockRefreshTokenStore.deleteRefreshToken(oldRefreshToken))
                 .thenResolve(); // Delete old token
@@ -135,8 +135,8 @@ describe('AuthService Integration', () => {
             
             // Verify mock interactions
             verify(mockRefreshTokenStore.getRefreshToken(oldRefreshToken)).once();
-            verify(mockEncrypter.decrypt(oldRefreshToken)).once();
-            verify(mockEncrypter.encrypt(payload)).once();
+            verify(mockTokenManager.verify(oldRefreshToken)).once();
+            verify(mockTokenManager.sign(payload)).once();
             verify(mockRefreshTokenStore.deleteRefreshToken(oldRefreshToken)).once();
             verify(mockRefreshTokenStore.saveRefreshToken(newTokens.refreshToken)).once();
         });

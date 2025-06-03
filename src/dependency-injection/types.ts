@@ -5,7 +5,7 @@ const TYPES = {
     IPasswordManager: Symbol.for('IPasswordManager'),
     IAuthController: Symbol.for('IAuthController'),
     IAuthService: Symbol.for('IAuthService'),
-    IEncrypter: Symbol.for('IEncrypter'),
+    ITokenManager: Symbol.for('ITokenManager'),
     IRefreshTokensStore: Symbol.for('IRefreshTokensStore'),
     EventEmmiter: Symbol.for('EventEmmiter'),
     CreateUserSendEmailHandler: Symbol.for('CreateUserSendEmailHandler'),

@@ -10,7 +10,7 @@ import IAuthService from "../services/contracts/auth-service-contract";
 import AuthService from "../services/auth-service";
 import AuthController from "../controllers/auth-controller";
 import IAuthController from "../controllers/contracts/auth-controller-contract";
-import IEncrypter from "../services/contracts/encrypter-contract";
+import ITokenManager from "../services/contracts/token-manager-contract";
 import IRefreshTokensStore from "../services/contracts/refresh-tokens-store";
 import { EventEmitter } from "events";
 import { EventHandlers } from "../events/event-handlers";
@@ -33,7 +33,7 @@ myContainer.bind<IUserRepository>(TYPES.IUserRepository).to(DI_CONFIG.IUserRepos
 myContainer.bind<IPasswordManager>(TYPES.IPasswordManager).to(DI_CONFIG.IPasswordManager);
 myContainer.bind<IAuthService>(TYPES.IAuthService).to(AuthService);
 myContainer.bind<IAuthController>(TYPES.IAuthController).to(AuthController);
-myContainer.bind<IEncrypter>(TYPES.IEncrypter).to(DI_CONFIG.IEncrypter);
+myContainer.bind<ITokenManager>(TYPES.ITokenManager).to(DI_CONFIG.ITokenManager);
 myContainer.bind<IRefreshTokensStore>(TYPES.IRefreshTokensStore).to(DI_CONFIG.IRefreshTokensStore).inSingletonScope();
 myContainer.bind(TYPES.EventEmmiter).toConstantValue(new EventEmitter());
 myContainer.bind<EventHandlers>(EventHandlers).toSelf();

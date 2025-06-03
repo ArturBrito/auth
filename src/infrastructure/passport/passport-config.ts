@@ -1,13 +1,13 @@
 import passport, { Profile } from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { myContainer } from '../../dependency-injection/inversify.config';
-import IEncrypter from '../../services/contracts/encrypter-contract';
+import ITokenManager from '../../services/contracts/token-manager-contract';
 import { TYPES } from '../../dependency-injection/types';
 import IUserRepository from '../../domain/repositories/user-repository';
 import { Role, User } from '../../domain/entities/user';
 import UserMapper from '../../domain/mapper/user-mapper';
 
-const encrypter = myContainer.get<IEncrypter>(TYPES.IEncrypter);
+const tokenManager = myContainer.get<ITokenManager>(TYPES.ITokenManager);
 const userRepository = myContainer.get<IUserRepository>(TYPES.IUserRepository);
 
 passport.use(
@@ -35,7 +35,7 @@ passport.use(
           await userRepository.updateUser(user);
         }
 
-        const tokens = await encrypter.encrypt({
+        const tokens = await tokenManager.sign({
           uid: user.uid,
           email: user.email,
           role: user.role,

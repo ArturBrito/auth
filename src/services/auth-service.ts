@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { AuthDto } from "../domain/dto/auth-dto";
 import IUserRepository from "../domain/repositories/user-repository";
 import IAuthService from "./contracts/auth-service-contract";
-import IEncrypter from "./contracts/encrypter-contract";
+import ITokenManager from "./contracts/token-manager-contract";
 import { TYPES } from "../dependency-injection/types";
 import IPasswordManager from "./contracts/password-manager";
 import { BadRequestError } from "../errors/bad-request-error";
@@ -13,18 +13,18 @@ import UserMapper from "../domain/mapper/user-mapper";
 @injectable()
 export default class AuthService implements IAuthService {
     private userRepository: IUserRepository;
-    private encrypter: IEncrypter;
+    private tokenManager: ITokenManager;
     private passwordManager: IPasswordManager;
     private refreshTokenStore: IRefreshTokensStore;
 
     constructor(
         @inject(TYPES.IUserRepository) userRepository: IUserRepository,
-        @inject(TYPES.IEncrypter) encrypter: IEncrypter,
+        @inject(TYPES.ITokenManager) tokenManager: ITokenManager,
         @inject(TYPES.IPasswordManager) passwordManager: IPasswordManager,
         @inject(TYPES.IRefreshTokensStore) refreshTokenStore: IRefreshTokensStore
     ) {
         this.userRepository = userRepository;
-        this.encrypter = encrypter;
+        this.tokenManager = tokenManager;
         this.passwordManager = passwordManager;
         this.refreshTokenStore = refreshTokenStore;
     }
@@ -46,7 +46,7 @@ export default class AuthService implements IAuthService {
             throw new BadRequestError('Invalid credentials');
         }
 
-        const tokens = await this.encrypter.encrypt({
+        const tokens = await this.tokenManager.sign({
             uid: user.uid,
             email: user.email,
             role: user.role,
@@ -65,12 +65,12 @@ export default class AuthService implements IAuthService {
             throw new BadRequestError('Invalid refresh token');
         }
 
-        const payload = await this.encrypter.decrypt(refreshToken);
+        const payload = await this.tokenManager.verify(refreshToken);
 
         delete payload.iat;
         delete payload.exp;
 
-        const tokens = await this.encrypter.encrypt(payload);
+        const tokens = await this.tokenManager.sign(payload);
 
         await this.refreshTokenStore.deleteRefreshToken(refreshToken);
         await this.refreshTokenStore.saveRefreshToken(tokens.refreshToken);
@@ -81,7 +81,7 @@ export default class AuthService implements IAuthService {
     async validateToken(token: string): Promise<UserDto> {
         let payload: any;
         try {
-            payload = await this.encrypter.decrypt(token);
+            payload = await this.tokenManager.verify(token);
         } catch (error) {
             throw new BadRequestError('Invalid token');
         }

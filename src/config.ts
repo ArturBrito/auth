@@ -1,4 +1,4 @@
-import JwtAdapter from "./infrastructure/encrypt/jwt-adapter";
+import JwtAdapter from "./infrastructure/token-manager/jwt-adapter";
 import UserInmemoryRepository from "./infrastructure/persistence/inmemory/user/user-inmemory-repository";
 import UserMongoRepository from "./infrastructure/persistence/mongo/user/user-mongo-repository";
 import SetupDbMongo from "./infrastructure/setup/database/setup-mongo";
@@ -9,14 +9,14 @@ import FireBaseUserRepository from "./infrastructure/persistence/firebase/user/u
 import SetupDbFirebase from "./infrastructure/setup/database/setup-firebase";
 import SetupDbInMemory from "./infrastructure/setup/database/setup-inmemory";
 import PasswordDummyAdapter from "./infrastructure/password/dummy-adapter";
-import FirebaseEncryptorAdapter from "./infrastructure/encrypt/firebase-adapter";
+import FirebaseTokenManagerAdapter from "./infrastructure/token-manager/firebase-adapter";
 import BcryptAdapter from "./infrastructure/password/bcrypt-adapter";
 import DummyRefreshToken from "./infrastructure/refresh-tokens/dummy-tokens";
 import DummyEmailClient from "./infrastructure/email/dummy-email-client";
 import NodeMailerClient from "./infrastructure/email/node-mailer-client";
 
 const inMemory = {
-    "IEncrypter": JwtAdapter,
+    "ITokenManager": JwtAdapter,
     "IUserRepository": UserInmemoryRepository,
     "ISetupDb": SetupDbInMemory,
     "IPasswordManager": BcryptAdapter,
@@ -26,7 +26,7 @@ const inMemory = {
 }
 
 const inMemoryWithRedis = {
-    "IEncrypter": JwtAdapter,
+    "ITokenManager": JwtAdapter,
     "IUserRepository": UserInmemoryRepository,
     "ISetupDb": SetupDbInMemory,
     "IPasswordManager": BcryptAdapter,
@@ -36,7 +36,7 @@ const inMemoryWithRedis = {
 }
 
 const mongoWithRedis = {
-    "IEncrypter": JwtAdapter,
+    "ITokenManager": JwtAdapter,
     "IUserRepository": UserMongoRepository,
     "ISetupDb": SetupDbMongo,
     "IPasswordManager": BcryptAdapter,
@@ -46,7 +46,7 @@ const mongoWithRedis = {
 }
 
 const mongoWithoutRedis = {
-    "IEncrypter": JwtAdapter,
+    "ITokenManager": JwtAdapter,
     "IUserRepository": UserMongoRepository,
     "ISetupDb": SetupDbMongo,
     "IPasswordManager": BcryptAdapter,
@@ -56,7 +56,7 @@ const mongoWithoutRedis = {
 }
 
 const firebase = {
-    "IEncrypter": FirebaseEncryptorAdapter,
+    "ITokenManager": FirebaseTokenManagerAdapter,
     "IUserRepository": FireBaseUserRepository,
     "ISetupDb": SetupDbFirebase,
     "IPasswordManager": PasswordDummyAdapter,
