@@ -6,7 +6,7 @@ import IUserRepository from '../../../src/domain/repositories/user-repository';
 import ITokenManager from '../../../src/services/contracts/token-manager-contract';
 import IPasswordManager from '../../../src/services/contracts/password-manager';
 import IRefreshTokensStore from '../../../src/services/contracts/refresh-tokens-store';
-import { User, Role } from '../../../src/domain/entities/user';
+import { User } from '../../../src/domain/entities/user';
 
 describe('AuthService', () => {
     let authService: AuthService;
@@ -18,7 +18,6 @@ describe('AuthService', () => {
     const testUser = User.create({
         email: 'test@example.com',
         password: 'hashedpassword',
-        role: Role.USER
     });
 
     beforeEach(() => {
@@ -72,7 +71,6 @@ describe('AuthService', () => {
             const inactiveUser = User.create({
                 email: 'inactive@example.com',
                 password: 'hashedpassword',
-                role: Role.USER
             });
 
             when(mockUserRepository.getUserByEmail('inactive@example.com')).thenResolve(inactiveUser);
@@ -130,7 +128,6 @@ describe('AuthService', () => {
             expect(result).toEqual({
                 uid: testUser.uid,
                 email: testUser.email,
-                role: testUser.role
             });
         });
 

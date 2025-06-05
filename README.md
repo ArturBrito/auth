@@ -12,7 +12,6 @@ This project provides a ready-to-use authentication system with minimal configur
 The system ensures:
 
 - **Stateless Authentication:** With JWT, user sessions are managed without maintaining server-side state.
-- **Role-Based Access Control:** Permissions can be implemented by encoding roles or privileges into the token claims.
 
 It supports registration and authentication via:
 - **Username and password**
@@ -293,7 +292,7 @@ _Note: Only the success cases are represented here_
 ## User
 ### Register new user
 POST `/api/user`
-* **Description:** Registers a new user with a username and password. The user is created with the role of User
+* **Description:** Registers a new user with a username and password.
 * **Request Body:**
 ```
 {
@@ -306,8 +305,7 @@ POST `/api/user`
 ```
 {
     "uid": "0be9691d-4e1d-4bb9-8376-a40a810bf5af",
-    "email": "artur.brito95@gmail.com",
-    "role": "user"
+    "email": "artur.brito95@gmail.com"
 }
 ```
 
@@ -319,8 +317,7 @@ PUT `/api/user/activate/:email/:activationCode`
 ```
 {
     "uid": "0be9691d-4e1d-4bb9-8376-a40a810bf5af",
-    "email": "artur.brito95@gmail.com",
-    "role": "user"
+    "email": "artur.brito95@gmail.com"
 }
 ```
 

@@ -5,7 +5,6 @@ import IUserRepository from '../../../src/domain/repositories/user-repository';
 import IPasswordManager from '../../../src/services/contracts/password-manager';
 import { EventEmitter } from 'events';
 import { User } from '../../../src/domain/entities/user';
-import { Role } from '../../../src/domain/entities/user';
 import { UserAlreadyRegisteredError } from '../../../src/errors/user-already-registered-error';
 import { InvalidUserError } from '../../../src/errors/invalid-user-error';
 import { UserNotFoundError } from '../../../src/errors/user-not-found-error';
@@ -21,13 +20,11 @@ describe('UserService', () => {
     const testUserDto: UserDto = {
         email: 'test@example.com',
         password: 'ValidPassword1!',
-        role: Role.USER
     };
 
     const testUser = User.create({
         email: 'test@example.com',
         password: 'hashedpassword',
-        role: Role.USER
     });
 
     beforeEach(() => {
@@ -59,7 +56,6 @@ describe('UserService', () => {
             expect(result).toEqual({
                 uid: testUser.uid,
                 email: testUser.email,
-                role: testUser.role
             });
             verify(mockEventEmitter.emit('CreateUserSendEmail', anything())).once();
         });
@@ -84,7 +80,6 @@ describe('UserService', () => {
             const googleUser = User.create({
                 email: 'google@example.com',
                 googleId: 'google-id',
-                role: Role.USER
             });
 
             when(mockUserRepository.getUserByEmail('google@example.com')).thenResolve(googleUser);
@@ -99,7 +94,6 @@ describe('UserService', () => {
             expect(result).toEqual({
                 uid: googleUser.uid,
                 email: googleUser.email,
-                role: googleUser.role
             });
             verify(mockEventEmitter.emit('CreateUserSendEmail', anything())).once();
         });
@@ -116,7 +110,6 @@ describe('UserService', () => {
             const inactiveUser = User.create({
                 email: 'inactive@example.com',
                 password: 'hashedpassword',
-                role: Role.USER
             });
 
             when(mockUserRepository.getUserByEmail('inactive@example.com')).thenResolve(inactiveUser);
@@ -127,7 +120,6 @@ describe('UserService', () => {
             expect(result).toEqual({
                 uid: inactiveUser.uid,
                 email: inactiveUser.email,
-                role: inactiveUser.role
             });
             expect(inactiveUser.isActive).toBe(true);
         });
@@ -152,7 +144,6 @@ describe('UserService', () => {
             const activatedUser = User.create({
                 email: 'active@example.com',
                 password: 'hashedpassword',
-                role: Role.USER
             });
             activatedUser.activateUser(activatedUser.activationCode.code);
 
@@ -181,7 +172,6 @@ describe('UserService', () => {
             const expiredUser = User.create({
                 email: 'expired@example.com',
                 password: 'hashedpassword',
-                role: Role.USER
             });
 
             when(mockUserRepository.getUserByEmail(expiredUser.email)).thenResolve(expiredUser);
@@ -193,7 +183,6 @@ describe('UserService', () => {
             const existingUser = User.create({
                 email: 'expired@example.com',
                 password: 'hashedpassword',
-                role: Role.USER,
                 isActive: true
             });
 
@@ -208,7 +197,6 @@ describe('UserService', () => {
             const expiredUser = User.create({
                 email: 'expired@example.com',
                 password: 'hashedpassword',
-                role: Role.USER,
                 isActive: true
             });
             expiredUser.generateResetCode();
@@ -228,7 +216,6 @@ describe('UserService', () => {
             const user = User.create({
                 email: 'expired@example.com',
                 password: 'hashedpassword',
-                role: Role.USER,
                 isActive: true
             });
             user.generateResetCode();
@@ -292,7 +279,6 @@ describe('UserService', () => {
             const existingUser = User.create({
                 email: testUserDto.email,
                 password: 'hashedpassword',
-                role: Role.USER,
                 isActive: true
             });
 
@@ -316,7 +302,6 @@ describe('UserService', () => {
             const inactiveUser = User.create({
                 email: testUserDto.email,
                 password: 'hashedpassword',
-                role: Role.USER
             });
 
             when(mockUserRepository.getUserByEmail(testUserDto.email)).thenResolve(inactiveUser);
@@ -328,7 +313,6 @@ describe('UserService', () => {
             const existingUser = User.create({
                 email: testUserDto.email,
                 password: 'hashedpassword',
-                role: Role.USER,
                 isActive: true
             });
 
@@ -352,7 +336,6 @@ describe('UserService', () => {
             const inactiveUser = User.create({
                 email: 'inactive@example.com',
                 password: 'hashedpassword',
-                role: Role.USER
             });
 
             // Force expiration
@@ -371,7 +354,6 @@ describe('UserService', () => {
             const inactiveUser = User.create({
                 email: 'inactive@example.com',
                 password: 'hashedpassword',
-                role: Role.USER
             });
 
             when(mockUserRepository.getUserByEmail('inactive@example.com')).thenResolve(inactiveUser);
@@ -384,7 +366,6 @@ describe('UserService', () => {
             const activeUser = User.create({
                 email: testUserDto.email,
                 password: 'hashedpassword',
-                role: Role.USER,
                 isActive: true
             });
 
@@ -411,7 +392,6 @@ describe('UserService', () => {
             const userToDelete = User.create({
                 email: testUserDto.email,
                 password: 'hashedpassword',
-                role: Role.USER,
                 isActive: true
             });
 

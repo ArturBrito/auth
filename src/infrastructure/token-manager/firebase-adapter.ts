@@ -13,7 +13,6 @@ export default class FirebaseTokenManagerAdapter implements ITokenManager {
         return {
             uid: decodedToken.uid,
             email: decodedToken.email,
-            role: decodedToken.role,
             isActive: decodedToken.email_verified
         };
     }

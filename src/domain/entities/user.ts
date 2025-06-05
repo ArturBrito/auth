@@ -8,7 +8,6 @@ interface UserProps {
     uid?: string;
     email: string;
     password?: string;
-    role: string;
     createdAt?: Date;
     isActive?: boolean;
     activationCode?: Code;
@@ -20,7 +19,6 @@ export class User {
     private readonly _uid: string;
     private _email: string;
     private _password: string;
-    private _role: Role;
     private _createdAt: Date;
     private _isActive: boolean;
     private _activationCode: Code;
@@ -31,7 +29,6 @@ export class User {
         this._uid = props.uid || uuid();
         this._email = props.email;
         this._password = props.password || '';
-        this._role = props.role as Role || Role.USER;
         this._createdAt = props.createdAt || new Date();
         this._isActive = props.isActive || false;
         this._activationCode = props.activationCode || new Code(uuid());
@@ -49,10 +46,6 @@ export class User {
 
     get password(): string {
         return this._password;
-    }
-
-    get role(): Role {
-        return this._role;
     }
 
     get createdAt(): Date {
@@ -159,11 +152,4 @@ export class User {
         this._activationCode = null;
     }
 
-}
-
-
-export enum Role {
-    ADMIN = 'admin',
-    USER = 'user',
-    MANAGER = 'manager'
 }

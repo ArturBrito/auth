@@ -2,7 +2,6 @@ import { container } from '../setup';
 import AuthService from '../../src/services/auth-service';
 import UserService from '../../src/services/user-service';
 import { UserDto } from '../../src/domain/dto/user-dto';
-import { Role } from '../../src/domain/entities/user';
 import { mock, instance, when, anything, verify } from 'ts-mockito';
 import ITokenManager from '../../src/services/contracts/token-manager-contract';
 import IRefreshTokensStore from '../../src/services/contracts/refresh-tokens-store';
@@ -28,7 +27,6 @@ describe('AuthService with RedisRefreshTokenStore Integration', () => {
     const userDto: UserDto = {
         email: 'signin@example.com',
         password: 'ValidPassword1!',
-        role: Role.USER
     };
 
     beforeAll(() => {
@@ -71,7 +69,6 @@ describe('AuthService with RedisRefreshTokenStore Integration', () => {
             const userDto: UserDto = {
                 email: 'tokenuser@example.com',
                 password: 'ValidPassword1!',
-                role: Role.USER
             };
 
             await userService.createUser(userDto);
@@ -112,7 +109,6 @@ describe('AuthService with RedisRefreshTokenStore Integration', () => {
             const payload = {
                 uid: 'user-123',
                 email: 'user@example.com',
-                role: Role.USER
             };
 
             // Mock dependencies
@@ -157,7 +153,6 @@ describe('AuthService Integration', () => {
     const userDto: UserDto = {
         email: 'signin@example.com',
         password: 'ValidPassword1!',
-        role: Role.USER
     };
 
     beforeAll(() => {
@@ -208,7 +203,6 @@ describe('AuthService Integration', () => {
             const userDto: UserDto = {
                 email: 'tokenuser@example.com',
                 password: 'ValidPassword1!',
-                role: Role.USER
             };
 
             await userService.createUser(userDto);
@@ -250,7 +244,6 @@ describe('AuthService Integration', () => {
             const payload = { 
                 uid: 'user-123', 
                 email: 'user@example.com', 
-                role: Role.USER 
             };
         
             // Mock dependencies

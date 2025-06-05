@@ -22,7 +22,6 @@ describe('Authentication API', () => {
 
             expect(response.body).toHaveProperty('uid');
             expect(response.body).toHaveProperty('email');
-            expect(response.body).toHaveProperty('role');
         });
 
         it('should return 403 for existing email', async () => {
@@ -330,7 +329,6 @@ describe('Authentication API', () => {
 
             expect(response.body).toHaveProperty('uid');
             expect(response.body).toHaveProperty('email');
-            expect(response.body).toHaveProperty('role');
         });
 
         it('should return 400 for invalid token', async () => {

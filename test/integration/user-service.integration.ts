@@ -1,7 +1,6 @@
 import { container } from '../setup';
 import UserService from '../../src/services/user-service';
 import { UserDto } from '../../src/domain/dto/user-dto';
-import { Role } from '../../src/domain/entities/user';
 import { mock, instance, when } from 'ts-mockito';
 import { EventEmitter } from 'events';
 import { TYPES } from '../../src/dependency-injection/types';
@@ -28,14 +27,12 @@ describe('UserService Integration', () => {
       const userDto: UserDto = {
         email: 'test@example.com',
         password: 'ValidPassword1!',
-        role: Role.USER
       };
 
       const result = await userService.createUser(userDto);
       
       expect(result).toMatchObject({
         email: userDto.email,
-        role: userDto.role
       });
       expect(result.uid).toBeDefined();
     });
@@ -44,7 +41,6 @@ describe('UserService Integration', () => {
       const userDto: UserDto = {
         email: 'duplicate@example.com',
         password: 'ValidPassword1!',
-        role: Role.USER
       };
 
       await userService.createUser(userDto);
@@ -58,7 +54,6 @@ describe('UserService Integration', () => {
       const userDto: UserDto = {
         email: 'activate@example.com',
         password: 'ValidPassword1!',
-        role: Role.USER
       };
 
       // Create user
@@ -87,7 +82,6 @@ describe('UserService Integration', () => {
       const userDto: UserDto = {
         email: 'invalidcode@example.com',
         password: 'ValidPassword1!',
-        role: Role.USER
       };
 
       await userService.createUser(userDto);
@@ -102,7 +96,6 @@ describe('UserService Integration', () => {
       const userDto: UserDto = {
         email: 'changepass@example.com',
         password: 'OriginalPassword1!',
-        role: Role.USER
       };
 
       await userService.createUser(userDto);
@@ -121,7 +114,6 @@ describe('UserService Integration', () => {
       const userDto: UserDto = {
         email: 'wrongpass@example.com',
         password: 'OriginalPassword1!',
-        role: Role.USER
       };
 
       await userService.createUser(userDto);

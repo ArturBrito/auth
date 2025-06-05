@@ -1,4 +1,4 @@
-import { User, Role } from '../../../src/domain/entities/user';
+import { User } from '../../../src/domain/entities/user';
 import { Code } from '../../../src/domain/entities/code';
 import { InvalidUserError } from '../../../src/errors/invalid-user-error';
 import { BadRequestError } from '../../../src/errors/bad-request-error';
@@ -7,7 +7,6 @@ describe('User', () => {
     const validProps = {
         email: 'test@example.com',
         password: 'ValidPassword1!',
-        role: Role.USER
     };
 
     describe('create', () => {
@@ -16,7 +15,6 @@ describe('User', () => {
 
             expect(user).toBeInstanceOf(User);
             expect(user.email).toBe(validProps.email);
-            expect(user.role).toBe(validProps.role);
             expect(user.isActive).toBe(false);
             expect(user.activationCode).toBeDefined();
         });

@@ -4,7 +4,7 @@ import { myContainer } from '../../dependency-injection/inversify.config';
 import ITokenManager from '../../services/contracts/token-manager-contract';
 import { TYPES } from '../../dependency-injection/types';
 import IUserRepository from '../../domain/repositories/user-repository';
-import { Role, User } from '../../domain/entities/user';
+import { User } from '../../domain/entities/user';
 import UserMapper from '../../domain/mapper/user-mapper';
 
 const tokenManager = myContainer.get<ITokenManager>(TYPES.ITokenManager);
@@ -25,8 +25,7 @@ passport.use(
         if (!user) {
           user = User.create({
             googleId: profile.id,
-            email: profile.emails?.[0].value,
-            role: Role.USER
+            email: profile.emails?.[0].value
           });
           
           await userRepository.createUser(user);
@@ -38,7 +37,6 @@ passport.use(
         const tokens = await tokenManager.sign({
           uid: user.uid,
           email: user.email,
-          role: user.role,
           isActive: false
         })
 

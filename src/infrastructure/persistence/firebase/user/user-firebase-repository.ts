@@ -17,16 +17,12 @@ export default class FireBaseUserRepository implements IUserRepository {
                 password: user.password
             });
 
-            await admin.auth().setCustomUserClaims(user.uid, {
-                role: user.role
-            });
             const activationLink = await admin.auth().generateEmailVerificationLink(user.email);
             
             const newUser = User.create({
                 uid: user.uid,
                 email: user.email,
                 password: "",
-                role: user.role,
                 isActive: false,
                 activationCode: new Code(activationLink)
             });
@@ -45,7 +41,6 @@ export default class FireBaseUserRepository implements IUserRepository {
                 uid: userRecord.uid,
                 email: userRecord.email,
                 password: "",
-                role: userRecord.customClaims.role,
                 isActive: userRecord.emailVerified
             })
 
@@ -61,7 +56,6 @@ export default class FireBaseUserRepository implements IUserRepository {
                 uid: userRecord.uid,
                 email: userRecord.email,
                 password: "",
-                role: userRecord.customClaims.role,
                 isActive: userRecord.emailVerified
             })
 

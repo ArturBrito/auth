@@ -49,7 +49,6 @@ export default class AuthService implements IAuthService {
         const tokens = await this.tokenManager.sign({
             uid: user.uid,
             email: user.email,
-            role: user.role,
             isActive: user.isActive
         });
 

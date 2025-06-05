@@ -1,21 +1,19 @@
 import { IUserPersistence } from "../../data-model/user.datamodel";
 import UserCodesDto from "../dto/user-codes-dto";
 import { UserDto } from "../dto/user-dto";
-import { Role, User } from "../entities/user";
+import { User } from "../entities/user";
 
 export default class UserMapper {
     static toDto(user: User): UserDto {
         return {
             uid: user.uid,
             email: user.email,
-            role: user.role
         };
     }
     static toEntity(userPersistence: IUserPersistence): User {
         const user = User.create({
             uid: userPersistence.uid,
             email: userPersistence.email,
-            role: userPersistence.role as Role,
             createdAt: userPersistence.createdAt,
             isActive: userPersistence.isActive,
             password: userPersistence.password,
@@ -23,11 +21,10 @@ export default class UserMapper {
         });
         return user;
     }
-    static tokenToDto(user: {uid: string, email: string, role: string}): UserDto {
+    static tokenToDto(user: {uid: string, email: string}): UserDto {
         return {
             uid: user.uid,
             email: user.email,
-            role: user.role
         };
     }
     static toPersistence(user: User): IUserPersistence {
@@ -35,7 +32,6 @@ export default class UserMapper {
             uid: user.uid,
             email: user.email,
             password: user.password,
-            role: user.role,
             createdAt: user.createdAt,
             isActive: user.isActive,
             googleId: user.googleId,

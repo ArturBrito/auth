@@ -55,7 +55,7 @@ alt password is not valid
     <-- API: 400 BadRequestError
 end
 
-Service -> TokenManager: tokens = tokenManager.sign({user.id, user.email, user.username, user.role, user.isActive})
+Service -> TokenManager: tokens = tokenManager.sign({user.id, user.email, user.username, user.isActive})
 activate TokenManager
 deactivate TokenManager
 

@@ -230,7 +230,6 @@ export default class UserService implements IUserService {
         const user = User.create({
             email: userDto.email,
             password: hashedPassword,
-            role: userDto.role
         });
 
         // save user

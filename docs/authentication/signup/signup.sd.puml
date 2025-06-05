@@ -72,7 +72,7 @@ alt user exist and have googleId
     end note
 end
 
-Service -> User: user = User.create(userDto.email, hashedPassword, role: userDto.role)
+Service -> User: user = User.create(userDto.email, hashedPassword)
 activate User
 deactivate User
 Service -> Repo: newUser = createUser(user)
