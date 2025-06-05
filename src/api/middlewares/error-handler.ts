@@ -9,12 +9,12 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   if (err instanceof CustomError) {
-    return res.status(err.statusCode).send({ errors: err.serializeErrors() });
+    return res.status(err.statusCode).send(err.serializeErrors());
   }
 
   logger.error(err);
   
   res.status(400).send({
-    errors: [{ message: 'Something went wrong' }]
+    message: 'Something went wrong'
   });
 };

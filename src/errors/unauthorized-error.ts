@@ -10,6 +10,9 @@ export class UnauthorizedError extends CustomError {
   }
 
   serializeErrors() {
-    return [{ message: 'Unauthorized' }];
+    return {
+      statusCode: this.statusCode,
+      message: 'Unauthorized'
+    };
   }
 }

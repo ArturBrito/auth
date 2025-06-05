@@ -34,7 +34,7 @@ describe('Authentication API', () => {
                 .send(existingUser)
                 .expect(403);
 
-            expect(response.body.errors[0].message).toBe('User already registered');
+            expect(response.body.message).toBe('User already registered');
         });
 
         it('should return 400 for invalid email format', async () => {
@@ -47,7 +47,7 @@ describe('Authentication API', () => {
                 .send(invalidUser)
                 .expect(400);
 
-            expect(response.body.errors[0].message).toBe('Email must be valid');
+            expect(response.body.message).toBe('Email must be valid');
         });
 
         it('should return 400 for weak password', async () => {
@@ -60,7 +60,7 @@ describe('Authentication API', () => {
                 .send(weakUser)
                 .expect(400);
 
-            expect(response.body.errors[0].message).toBe('Password does not meet requirements');
+            expect(response.body.message).toBe('Password does not meet requirements');
         });
     });
 
@@ -71,7 +71,7 @@ describe('Authentication API', () => {
                 .send({ email: testUser.email })
                 .expect(400);
 
-            expect(response.body.errors[0].message).toBe('You\'ve already requested an activation code. Please wait for the code to expire before requesting a new one.');
+            expect(response.body.message).toBe('You\'ve already requested an activation code. Please wait for the code to expire before requesting a new one.');
         });
 
         it('should return 404 for non-existent email', async () => {
@@ -79,7 +79,7 @@ describe('Authentication API', () => {
                 .post('/api/user/resend-activation-code')
                 .send({ email: 'nonvalidemail@mail.com' })
                 .expect(404);
-            expect(response.body.errors[0].message).toBe('User not Found');
+            expect(response.body.message).toBe('User not Found');
         });
 
         it('should return 200 and resend activation code', async () => {
@@ -101,7 +101,7 @@ describe('Authentication API', () => {
                 .get(`/api/user/activate/${testUser.email}/invalid-code`)
                 .expect(400);
 
-            expect(response.body.errors[0].message).toBe('Invalid activation code');
+            expect(response.body.message).toBe('Invalid activation code');
         });
 
         it('should activate user with valid code', async () => {
@@ -139,7 +139,7 @@ describe('Authentication API', () => {
                 })
                 .expect(400);
 
-            expect(response.body.errors[0].message).toBe('Invalid credentials');
+            expect(response.body.message).toBe('Invalid credentials');
         });
 
         it('should return 400 for missing credentials', async () => {
@@ -148,7 +148,7 @@ describe('Authentication API', () => {
                 .send({})
                 .expect(400);
 
-            expect(response.body.errors[0].message).toBe('Email must be valid');
+            expect(response.body.message).toBe('Email must be valid');
         });
     });
 
@@ -171,7 +171,7 @@ describe('Authentication API', () => {
                 .send({ refreshToken: 'invalid-token' })
                 .expect(400);
 
-            expect(response.body.errors[0].message).toBe('Invalid refresh token');
+            expect(response.body.message).toBe('Invalid refresh token');
         });
     });
 
@@ -185,7 +185,7 @@ describe('Authentication API', () => {
                 })
                 .expect(404);
 
-            expect(response.body.errors[0].message).toBe('Invalid token');
+            expect(response.body.message).toBe('Invalid token');
         });
 
         it('should return 404 for wrong password', async () => {
@@ -198,7 +198,7 @@ describe('Authentication API', () => {
                 })
                 .expect(404);
 
-            expect(response.body.errors[0].message).toBe('User not Found');
+            expect(response.body.message).toBe('User not Found');
 
         });
 
@@ -237,7 +237,7 @@ describe('Authentication API', () => {
                 .post('/api/user/reset-password-request')
                 .send({ email: 'nonexisting@mail.com' })
                 .expect(404);
-            expect(response.body.errors[0].message).toBe('User not Found');
+            expect(response.body.message).toBe('User not Found');
         });
         it('should return 200 and send reset code for existing user', async () => {
             const response = await request(app)
@@ -257,7 +257,7 @@ describe('Authentication API', () => {
                     newPassword: 'NewValidPassword2!'
                 })
                 .expect(404);
-            expect(response.body.errors[0].message).toBe('User not Found');
+            expect(response.body.message).toBe('User not Found');
         });
 
         it('should return 404 for invalid reset code', async () => {
@@ -269,7 +269,7 @@ describe('Authentication API', () => {
                     newPassword: 'NewValidPassword2!'
                 })
                 .expect(404);
-            expect(response.body.errors[0].message).toBe('User not Found');
+            expect(response.body.message).toBe('User not Found');
         });
 
         it('should return 400 for invalid new password', async () => {
@@ -284,7 +284,7 @@ describe('Authentication API', () => {
                     newPassword: 'weak'
                 })
                 .expect(400);
-            expect(response.body.errors[0].message).toBe('Password does not meet requirements');
+            expect(response.body.message).toBe('Password does not meet requirements');
         });
 
         it('should return 204 for valid reset password', async () => {
@@ -341,7 +341,7 @@ describe('Authentication API', () => {
                 })
                 .expect(400);
 
-            expect(response.body.errors[0].message).toBe('Invalid token');
+            expect(response.body.message).toBe('Invalid token');
         });
     });
 });

@@ -12,6 +12,9 @@ export class InvalidUserError extends CustomError {
   }
 
   serializeErrors() {
-    return [{ message: this.reason }];
+    return {
+      statusCode: this.statusCode,
+      message: this.reason
+    };
   }
 }

@@ -10,6 +10,9 @@ export class UserNotFoundError extends CustomError {
   }
 
   serializeErrors() {
-    return [{ message: 'User not Found' }];
+    return {
+      statusCode: this.statusCode,
+      message: 'User not Found'
+    };
   }
 }

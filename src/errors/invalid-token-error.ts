@@ -10,6 +10,9 @@ export class InvalidTokenError extends CustomError {
   }
 
   serializeErrors() {
-    return [{ message: 'Invalid token' }];
+    return {
+      statusCode: this.statusCode,
+      message: 'Invalid token'
+    };
   }
 }
