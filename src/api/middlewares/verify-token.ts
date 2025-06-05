@@ -4,7 +4,6 @@ import { Request, Response, NextFunction } from "express";
 import { UserDto } from "../../domain/dto/user-dto";
 import ITokenManager from "../../services/contracts/token-manager-contract";
 import { TYPES } from "../../dependency-injection/types";
-import { InvalidTokenError } from "../../errors/invalid-token-error";
 import UserMapper from "../../domain/mapper/user-mapper";
 import { BadRequestError } from "../../errors/bad-request-error";
 
@@ -31,13 +30,13 @@ export default class VerifyToken implements IVerifyToken {
             const idToken = req.headers.authorization?.split('Bearer ')[1];
 
             if (!idToken) {
-                throw new InvalidTokenError();
+                throw new BadRequestError('Invalid token');
             }
 
             const decodedToken = await this.tokenManager.verify(idToken);
 
             if (!decodedToken) {
-                throw new InvalidTokenError();
+                throw new BadRequestError('Invalid token');
             }
 
             if (!decodedToken.isActive) {
@@ -47,7 +46,7 @@ export default class VerifyToken implements IVerifyToken {
             req.currentUser = UserMapper.tokenToDto(decodedToken);
             next();
         } catch (error) {
-            next(new InvalidTokenError());
+            next(new BadRequestError('Invalid token'));
         }
     }
 

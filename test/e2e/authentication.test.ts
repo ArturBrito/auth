@@ -183,7 +183,7 @@ describe('Authentication API', () => {
                     password: testUser.password,
                     newPassword: 'NewValidPassword1!'
                 })
-                .expect(404);
+                .expect(400);
 
             expect(response.body.message).toBe('Invalid token');
         });
