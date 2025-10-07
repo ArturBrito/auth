@@ -6,4 +6,5 @@ export default interface IAuthController {
     googleSignIn(req: Request, res: Response, next: NextFunction);
     googleCallback(req: Request, res: Response, next: NextFunction);
     validateToken(req: Request, res: Response, next: NextFunction);
+    signOut(req: Request, res: Response, next: NextFunction);
 }

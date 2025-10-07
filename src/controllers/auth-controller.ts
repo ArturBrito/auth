@@ -36,6 +36,14 @@ export default class AuthController implements IAuthController {
         try {
             const { refreshToken } = req.body;
             const tokens = await this.authService.refreshToken(refreshToken);
+            const cookieOptions = {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax' as 'lax',
+                maxAge: 24 * 60 * 60 * 1000 // 1 day
+            };
+            res.cookie('token', tokens.token, cookieOptions);
+            res.cookie('refreshToken', tokens.refreshToken, cookieOptions);
             res.status(200).json(tokens);
         } catch (error) {
             next(error);
@@ -45,6 +53,14 @@ export default class AuthController implements IAuthController {
         try {
             const { email, password } = req.body;
             const tokens = await this.authService.signIn(email, password);
+            const cookieOptions = {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax' as 'lax',
+                maxAge: 3 * 60 * 60 * 1000 // 3 hours
+            };
+            res.cookie('token', tokens.token, cookieOptions);
+            res.cookie('refreshToken', tokens.refreshToken, { ...cookieOptions, maxAge: 24 * 60 * 60 * 1000 });
             res.status(200).json(tokens);
         } catch (error) {
             next(error);
@@ -55,6 +71,23 @@ export default class AuthController implements IAuthController {
             const { token } = req.body;
             const isValid = await this.authService.validateToken(token);
             res.status(200).json(isValid);
+        } catch (error) {
+            next(error);
+        }
+    }
+    async signOut(req: Request, res: Response, next: NextFunction) {
+        try {
+            // Prefer cookie refreshToken, fallback to body
+            const refreshToken = req.cookies?.refreshToken || req.body.refreshToken;
+            if (refreshToken) {
+                await this.authService.signOut(refreshToken);
+            }
+
+            // Clear cookies
+            res.clearCookie('token');
+            res.clearCookie('refreshToken');
+
+            res.status(200).json({ success: true });
         } catch (error) {
             next(error);
         }

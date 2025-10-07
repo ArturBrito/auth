@@ -35,6 +35,10 @@ export default (app: Router) => {
         validateRequest,
         (req: Request, res: Response, next: NextFunction) => ctrl.refreshToken(req, res, next));
 
+    // sign out route: optional refreshToken in body, or will use cookie
+    router.post('/signout',
+        (req: Request, res: Response, next: NextFunction) => ctrl.signOut(req, res, next));
+
     router.get(
         '/google',
         (req: Request, res: Response, next: NextFunction) => ctrl.googleSignIn(req, res, next));

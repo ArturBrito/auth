@@ -27,7 +27,8 @@ export default class VerifyToken implements IVerifyToken {
 
     async verifyToken(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const idToken = req.headers.authorization?.split('Bearer ')[1];
+            // Prefer token from httpOnly cookie, fallback to Authorization header
+            const idToken = req.cookies?.token || req.headers.authorization?.split('Bearer ')[1];
 
             if (!idToken) {
                 throw new BadRequestError('Invalid token');

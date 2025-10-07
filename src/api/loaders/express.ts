@@ -2,6 +2,7 @@ import { Application, NextFunction } from "express";
 import { json } from 'body-parser';
 import routes from "../routes";
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { errorHandler } from "../middlewares/error-handler";
 import { NotFoundError } from "../../errors/not-found-error";
 import 'express-async-errors';
@@ -15,6 +16,7 @@ export default ({ app }: { app: Application }) => {
 
     app.set('trust proxy', true);
     app.use(cors());
+    app.use(cookieParser());
     app.use(json());
 
     app.use('/api', routes());
