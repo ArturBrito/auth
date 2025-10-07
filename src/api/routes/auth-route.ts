@@ -26,13 +26,13 @@ export default (app: Router) => {
         validateRequest,
         (req: Request, res: Response, next: NextFunction) => ctrl.signIn(req, res, next));
     router.post('/refreshtoken',
-        [
+        /*[
             body('refreshToken')
                 .trim()
                 .notEmpty()
                 .withMessage('You must supply a refresh token')
         ],
-        validateRequest,
+        validateRequest,*/
         (req: Request, res: Response, next: NextFunction) => ctrl.refreshToken(req, res, next));
 
     // sign out route: optional refreshToken in body, or will use cookie

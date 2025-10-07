@@ -34,7 +34,7 @@ export default class AuthController implements IAuthController {
     }
     async refreshToken(req: Request, res: Response, next: NextFunction) {
         try {
-            const { refreshToken } = req.body;
+            const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
             const tokens = await this.authService.refreshToken(refreshToken);
             const cookieOptions = {
                 httpOnly: true,
